@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>회원가입</title>
+</head>
+<body>
+<div>
+  <form action="api/users/join" method="post" id="joinForm">
+    <div>
+      <label for="email">이메일</label>
+      <input type="text" id="email" name="email" required placeholder="이메일을 입력해주세요.">
+      <button type="button">인증번호받기</button>
+    </div>
+
+    <div>
+      <label for="emailCertification"></label>
+      <input type="text" id="emailCertification" name="emailCertification"
+             placeholder="인증번호를 입력해주세요.">
+      <button type="button">인증번호확인</button>
+    </div>
+
+    <div>
+      <label for="password">패스워드</label>
+      <input type="password" id="password" name="password" required placeholder="비밀번호를 입력해주세요.">
+    </div>
+
+    <div>
+      <label for="checkPassword">패스워드 확인</label>
+      <input type="password" id="checkPassword" name="checkPassword" required placeholder="비밀번호 확인">
+    </div>
+
+    <div>
+      <label for="nickname"></label>
+      <input type="text" id="nickname" name="nickname" required placeholder="사용할 유저명을 입력해주세요.">
+      <button type="button">중복확인</button>
+    </div>
+
+    <button type="submit" id="joinBtn">회원가입</button>
+  </form>
+</div>
+<script src="/js/join/join.js"></script>
+</body>
+</html>
