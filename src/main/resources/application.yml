@@ -1,10 +1,11 @@
 spring:
   application:
     name: fluffytime
+
   datasource:
-    url: jdbc:mysql://localhost:3306/{?? ??}
-    username: { ??? }
-    password: { ???? }
+    url: jdbc:mysql://localhost:3306/fluffydb
+    username: root
+    password: 12qwaszx!@
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -14,3 +15,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+  security:
+    user:
+      name: 1
+      password: 1
