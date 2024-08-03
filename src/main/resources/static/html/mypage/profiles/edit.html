@@ -4,25 +4,57 @@
   <meta charset="UTF-8">
   <title>프로필 편집</title>
   <script src="/js/mypage/profiles/profile.js" defer></script>
+  <link rel=stylesheet href="/css/mypage/profiles/edit.css">
 </head>
 <body>
-<h1>프로필 편집 페이지</h1>
-<p><span>사진</span><span>     닉네임 : </span><span id="nickname"></span>
-  <button>사진변경</button>
-</p>
-<p>이메일 : <span id="email"></span></p>
-<p>유저명 : <span id="username"></span>
+<h3>프로필 편집 페이지</h3>
+
+<form id="profile_edit_form">
+  <p><span>[사진이 들어갈 곳]     </span><span id="nickname"></span> <span><input type="file" value="사진 번경"
+                                                                           id="profile_picture"></span>
+  </p>
+
+  <p>이메일 : <span id="email"></span></p><br>
+
+  <label for="username">유저명</label><br>
+  <input type="text" id="username">
   <button>중복확인</button>
-</p>
-<p>소개 : <span id="intro"></span></p>
-<p>반려동물 이름 : <span id="pet_name"></span></p>
-<p>반려동물 성별 : <span id="pet_sex"></span></p>
-<p>반려동물 나이 : <span id="pet_age"></span></p>
-<p>반려동물 카테고리 : <span id="pet_category"></span></p>
+  <br><br>
+
+  <label for="intro">소개</label><br>
+  <input type="text" id="intro"><br><br>
+
+  <label for="pet_name">반려동물 이름</label><br>
+  <input type="text" id="pet_name"><br><br>
+
+  <label for="pet_sex">반려동물 성별</label><br>
+  <select id="pet_sex">>
+    <option value="수컷" id="male">수컷</option>
+    <option value="암컷" id="female">암컷</option>
+  </select><br><br>
+
+
+  <label for="pet_age">반려동물 나이</label><br>
+  <select id="pet_age"></select><br><br>
+
+  <label for="pet_category">반려동물 카테고리</label><br>
+  <select id="pet_category">
+    <option value="강아지" id="dog">강아지</option>
+    <option value="고양이" id="cat">고양이</option>
+    <option value="도마뱀" id="lizard">도마뱀</option>
+    <option value="앵무새" id="parrot">앵무새</option>
+  </select>
+  <br><br>
+
+  <label for="public_status">계정 공개</label>
+  <input hidden type="checkbox" id="public_status"/><label for="public_status" id="switch"></label>
+  <br><br>
+  <input type="submit" value="제출">
+</form>
+
 <p>차단 계정</p>
 <p>계정 삭제
   <button>삭제</button>
 </p>
-<button id="testBtn">API 테스트 버튼</button>
 </body>
 </html>

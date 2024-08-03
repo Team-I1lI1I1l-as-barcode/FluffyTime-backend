@@ -42,8 +42,5 @@ public class Profile {
         this.publicStatus = "1";
     }
 
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
 
 }
