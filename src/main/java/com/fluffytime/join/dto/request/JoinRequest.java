@@ -1,4 +1,4 @@
-package com.fluffytime.join.request;
+package com.fluffytime.join.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class JoinRequestDto {
+public class JoinRequest {
 
     @NotBlank
     @Email
@@ -19,6 +19,6 @@ public class JoinRequestDto {
     private String password;
 
     @NotBlank
-    @Size(max = 100, message = "닉네임은 20자 까지만 작성 가능합니다.")
+    @Size(max = 20)
     private String nickname;
 }
