@@ -20,3 +20,23 @@ spring:
     user:
       name: 1234
       password: 1234
+
+  ## GMail 설정
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: andcl1227@gmail.com
+    password: fcqt tawt uyju ozto
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1234
+      timeout: 5000
