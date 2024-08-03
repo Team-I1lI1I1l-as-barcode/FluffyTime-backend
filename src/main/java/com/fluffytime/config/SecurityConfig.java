@@ -16,9 +16,11 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/static/html/mypage/**", "/static/html/mypage/profiles/**",
-                    "static/js/mypage/**", "static/js/mypage/profiles/**", "/login", "/",
-                    "/mypage/{id}",
-                    " /mypage/profile/edit/{id}", "/api/mypage/info", "/api/mypage/profiles/info")
+                    "static/js/mypage/**", "static/js/mypage/profiles/**", "/static/css/mypage/**",
+                    "/static/css/mypage/profiles/**",
+                    "/login", "/",
+                    "/mypage/{id}", " /mypage/profile/edit/{id}", "/api/mypage/info",
+                    "/api/mypage/profiles/info")
                 .permitAll()
                 .anyRequest().authenticated()
             )

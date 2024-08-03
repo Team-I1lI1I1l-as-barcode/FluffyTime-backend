@@ -20,7 +20,7 @@ window.onload = function () {
   let pet_name = document.getElementById("pet_name"); // 반려동물 이름
   let pet_sex = document.getElementById("pet_sex"); // 반려동물 성별
   let pet_age = document.getElementById("pet_age"); // 반려동물 나이
-  let users_intro = document.getElementById("users_intro"); // 소개글
+  let intro = document.getElementById("intro"); // 소개글
 
   // 마이페이지에 필요한 정보 요청(API)
   fetch(`/api/mypage/info?userId=${encodeURIComponent(userId)}`, {
@@ -32,21 +32,21 @@ window.onload = function () {
   .then(response => response.json()) // 서버에서 보낸 응답을 JOSN 형식으로 변환
   // 변환된 데이터를 처리
   .then(data => {
-    if (data.error) { // 서버에서 에러 메시지가 반환된 경우
-      alert("에러메시지: " + data.error);
+    if (data.code !== "200") { // 서버가 정상적으로 응답했으나, 응답 데이터 안에 오류 정보가 포함되어있는 경우
+      alert(data.message);
+      window.location.href = "/";
     } else { // 성공적인 응답을 받은 경우
       nickName.innerText = data.nickname;
       posts_count.innerText = data.postsList.length;
       pet_name.innerText = data.petName;
       pet_sex.innerText = data.petSex;
       pet_age.innerText = data.petAge;
-      users_intro.innerText = data.intro;
+      intro.innerText = data.intro;
       renderPosts(data.postsList);
     }
   })
-  // 네트워크 오류나 기타 문제가 발생한 경우 처리
-  .catch(error => {
-    alert("네트워크 에러 또는 기타 오류 발생:" + error);
+  .catch(error => { //fetch() 호출 이후, 네트워크 통신 오류, 서버 미응답, 요청이 제대로 이루어지지 않을때 오류 출력
+    alert("서버 오류 발생:" + error);
   });
 }
 
