@@ -46,7 +46,7 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Comment(String content, Long userId, Long postId) {
+    public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;
         this.post = post;

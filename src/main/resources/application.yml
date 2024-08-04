@@ -2,7 +2,7 @@ spring:
   application:
     name: fluffytime
   datasource:
-    url: jdbc:mysql://localhost:3306/fluffydb
+    url: jdbc:mysql://localhost:3307/fluffydb
     username: developer
     password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
