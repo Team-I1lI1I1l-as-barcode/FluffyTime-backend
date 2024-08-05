@@ -1,4 +1,4 @@
-package com.fluffytime.myPage.dto;
+package com.fluffytime.mypage.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+// 유저의 게시글 가져오는 DTO
 public class PostDto {
 
     private String title;

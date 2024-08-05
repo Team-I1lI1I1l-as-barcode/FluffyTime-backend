@@ -1,4 +1,4 @@
-package com.fluffytime.myPage.controller;
+package com.fluffytime.mypage.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,14 +12,14 @@ public class MyPageController {
     }
 
     // 마이페이지
-    @GetMapping("/mypage/{id}")
+    @GetMapping("/mypage/{nickname}")
     public String mypage() {
         return "/html/mypage/mypage.html";
     }
 
     // 프로필 편집 페이지
-    @GetMapping("/mypage/profile/edit/{id}")
+    @GetMapping("/mypage/profile/edit/{nickname}")
     public String profileEdit() {
-        return "/html/mypage/profiles/edit.html";
+        return "/html/mypage/profiles/profile.html";
     }
 }

@@ -1,4 +1,4 @@
-package com.fluffytime.myPage.exception;
+package com.fluffytime.mypage.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

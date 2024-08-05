@@ -7,11 +7,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "profiles")
 @Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Profile {
 
     @Id
@@ -22,16 +30,16 @@ public class Profile {
     @Column(name = "intro", columnDefinition = "TEXT")
     private String intro;
 
-    @Column(name = "pet_name", nullable = false, length = 100)
+    @Column(name = "pet_name", length = 100)
     private String petName;
 
-    @Column(name = "pet_sex", nullable = false, length = 10)
+    @Column(name = "pet_sex", length = 10)
     private String petSex;
 
-    @Column(name = "pet_age", nullable = false, columnDefinition = "BIGINT")
+    @Column(name = "pet_age", columnDefinition = "BIGINT")
     private Long petAge;
 
-    @Column(name = "pet_category", nullable = false, length = 50)
+    @Column(name = "pet_category", length = 50)
     private String petCategory;
 
     @Column(name = "public_status", nullable = false, length = 10)
