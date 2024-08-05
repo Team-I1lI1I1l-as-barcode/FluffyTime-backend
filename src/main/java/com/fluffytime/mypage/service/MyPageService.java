@@ -9,7 +9,7 @@ import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
 import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
-import com.fluffytime.mypage.response.UpdateResultDto;
+import com.fluffytime.mypage.response.RequestResultDto;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.ProfileRepository;
 import com.fluffytime.repository.UserRepository;
@@ -138,30 +138,30 @@ public class MyPageService {
     }
 
     // 프로필 등록(기본틀)
-    public UpdateResultDto createProfile(String nickname) {
+    public RequestResultDto createProfile(String nickname) {
         Profile basicProfile = new Profile();
-        UpdateResultDto updateResultDto = new UpdateResultDto();
+        RequestResultDto requestResultDto = new RequestResultDto();
         User user = findUserByNickname(nickname);
 
         if (user != null) { // 사용자가 있을때 프로필이 없다면 프로필 생성
             log.info("createProfile 실행 >> 해당 유저가 존재하여 프로필을 등록 하고 updateResultDto 구성");
             user.setProfile(basicProfile);
             userRepository.save(user);
-            updateResultDto.setCode(MyPageExceptionCode.MYPAGE_CREATED.getCode());
-            updateResultDto.setMessage(MyPageExceptionCode.MYPAGE_CREATED.getMessage());
-            updateResultDto.setResult(true);
+            requestResultDto.setCode(MyPageExceptionCode.MYPAGE_CREATED.getCode());
+            requestResultDto.setMessage(MyPageExceptionCode.MYPAGE_CREATED.getMessage());
+            requestResultDto.setResult(true);
         } else { // 유저가 없으므로 프로필 생성 실패
             log.info("createProfile 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USER 예외 발생");
-            updateResultDto.setCode(MyPageExceptionCode.NOT_FOUND_USER.getCode());
-            updateResultDto.setMessage(MyPageExceptionCode.NOT_FOUND_USER.getMessage());
-            updateResultDto.setResult(false);
+            requestResultDto.setCode(MyPageExceptionCode.NOT_FOUND_USER.getCode());
+            requestResultDto.setMessage(MyPageExceptionCode.NOT_FOUND_USER.getMessage());
+            requestResultDto.setResult(false);
         }
-        return updateResultDto;
+        return requestResultDto;
     }
 
     // 프로필 수정
     @Transactional
-    public UpdateResultDto profileSave(ProfileDto profileDto) {
+    public RequestResultDto profileSave(ProfileDto profileDto) {
         User user = findUserByNickname(profileDto.getNickname());
         if (user != null) {
             log.info("profileSave 실행 >> 해당 유저가 존재하여 프로필을 업데이트하고 UpdateResultDto 구성");
@@ -176,14 +176,14 @@ public class MyPageService {
 
             userRepository.save(user);
             profileRepository.save(profile);
-            return UpdateResultDto.builder()
+            return RequestResultDto.builder()
                 .code(MyPageExceptionCode.OK.getCode())
                 .message(MyPageExceptionCode.OK.getMessage())
                 .result(true)
                 .build();
         } else {
             log.info("profileSave 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_PROFILE 예외 발생");
-            return UpdateResultDto.builder()
+            return RequestResultDto.builder()
                 .code(MyPageExceptionCode.NOT_FOUND_PROFILE.getCode())
                 .message(MyPageExceptionCode.NOT_FOUND_PROFILE.getMessage())
                 .result(false)
@@ -191,19 +191,28 @@ public class MyPageService {
         }
     }
 
-//    // 회원 탈퇴 기능
-//    @Transactional
-//    public Boolean AccountDelete(String userId) {
-//
-//        if (findUser(userId).isPresent()) { // 유저가 없다면 오류 표시
-//            Long username = Long.parseLong(userId); // String -> Long 변환
-//            userRepository.deleteById(username);
-//            return true;
-//        } else {
-//            throw new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
-//                MyPageExceptionCode.NOT_FOUND_USER.getMessage());
-//        }
-//
-//
-//    }
+    // 회원 탈퇴 기능
+    @Transactional
+    public RequestResultDto AccountDelete(String nickname) {
+        User user = findUserByNickname(nickname);
+        if (user != null) { // 유저가 있다면 계정 삭제 진행
+            log.info("AccountDelete 실행 >> 해당 유저가 존재하여 회원 탈퇴");
+            userRepository.delete(user);
+            return RequestResultDto.builder()
+                .code(MyPageExceptionCode.OK.getCode())
+                .message(MyPageExceptionCode.OK.getMessage())
+                .result(true)
+                .build();
+        } else {
+            log.info("AccountDelete 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USER 예외 발생");
+            return RequestResultDto.builder()
+                .code(MyPageExceptionCode.NOT_FOUND_PROFILE.getCode())
+                .message(MyPageExceptionCode.NOT_FOUND_PROFILE.getMessage())
+                .result(false)
+                .build();
+
+        }
+
+
+    }
 }
