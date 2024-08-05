@@ -1,4 +1,4 @@
-package com.fluffytime.post.repository;
+package com.fluffytime.repository.post;
 
 import com.fluffytime.domain.Post;
 import org.springframework.data.jpa.repository.JpaRepository;

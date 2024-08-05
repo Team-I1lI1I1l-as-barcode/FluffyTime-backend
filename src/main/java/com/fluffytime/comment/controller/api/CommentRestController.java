@@ -2,6 +2,7 @@ package com.fluffytime.comment.controller.api;
 
 import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.comment.service.CommentService;
+import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class CommentRestController {
 
     @PostMapping("/reg")
     public ResponseEntity<Map<String, String>> createComment(
-        @RequestBody CommentRequestDto requestDto) {
+        @Valid @RequestBody CommentRequestDto requestDto) {
         try {
             commentService.createComment(requestDto);
             return ResponseEntity.status(HttpStatus.CREATED)

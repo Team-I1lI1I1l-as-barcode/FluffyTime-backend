@@ -1,4 +1,4 @@
-package com.fluffytime.comment.repository;
+package com.fluffytime.repository.comment;
 
 import com.fluffytime.domain.Comment;
 import java.util.List;
