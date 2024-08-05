@@ -11,11 +11,11 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
 public class AwsConfig {
 
-    @Value("${aws.access-key-id}")
+    @Value("${aws.credentials.access-key-id}")
     private String accessKeyId;
 
-    @Value("${aws.secret-access-key}")
-    private String secretKey;
+    @Value("${aws.credentials.secret-access-key}")
+    private String secretAccessKey;
 
     @Value("${aws.s3.region}")
     private String region;
@@ -29,7 +29,7 @@ public class AwsConfig {
     @Bean
     public S3Client s3Client(Region region) {
         // 주입받은 accessKeyId와 secretKey를 이용해 AwsBasicCredentials 객체를 생성
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretKey);
+        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId, secretAccessKey);
         // S3Client를 생성하여 빈으로 등록. Region과 CredentialsProvider를 설정
         return S3Client.builder()
             .region(region)

@@ -212,7 +212,7 @@
     </div>
     <div class="right-content">
       <div class="header">
-        게시물 상세보기
+        닉네임~~~
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
       <div id="postContent" class="content"></div> <!-- 게시물 내용 컨테이너 -->
@@ -340,7 +340,7 @@
 
     try {
       const response = await fetch(`/api/posts/edit/${currentPostId}`, {
-        method: 'PATCH',
+        method: 'POST', // PATCH에서 POST로 변경
         body: editRequest
       });
       if (!response.ok) {
@@ -359,7 +359,7 @@
     if (currentPostId) {
       try {
         const response = await fetch(`/api/posts/delete/${currentPostId}`, {
-          method: 'DELETE'
+          method: 'POST' // DELETE에서 POST로 변경
         });
         if (!response.ok) {
           throw new Error('Failed to delete post');

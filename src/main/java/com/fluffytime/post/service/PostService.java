@@ -4,7 +4,7 @@ import com.fluffytime.domain.Post;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.PostRequest;
-import com.fluffytime.post.repository.PostRepository;
+import com.fluffytime.repository.PostRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +21,7 @@ public class PostService {
 
     // 게시글 등록하기
     public Long createPost(PostRequest postRequest, MultipartFile[] files) {
-        if (files.length > 10) {
+        if (files.length > 11) {
             throw new IllegalArgumentException("최대 10개의 이미지만 업로드할 수 있습니다."); // 파일 개수 제한
         }
 

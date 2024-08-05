@@ -9,9 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +54,7 @@ public class PostRestController {
             postRequest.setTempStatus(tempStatus); // 임시 상태 설정
             log.info("Received post request: {}", postRequest);
 
-            if (files.length > 10) {
+            if (files.length > 11) {
                 log.error("Too many files uploaded: {}", files.length);
                 throw new IllegalArgumentException("Too many files uploaded");
             }
@@ -76,14 +74,14 @@ public class PostRestController {
     }
 
     // 임시 등록 게시물 삭제하기
-    @DeleteMapping("/temp-delete/{id}")
+    @PostMapping("/temp-delete/{id}")
     public ResponseEntity<Void> deleteTempPost(@PathVariable Long id) {
         try {
-            postService.deleteTempPost(id); // 임시 게시물 삭제
+            postService.deleteTempPost(id);// 임시 게시물 삭제
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to delete temp post", e);
-            return ResponseEntity.status(500).build(); // 삭제 실패 시 에러 반환
+            return ResponseEntity.status(500).build();
         }
     }
 
@@ -106,7 +104,7 @@ public class PostRestController {
     }
 
     // 게시물 수정하기
-    @PatchMapping("/edit/{id}")
+    @PostMapping("/edit/{id}")
     public ResponseEntity<Post> editPost(@PathVariable Long id,
         @RequestParam("content") String content,
         @RequestParam(value = "imageUrls", required = false) List<String> imageUrls) {
@@ -117,15 +115,15 @@ public class PostRestController {
             postRequest.setImageUrls(imageUrls); // 이미지 URL 설정
         }
 
-        Post updatedPost = postService.updatePost(id, postRequest, new MultipartFile[]{}); // 게시물 수정
+        Post updatedPost = postService.updatePost(id, postRequest, new MultipartFile[]{});// 게시물 수정
         return ResponseEntity.ok(updatedPost);
     }
 
     // 게시물 삭제하기
-    @DeleteMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         try {
-            postService.deletePost(id); // 게시물 삭제
+            postService.deletePost(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to delete post", e);
