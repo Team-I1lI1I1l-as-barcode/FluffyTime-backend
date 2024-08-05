@@ -1,5 +1,6 @@
-package com.fluffytime.myPage.dto;
+package com.fluffytime.mypage.response;
 
+import com.fluffytime.mypage.request.PostDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,12 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-// 마이페이지 정보 불러오기 - 응답 DTO
+
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class MyPageResponseDto {
+// 마이페이지 정보를 클라이언트에게 보내는 응답 DTO
+public class MyPageInformationDto {
 
     private String code; // 상태코드
     private String message; // 상태 메시지
@@ -26,7 +28,8 @@ public class MyPageResponseDto {
     private String intro;    // 소개글
 
     @Builder
-    public MyPageResponseDto(String code, String message, String nickname, List<PostDto> postsList,
+    public MyPageInformationDto(String code, String message, String nickname,
+        List<PostDto> postsList,
         String petName, String petSex, Long petAge, String intro) {
         this.code = code;
         this.message = message;
