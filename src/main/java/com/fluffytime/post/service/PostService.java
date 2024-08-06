@@ -62,10 +62,6 @@ public class PostService {
             existingPost.setContent(postRequest.getContent()); // 내용 수정
         }
 
-        if (postRequest.getTempStatus() != null) {
-            existingPost.setTempStatus(postRequest.getTempStatus()); // 상태 수정
-        }
-
         List<String> imageUrls = existingPost.getImageUrls();
         for (MultipartFile file : files) {
             String imageUrl = s3Service.uploadFile(file); // 파일 업로드
