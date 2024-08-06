@@ -1,5 +1,4 @@
 // 게시물 리스트를 반환하는 함수
-//TODO db 연결해서 다시 구현 필요
 async function getExplorePosts() {
   try {
     // 현재 페이지의 URL 가져오기
@@ -28,8 +27,9 @@ async function getExplorePosts() {
       alert("request not handled")
       throw new Error(data.message || "error");
     }
-    // 클라이언트에게 데이터가 잘 들어왔는지 길이로 확인
-    console.log(data.list.length)
+
+    // 클라이언트에게 데이터가 잘 들어왔는지 확인
+    console.log(data);
 
     return data.list;
   } catch (error) {
@@ -45,7 +45,7 @@ async function populateGrid() {
   list.forEach(item => {
     const img = document.createElement('img');
     img.src = item.imageUrl;
-    img.alt = item.title; //TODO
+    img.alt = item.content; //혹시 에레로 이미지가 없으면 게시물 내용이 대신 나타나게 함
     img.createdAt = item.createdAt;
     img.className = 'grid-item';
 
