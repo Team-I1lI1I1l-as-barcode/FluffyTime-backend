@@ -2,7 +2,7 @@ package com.fluffytime.comment.config.error.exception;
 
 import com.fluffytime.comment.config.error.ErrorCode;
 
-public class NotFoundException extends BusinessBaseException {
+public class NotFoundException extends CommentException {
 
     public NotFoundException(ErrorCode errorCode) {
         super(errorCode.getMessage(), errorCode);
