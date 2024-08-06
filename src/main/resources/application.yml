@@ -10,7 +10,7 @@ spring:
   # spring jpa 설정
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -45,7 +45,7 @@ jwt:
 
 aws:
   s3:
-    bucket-name: fluffytime-bucket-kkh
+    bucket-name: fluffytime-bucket
     region: ${AWS_REGION}
   credentials:
     access-key-id: ${AWS_ACCESS_KEY_ID}
