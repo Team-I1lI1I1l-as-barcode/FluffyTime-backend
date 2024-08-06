@@ -31,12 +31,12 @@ public class GlobalExceptionHandler {
         return createErrorResponseEntity(e.getErrorCode());
     }
 
-    @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handle(Exception e) {
-        e.printStackTrace();
-        log.error("Exception", e);
-        return createErrorResponseEntity(GlobalErrorCode.INTERNAL_SERVER_ERROR);
-    }
+//    @ExceptionHandler(Exception.class)
+//    protected ResponseEntity<ErrorResponse> handle(Exception e) {
+//        e.printStackTrace();
+//        log.error("Exception", e);
+//        return createErrorResponseEntity(GlobalErrorCode.INTERNAL_SERVER_ERROR);
+//    }
 
     private ResponseEntity<ErrorResponse> createErrorResponseEntity(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getStatus()).body(ErrorResponse.of(errorCode));

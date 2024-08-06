@@ -1,13 +1,15 @@
 package com.fluffytime.join.service;
 
-import static com.fluffytime.join.dto.reponse.ResponseCode.SUCCESS_SEND_CERTIFICATION_EMAIL;
+import static com.fluffytime.join.dto.response.JoinResponseCode.SUCCEED_EMAIL_CERTIFICATION;
+import static com.fluffytime.join.dto.response.JoinResponseCode.SUCCESS_SEND_CERTIFICATION_EMAIL;
 
+import com.fluffytime.join.dao.EmailCertificationDao;
 import com.fluffytime.join.dto.TempUser;
-import com.fluffytime.join.dto.reponse.ApiResponse;
-import com.fluffytime.join.dto.reponse.SendEmailResponse;
+import com.fluffytime.join.dto.response.ApiResponse;
+import com.fluffytime.join.dto.response.SendEmailResponse;
+import com.fluffytime.join.dto.response.SucceedCertificationResponse;
 import com.fluffytime.join.exception.FailedToSendCertificationEmail;
-import com.fluffytime.join.exception.TempUserNotFound;
-import com.fluffytime.join.repository.dao.EmailCertificationDao;
+import com.fluffytime.join.exception.NotFoundTempUser;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -25,11 +27,17 @@ public class CertificationService {
 
 
     // 인증 성공 or 실패 응답을 구현해야함
-    public void certificateEmail(String email) {
+    public ApiResponse<SucceedCertificationResponse> certificateEmail(String email) {
         TempUser user = emailCertificationDao.getTempUser(email)
-            .orElseThrow(TempUserNotFound::new);
+            .orElseThrow(NotFoundTempUser::new);
         user.successCertification();
         emailCertificationDao.saveEmailCertificationTempUser(user);
+
+        SucceedCertificationResponse response = SucceedCertificationResponse.builder()
+            .email(email)
+            .build();
+
+        return ApiResponse.response(SUCCEED_EMAIL_CERTIFICATION, response);
     }
 
     // 메일 제작 및 전송

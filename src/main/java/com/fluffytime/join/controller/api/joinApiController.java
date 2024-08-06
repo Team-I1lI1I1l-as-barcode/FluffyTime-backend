@@ -1,10 +1,10 @@
 package com.fluffytime.join.controller.api;
 
-import com.fluffytime.join.dto.reponse.ApiResponse;
-import com.fluffytime.join.dto.reponse.ExistsAccountResponse;
-import com.fluffytime.join.dto.reponse.JoinResponse;
-import com.fluffytime.join.dto.reponse.SendEmailResponse;
 import com.fluffytime.join.dto.request.JoinRequest;
+import com.fluffytime.join.dto.response.ApiResponse;
+import com.fluffytime.join.dto.response.JoinResponse;
+import com.fluffytime.join.dto.response.SendEmailResponse;
+import com.fluffytime.join.dto.response.SucceedCertificationResponse;
 import com.fluffytime.join.service.CertificationService;
 import com.fluffytime.join.service.JoinService;
 import jakarta.validation.Valid;
@@ -33,7 +33,6 @@ public class joinApiController {
     public ResponseEntity<ApiResponse<JoinResponse>> tempJoin(
         @RequestBody @Valid JoinRequest joinUser
     ) {
-        log.info("user = {}", joinUser.toString());
         return ResponseEntity.ok(joinService.tempJoin(joinUser));
     }
 
@@ -48,23 +47,21 @@ public class joinApiController {
     }
 
     @GetMapping("/check-email")
-    public ResponseEntity<ApiResponse<ExistsAccountResponse>> checkEmail(
+    public ResponseEntity<ApiResponse<Void>> checkEmail(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        log.info("email = {}", email);
         return ResponseEntity.ok(joinService.checkExistsEmail(email));
     }
 
     @GetMapping("/check-nickname")
-    public ResponseEntity<ApiResponse<ExistsAccountResponse>> checkNickname(
+    public ResponseEntity<ApiResponse<Void>> checkNickname(
         @RequestParam(name = "nickname")
         @NotBlank
         String nickname
     ) {
-        log.info("nickname = {}", nickname);
         return ResponseEntity.ok(joinService.checkExistsNickname(nickname));
     }
 
@@ -79,13 +76,12 @@ public class joinApiController {
     }
 
     @GetMapping("/email-certification")
-    public String certificateEmail(
+    public ResponseEntity<ApiResponse<SucceedCertificationResponse>> certificateEmail(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        certificationService.certificateEmail(email);
-        return "ok";
+        return ResponseEntity.ok(certificationService.certificateEmail(email));
     }
 }

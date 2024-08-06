@@ -1,6 +1,6 @@
-package com.fluffytime.join.exception;
+package com.fluffytime.login.exception;
 
-import com.fluffytime.join.exception.errorcode.ErrorCode;
+import com.fluffytime.login.exception.errorcode.ErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,4 +29,5 @@ public class ErrorResponse {
     public static ErrorResponse of(ErrorCode code, String message) {
         return new ErrorResponse(code, message);
     }
+
 }

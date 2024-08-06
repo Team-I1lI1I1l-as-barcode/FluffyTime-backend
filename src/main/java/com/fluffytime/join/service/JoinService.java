@@ -1,28 +1,28 @@
 package com.fluffytime.join.service;
 
 import static com.fluffytime.domain.RoleName.ROLE_USER;
-import static com.fluffytime.join.dto.reponse.ResponseCode.JOIN_SUCCESS;
-import static com.fluffytime.join.dto.reponse.ResponseCode.NOT_DUPLICATED_EMAIL;
-import static com.fluffytime.join.dto.reponse.ResponseCode.NOT_DUPLICATED_NICKNAME;
-import static com.fluffytime.join.dto.reponse.ResponseCode.TEMP_JOIN_SUCCESS;
+import static com.fluffytime.join.dto.response.JoinResponseCode.JOIN_SUCCESS;
+import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_EMAIL;
+import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_NICKNAME;
+import static com.fluffytime.join.dto.response.JoinResponseCode.TEMP_JOIN_SUCCESS;
 
 import com.fluffytime.domain.Role;
 import com.fluffytime.domain.User;
 import com.fluffytime.domain.UserRole;
+import com.fluffytime.join.dao.EmailCertificationDao;
 import com.fluffytime.join.dto.TempUser;
-import com.fluffytime.join.dto.reponse.ApiResponse;
-import com.fluffytime.join.dto.reponse.ExistsAccountResponse;
-import com.fluffytime.join.dto.reponse.JoinResponse;
 import com.fluffytime.join.dto.request.JoinRequest;
+import com.fluffytime.join.dto.response.ApiResponse;
+import com.fluffytime.join.dto.response.JoinResponse;
 import com.fluffytime.join.exception.AlreadyExistsEmail;
 import com.fluffytime.join.exception.AlreadyExistsNickname;
 import com.fluffytime.join.exception.InvalidTempUser;
-import com.fluffytime.join.exception.RoleNameNotFound;
-import com.fluffytime.join.exception.TempUserNotFound;
-import com.fluffytime.join.repository.RoleRepository;
-import com.fluffytime.join.repository.UserRepository;
-import com.fluffytime.join.repository.dao.EmailCertificationDao;
+import com.fluffytime.join.exception.NotFoundRoleName;
+import com.fluffytime.join.exception.NotFoundTempUser;
+import com.fluffytime.repository.RoleRepository;
+import com.fluffytime.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,39 +33,38 @@ public class JoinService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailCertificationDao emailCertificationDao;
-    private final CertificationService certificationService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
     public ApiResponse<JoinResponse> tempJoin(JoinRequest joinUser) {
-
         TempUser tempUser = TempUser.builder()
             .email(joinUser.getEmail())
-            .password(joinUser.getPassword())
+            .password(bCryptPasswordEncoder.encode(joinUser.getPassword()))
             .nickname(joinUser.getNickname())
             .certificationStatus(false)
             .build();
 
         emailCertificationDao.saveEmailCertificationTempUser(tempUser);
 
-        JoinResponse joinResult = JoinResponse.builder()
+        JoinResponse response = JoinResponse.builder()
             .email(tempUser.getEmail())
             .nickname(tempUser.getNickname())
             .build();
 
-        return ApiResponse.response(TEMP_JOIN_SUCCESS, joinResult);
+        return ApiResponse.response(TEMP_JOIN_SUCCESS, response);
     }
 
     @Transactional
     public ApiResponse<JoinResponse> join(String email) {
 
         TempUser tempUser = emailCertificationDao.getTempUser(email)
-            .orElseThrow(TempUserNotFound::new);
+            .orElseThrow(NotFoundTempUser::new);
 
         if (!tempUser.getCertificationStatus()) {
             throw new InvalidTempUser();
         }
 
-        Role role = roleRepository.findByRoleName(ROLE_USER).orElseThrow(RoleNameNotFound::new);
+        Role role = roleRepository.findByRoleName(ROLE_USER).orElseThrow(NotFoundRoleName::new);
 
         User user = User.builder()
             .email(tempUser.getEmail())
@@ -84,16 +83,16 @@ public class JoinService {
 
         emailCertificationDao.removeTempUser(email);
 
-        JoinResponse joinResult = JoinResponse.builder()
+        JoinResponse response = JoinResponse.builder()
             .email(user.getEmail())
             .nickname(user.getNickname())
             .build();
 
-        return ApiResponse.response(JOIN_SUCCESS, joinResult);
+        return ApiResponse.response(JOIN_SUCCESS, response);
     }
 
     @Transactional(readOnly = true)
-    public ApiResponse<ExistsAccountResponse> checkExistsEmail(
+    public ApiResponse<Void> checkExistsEmail(
         String email) {
         boolean isExists = userRepository.findByEmail(email).isPresent();
         if (isExists) {
@@ -103,7 +102,7 @@ public class JoinService {
     }
 
     @Transactional(readOnly = true)
-    public ApiResponse<ExistsAccountResponse> checkExistsNickname(
+    public ApiResponse<Void> checkExistsNickname(
         String nickname) {
         boolean isExists = userRepository.findByNickname(nickname).isPresent();
         if (isExists) {
