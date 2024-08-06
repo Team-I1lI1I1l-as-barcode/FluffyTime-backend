@@ -25,8 +25,9 @@ public class ExploreRestController {
         // 메서드명에 get을 사용할 때는 무조건 데이터가 존재할 경우에만, 없어도 되는 경우에는 find 사용(+optional 사용)
         @RequestParam(value = "tag", required = false) String tag) {
 
-        // db로부터 데이터 받아오기
+        // db로부터 게시물 리스트 받아오기
         List<Post> posts = exploreService.findLatestPosts();
+
         List<Map<String, String>> list = new ArrayList<>();
 
         int end = 9;
@@ -40,6 +41,11 @@ public class ExploreRestController {
 
         // 데이터 기반으로 리스트 생성
         for (int i = 0; i < end; i++) {
+
+            if (i >= posts.size()) {
+                break;
+            }
+
             Post post = posts.get(i);
             Map<String, String> item = new HashMap<>();
             item.put("postId", String.valueOf(post.getPostId()));
