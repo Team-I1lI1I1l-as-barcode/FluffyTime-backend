@@ -11,7 +11,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class KKHGlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> invalidRequestHandle(MethodArgumentNotValidException e) {

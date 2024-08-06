@@ -24,13 +24,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, errorCode.getStatus());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    protected ResponseEntity<ErrorResponse> handle(RuntimeException e) {
-        log.error("RuntimeException", e);
-        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        ErrorResponse errorResponse = ErrorResponse.of(errorCode);
-        return new ResponseEntity<>(errorResponse, errorCode.getStatus());
-    }
+//    @ExceptionHandler(RuntimeException.class)
+//    protected ResponseEntity<ErrorResponse> handle(RuntimeException e) {
+//        log.error("RuntimeException", e);
+//        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+//        ErrorResponse errorResponse = ErrorResponse.of(errorCode);
+//        return new ResponseEntity<>(errorResponse, errorCode.getStatus());
+//    }
 
     @ExceptionHandler(UserNotFoundException.class)
     protected ResponseEntity<ErrorResponse> handle(UserNotFoundException e) {
