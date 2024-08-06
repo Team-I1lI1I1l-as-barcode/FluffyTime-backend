@@ -57,8 +57,7 @@ public class Post {
         orphanRemoval = true
     )
     private List<Comment> commentList = new ArrayList<>();
-}
-
+    
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
         LocalDateTime updatedAt, TempStatus tempStatus, List<String> imageUrls, User user) {

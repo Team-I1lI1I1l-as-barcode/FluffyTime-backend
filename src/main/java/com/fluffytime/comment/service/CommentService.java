@@ -6,9 +6,9 @@ import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.User;
-import com.fluffytime.repository.comment.CommentRepository;
-import com.fluffytime.repository.post.PostRepository;
-import com.fluffytime.repository.user.UserRepository;
+import com.fluffytime.repository.CommentRepository;
+import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

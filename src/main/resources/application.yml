@@ -45,7 +45,7 @@ jwt:
 
 aws:
   s3:
-    bucket-name: fulffytimeprofilebuket
+    bucket-name: fluffytime-bucket-kkh
     region: ${AWS_REGION}
   credentials:
     access-key-id: ${AWS_ACCESS_KEY_ID}

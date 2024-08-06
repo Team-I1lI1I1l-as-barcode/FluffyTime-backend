@@ -43,7 +43,6 @@ public class ExploreRestController {
             Post post = posts.get(i);
             Map<String, String> item = new HashMap<>();
             item.put("postId", String.valueOf(post.getPostId()));
-            item.put("title", post.getTitle());
             item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 이미지 url로 수정 필요
             list.add(item);
         }
