@@ -1,12 +1,13 @@
 spring:
   application:
     name: fluffytime
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  # spring jpa 설정
   jpa:
     hibernate:
       ddl-auto: update
@@ -26,6 +27,7 @@ spring:
           auth: true
           starttls:
             enable: true
+
   data:
     redis:
       host: ${REDIS_HOST}
@@ -33,9 +35,17 @@ spring:
       password: ${REDIS_PASSWORD}
       timeout: 5000
 
+# spring security 로깅 설정
+logging:
+  level.org.springframework.security: TRACE
+
+jwt:
+  secretKey: 12345678901234567890123456789012
+  refreshKey: 12345678901234567890123456789012
+
 aws:
   s3:
-    bucket-name: fluffytime-bucket-yubin
+    bucket-name: fulffytimeprofilebuket
     region: ${AWS_REGION}
   credentials:
     access-key-id: ${AWS_ACCESS_KEY_ID}

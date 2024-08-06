@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <title>홈페이지</title>
+</head>
+<body>
+<h1> 메인 홈페이지 입니다.</h1>
+<button id="mypageBtn">마이페이지</button>
+<button id="userpageBtn">유저페이지</button>
+<script>
+  document.getElementById("mypageBtn").addEventListener('click', event => {
+    window.location.href = "/mypage/test";
+  });
+  document.getElementById("userpageBtn").addEventListener('click', event => {
+    window.location.href = "/mypage/test";
+  });
+
+</script>
