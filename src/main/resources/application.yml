@@ -1,12 +1,13 @@
 spring:
   application:
     name: fluffytime
+
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  # spring jpa 설정
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,20 +16,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-  security:
-    user:
-      name: 1234
-      password: 1234
-
-  aws:
-    s3:
-      bucket-name: fluffytime-chanchangood
-      region: ${AWS_DEFAULT_REGION}
-    credentials:
-      access-key-id: ${AWS_ACCESS_KEY_ID}
-      secret-access-key: ${AWS_SECRET_ACCESS_KEY}
-
-  #  GMail 설정
   mail:
     host: ${SMTP_HOST}
     port: ${SMTP_PORT}
@@ -40,10 +27,27 @@ spring:
           auth: true
           starttls:
             enable: true
-  #  REDIS 설정
+
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       timeout: 5000
+
+# spring security 로깅 설정
+logging:
+  level.org.springframework.security: TRACE
+
+jwt:
+  secretKey: 12345678901234567890123456789012
+  refreshKey: 12345678901234567890123456789012
+
+aws:
+  s3:
+    bucket-name: fulffytimeprofilebuket
+    region: ${AWS_REGION}
+  credentials:
+    access-key-id: ${AWS_ACCESS_KEY_ID}
+    secret-access-key: ${AWS_SECRET_ACCESS_KEY}
+
