@@ -28,9 +28,6 @@ public class Post {
     @Column(name = "post_id", nullable = false)
     private Long postId;
 
-//    @Column(name = "title", nullable = false)
-//    private String title;
-
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -52,10 +49,9 @@ public class Post {
     private User user;
 
     @Builder
-    public Post(Long postId, String title, String content, LocalDateTime createdAt,
+    public Post(Long postId, String content, LocalDateTime createdAt,
         LocalDateTime updatedAt, TempStatus tempStatus, List<String> imageUrls, User user) {
         this.postId = postId;
-        //this.title = title;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

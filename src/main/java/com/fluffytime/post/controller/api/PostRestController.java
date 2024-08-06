@@ -54,7 +54,7 @@ public class PostRestController {
             postRequest.setTempStatus(tempStatus); // 임시 상태 설정
             log.info("Received post request: {}", postRequest);
 
-            if (files.length > 11) {
+            if (files.length > 10) {
                 log.error("Too many files uploaded: {}", files.length);
                 throw new IllegalArgumentException("Too many files uploaded");
             }

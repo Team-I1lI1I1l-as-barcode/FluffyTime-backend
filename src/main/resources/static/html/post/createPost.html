@@ -4,324 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>새 게시물 만들기</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .modal, .draft-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content, .draft-modal-content {
-      background-color: #ffffff;
-      width: 70%;
-      max-width: 1200px;
-      height: 70%;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .header {
-      text-align: center;
-      padding: 15px;
-      border-bottom: 1px solid #ccc;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .content {
-      display: flex;
-      flex: 1;
-    }
-
-    .left-content {
-      flex: 3.5;
-      border-right: 1px solid #ccc;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-    }
-
-    .left-content img {
-      max-width: 100%;
-      max-height: 100%;
-      margin-bottom: 20px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .left-content.fullscreen img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .left-content input {
-      display: none;
-    }
-
-    .left-content label {
-      cursor: pointer;
-    }
-
-    .left-content .nav-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: rgba(0, 0, 0, 0.5);
-      border: none;
-      color: white;
-      font-size: 24px;
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .left-content .prev {
-      left: 10px;
-    }
-
-    .left-content .next {
-      right: 10px;
-    }
-
-    .share-button {
-      background-color: #fcd21d;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 10px 0;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    .right-content {
-      flex: 1.5;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      border-left: 1px solid #ccc;
-    }
-
-    .profile {
-      display: flex;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .profile img {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      margin-right: 10px;
-    }
-
-    .right-content textarea {
-      resize: none;
-      width: calc(100% - 20px);
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 4px;
-      border: none;
-    }
-
-    .right-content input[type="text"] {
-      width: calc(100% - 20px);
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 4px;
-      border: none;
-    }
-
-    .char-count {
-      text-align: right;
-      font-size: 12px;
-      color: #999;
-      margin-bottom: 10px;
-    }
-
-    .toggle {
-      display: flex;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 34px;
-      height: 20px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 14px;
-      width: 14px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: #f0b90b;
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(14px);
-    }
-
-    .options {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      margin-top: auto;
-    }
-
-    .options a {
-      color: #fcd21d;
-      margin-bottom: 10px;
-      text-decoration: none;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .options a:hover {
-      color: #f0b90b;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #fff;
-    }
-
-    .complete {
-      display: none;
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .post-textarea {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      padding: 10px;
-      margin-bottom: 10px;
-      width: calc(100% - 20px);
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid #ccc;
-      margin: 10px 0;
-      width: calc(100% + 40px);
-      transform: translateX(-20px);
-    }
-
-    .temp-posts {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-top: 20px;
-    }
-
-    .temp-post {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #fff;
-      padding: 10px;
-      border-radius: 4px;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-      margin-bottom: 10px;
-      width: 80%;
-    }
-
-    .temp-post p {
-      margin: 0;
-      flex: 1;
-    }
-
-    .temp-post button {
-      border: none;
-      background: none;
-      color: red;
-      cursor: pointer;
-    }
-
-    .delete-icon {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: url('/static/image/post/trash.jpg') no-repeat center center;
-      background-size: contain;
-      width: 30px;
-      height: 30px;
-      border: none;
-      cursor: pointer;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/createPost.css">
 </head>
 <body>
 <button onclick="openModal()">새 게시물 만들기</button> <!-- 새 게시물 만들기 모달 열기 버튼 -->
@@ -329,7 +12,7 @@
 <div class="modal" id="postModal">
   <div class="modal-content">
     <button class="close-btn" onclick="closeModal()">&times;</button> <!-- 모달 닫기 버튼 -->
-    <div class="header">새 게시물을 만들기</div>
+    <div class="header">새 게시물 만들기</div>
     <form id="postForm" class="content" enctype="multipart/form-data" method="post">
       <div class="left-content" id="leftContent">
         <label for="images">
@@ -349,7 +32,7 @@
       <div class="right-content">
         <div>
           <div class="profile">
-            <img src="/image/post/profile-placeholder.JPG" alt="프로필 이미지"><!--수정~~!-->
+            <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정~~!-->
             <span>happy</span>
           </div>
           <textarea id="content" name="content" class="post-textarea" rows="10"
@@ -378,13 +61,14 @@
         </div>
         <hr>
         <div class="options">
-          <a href="#" onclick="openDraftModal()">임시 저장 글 불러오기</a>
-          <a href="#" onclick="saveAsTemp(event)">임시저장</a>
-          <a href="#" onclick="submitPost(event)">공유하기</a>
+          <a href="javascript:void(0);" onclick="openDraftModal()">임시 저장 글 불러오기</a>
+          <a href="javascript:void(0);" onclick="saveAsTemp(event)">임시저장</a>
+          <a href="javascript:void(0);" onclick="submitPost(event)">공유하기</a>
         </div>
       </div>
     </form>
     <div class="complete" id="complete-container">
+      <img src="/image/post/complete.jpg">
       <p>게시물 등록이 완료되었습니다!</p>
     </div>
   </div>
@@ -437,7 +121,7 @@
     previewContainer.innerHTML = '';
     imagesArray = [];
 
-    if (files.length > 11) {
+    if (files.length > 10) {
       alert('이미지는 최대 10장까지 업로드할 수 있습니다.');
       event.target.value = ""; // 파일 선택 초기화
       return;
@@ -452,6 +136,7 @@
           const img = document.createElement('img');
           img.src = e.target.result;
           img.classList.add('photo');
+          img.style.objectFit = 'cover'; // 이미지 꽉 차게
           previewContainer.appendChild(img);
         }
       };
@@ -526,7 +211,7 @@
       return;
     }
 
-    if (images.length > 11) {
+    if (images.length > 10) {
       alert('이미지는 최대 10장까지 업로드할 수 있습니다.');
       return;
     }
@@ -554,7 +239,13 @@
         throw new Error('게시물 등록에 실패했습니다.');
       }
     }).then(postId => {
-      window.location.href = `/html/post/postDetail.html?postId=${postId}`; // 게시물 상세 페이지로 이동
+      // 게시물 등록 완료 후 3초 동안 완료 메시지 표시
+      document.querySelector('.content').style.display = 'none';
+      document.getElementById('complete-container').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('complete-container').style.display = 'none';
+        window.location.href = `/html/post/postDetail.html?postId=${postId}`; // 게시물 상세 페이지로 이동
+      }, 3000); // 3초 후에 완료 메시지를 숨기고 상세 페이지로 이동
     }).catch(error => {
       alert(error.message);
     });
@@ -572,10 +263,18 @@
         tempPosts.forEach(post => {
           const postElement = document.createElement('div');
           postElement.classList.add('temp-post');
+
+          const postContent = post.content.length > 40 ? post.content.substring(0, 40) + '...'
+              : post.content;
+          const postDate = new Date(post.createdAt).toLocaleDateString();
+
           postElement.innerHTML = `
-            <p>${post.content}</p>
-            <button onclick="deleteTempPost(${post.postId})">삭제</button>
-          `;
+              <div class="post-details">
+                <p class="post-content">${postContent}</p>
+                <span class="post-date">${postDate}</span>
+                <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
+              </div>
+            `;
           postElement.onclick = () => continueDraft(post); // 임시 저장 글 불러오기
           tempPostsContainer.appendChild(postElement);
         });
@@ -612,6 +311,7 @@
       const img = document.createElement('img');
       img.src = imagesArray[currentImageIndex];
       img.classList.add('photo');
+      img.style.objectFit = 'cover'; // 이미지 꽉 차게
       previewContainer.appendChild(img);
 
       if (imagesArray.length > 1) {
@@ -642,7 +342,8 @@
     displayImages();
   }
 
-  async function deleteTempPost(postId) {
+  async function deleteTempPost(postId, event) {
+    event.stopPropagation();
     try {
       const response = await fetch(`/api/posts/temp-delete/${postId}`, {
         method: 'POST' // DELETE에서 POST로 변경
