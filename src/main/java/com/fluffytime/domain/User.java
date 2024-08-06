@@ -43,6 +43,13 @@ public class User {
     )
     private List<Post> postList = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Comment> commentList = new ArrayList<>();
+
     @PrePersist
     public void create() {
         this.registrationAt = LocalDateTime.now();
