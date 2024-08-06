@@ -8,11 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class LoginController {
 
-    @GetMapping("/")
-    public String home() {
-        return "/html/index.html";
-    }
-
     @GetMapping("/login")
     public String loginPage() {
         return "/html/login/login.html";

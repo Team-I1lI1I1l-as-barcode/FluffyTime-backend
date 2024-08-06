@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,10 +34,26 @@ public class SecurityConfig {
                     "/login",
                     "/logout",
                     "/join/**",
-                    "/api/users/**",
+
                     "/static/**",
+                    "/static/html/**",
                     "/html/**",
-                    "/js/**"
+                    "/js/**",
+                    "/api/users/**",
+                    // 내가 추가한거
+                    "/",
+                    "/static/css/mypage/profiles/**",
+                    "/static/html/mypage/profiles/**",
+                    "/static/html/mypage/**",
+                    "/static/js/mypage/**",
+                    "/static/js/mypage/profiles/**",
+                    "/mypage/{nickname}",
+                    "/mypage/profile/edit/{nickname}",
+                    "/api/mypage/info",
+                    "/api/mypage/profiles/info",
+                    "/api/mypage/profiles/edit",
+                    "/api/mypage/profiles/check-username",
+                    "/api/users/withdraw"
                 ).permitAll()
                 .requestMatchers("/admin").hasRole("ADMIN")
                 .anyRequest().authenticated()

@@ -42,7 +42,9 @@ public class MyPageService {
     @Transactional(readOnly = true)
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
-        return userRepository.findByNickname(nickname);
+        return userRepository.findByNickname(nickname).orElseThrow(
+            () -> new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
+                MyPageExceptionCode.NOT_FOUND_USER.getMessage()));
     }
 
 
