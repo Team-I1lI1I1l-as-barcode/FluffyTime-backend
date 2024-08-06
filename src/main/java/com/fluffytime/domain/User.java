@@ -14,14 +14,21 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+
 
 @Getter
 @Table(name = "users")
 @Entity
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -53,8 +60,23 @@ public class User {
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        fetch = FetchType.LAZY
+    )
+    private Set<UserRole> userRoles = new HashSet<>();
+
+
     @PrePersist
     public void create() {
         this.registrationAt = LocalDateTime.now();
+    }
+
+    @Builder
+    public User(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
     }
 }
