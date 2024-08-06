@@ -1,5 +1,6 @@
 package com.fluffytime.config;
 
+
 import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -71,4 +73,5 @@ public class SecurityConfig {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

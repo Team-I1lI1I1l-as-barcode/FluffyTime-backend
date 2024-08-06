@@ -7,7 +7,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -18,11 +20,14 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
+
 
 @Getter
 @Table(name = "users")
 @Entity
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
@@ -50,12 +55,18 @@ public class User {
     )
     private List<Post> postList = new ArrayList<>();
 
+    // 유저 - 프로필 (일대일 단방향)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
     @OneToMany(
         mappedBy = "user",
         cascade = CascadeType.ALL,
         fetch = FetchType.LAZY
     )
     private Set<UserRole> userRoles = new HashSet<>();
+
 
     @PrePersist
     public void create() {
