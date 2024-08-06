@@ -1,0 +1,19 @@
+.comment-container {
+  margin-top: 20px;
+}
+
+.comment {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.status-message {
+  margin-top: 10px;
+  color: green;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+}

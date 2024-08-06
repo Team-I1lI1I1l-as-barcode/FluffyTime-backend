@@ -55,6 +55,13 @@ public class User {
     )
     private List<Post> postList = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Comment> commentList = new ArrayList<>();
+
     // 유저 - 프로필 (일대일 단방향)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
