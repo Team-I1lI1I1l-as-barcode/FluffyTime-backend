@@ -5,7 +5,7 @@ import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
 import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
-import com.fluffytime.mypage.response.UpdateResultDto;
+import com.fluffytime.mypage.response.RequestResultDto;
 import com.fluffytime.mypage.service.MyPageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,8 +50,8 @@ public class MyPageRestController {
     @PostMapping("/api/mypage/profiles/reg")
     public ResponseEntity<?> registerProfiles(@RequestParam("nickname") String nickname) {
         log.info(nickname + "님의 기본 프로필 등록 api 실행");
-        UpdateResultDto updateResultDto = myPageService.createProfile(nickname);
-        return ResponseEntity.status(HttpStatus.OK).body(updateResultDto);
+        RequestResultDto requestResultDto = myPageService.createProfile(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(requestResultDto);
     }
 
     // 프로필 정보 수정
@@ -59,9 +59,9 @@ public class MyPageRestController {
     public ResponseEntity<?> editProfiles(
         @RequestBody ProfileDto profileDto) {
         log.info(profileDto.getNickname() + "님의 프로필 정보 수정 api 실행 ");
-        UpdateResultDto updateResultDto = myPageService.profileSave(profileDto);
+        RequestResultDto requestResultDto = myPageService.profileSave(profileDto);
 
-        return ResponseEntity.status(HttpStatus.OK).body(updateResultDto);
+        return ResponseEntity.status(HttpStatus.OK).body(requestResultDto);
     }
 
     // 프로필 유저명 중복 확인
@@ -70,5 +70,12 @@ public class MyPageRestController {
         log.info(nickname + "가 중복 확인 api 실행");
         CheckUsernameDto checkUsernameDto = myPageService.nicknameExists(nickname);
         return ResponseEntity.status(HttpStatus.OK).body(checkUsernameDto);
+    }
+
+    // 프로필 회원 탈퇴
+    @GetMapping("/api/users/withdraw")
+    public ResponseEntity<?> withdrawAccount(@RequestParam("nickname") String nickname) {
+        RequestResultDto requestResultDto = myPageService.AccountDelete(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(requestResultDto);
     }
 }

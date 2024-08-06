@@ -11,6 +11,8 @@ const pet_age = getElement("pet_age");
 const pet_category = getElement("pet_category");
 const public_status = getElement("public_status");
 const submitBtn = getElement("submit");
+const deleteAccountBtn = getElement("delete_account");
+
 let originalIntroValue = ""; // intro 필드의 원래 값을 저장하는 변수
 let originalPetNameValue = ""; // intro 필드의 원래 값을 저장하는 변수
 
@@ -80,7 +82,6 @@ function handleProfileData(data) {
   if (data.code === "404") {
     // 프로필 등록 api 부르기
     console.log("handleProfileData 실행 >> createProfile 살행");
-    alert("프로필 등록을 등록합니다");
     createProfile(window.location.pathname.split('/').pop());
   } else if (data.code !== "404" && data.code !== "200") {
     console.log("handleProfileData 에러 발생 >> " + data.message);
@@ -169,7 +170,11 @@ function createProfile(nickname) {
 
 // 프로필 등록 api 후처리 함수
 function handleCreateProfile(data) {
-  if (data.result === true) {
+  if (data.code === "404") {
+    console.log(data.message);
+    alert(data.message);
+    window.location.href = "/";
+  } else if (data.result === true) {
     console.log("handleCreateProfile 실행 >> true");
     alert("프로필 등록이 완료되었습니다.");
     window.location.reload();
@@ -225,6 +230,19 @@ function createReqeustDto(nickname) {
   return ProfileRequestDto;
 }
 
+// 회원 탈퇴
+function withdrawAccount(data) {
+  if (data.result === true) {
+    console.log("withdrawAccount 실행 >> true");
+    alert("회원 탈퇴가 완료되었습니다.");
+    window.location.href = "/";
+  } else {
+    console.log("withdrawAccount 실행 >> false");
+    alert("회원 탈퇴가 실패되었습니다. 다시 시도해주세요.");
+    window.location.href = "/";
+  }
+}
+
 // 초기화 함수
 function initialize() {
   // 반려동물 나이 옵션 설정
@@ -259,6 +277,21 @@ function initialize() {
     event.preventDefault(); // 기본 폼 제출 방지
     fetchProfileJson("PATCH", saveProfileData, "/api/mypage/profiles/edit",
         createReqeustDto(nickname));
+
+  });
+
+  // 회원 탈퇴 버튼을 누를시 api 요청
+  deleteAccountBtn.addEventListener('click', event => {
+    event.preventDefault(); // 기본 폼 제출 방지
+    const deleteAccountMessage = confirm("계정이 영구 삭제됩니다. 정말 탈퇴하시겠습니까?");
+    if (deleteAccountMessage) { // 확인 클릭시
+      console.log(nickname + " 회원님 탈퇴 알림창에 확인 클릭 ");
+      fetchProfile("GET", withdrawAccount,
+          `/api/users/withdraw?nickname=${encodeURIComponent(nickname)}`);
+    } else {
+      console.log(nickname + "회원 탈퇴가 취소되었습니다.");
+      alert("회원 탈퇴가 취소되었습니다. ")
+    }
 
   });
 }

@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 
 // 프로필 수정 등 요청 결과를 담아 보내는 응답 DTO
-public class UpdateResultDto {
+public class RequestResultDto {
 
     private String code; // 상태코드
     private String message; // 상태 메시지
