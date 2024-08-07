@@ -61,14 +61,22 @@ async function tempJoin(event) {
           body: JSON.stringify(jsonData)
         });
 
-    const data = await response.json();
+    const res = await response.json();
 
     if (!response.ok) {
-      alert("옳바른 회원가입 데이터 형식이 아닙니다.")
-      throw new Error(data.message || "error");
+      if (res.code === "GE-010") {
+        alert("옳바른 회원가입 데이터 형식이 아닙니다.")
+        return
+      } else {
+        alert("[ERROR]" + res.code + " : " + res.message)
+        return
+      }
     }
+
     await getCertificationEmail();
+
     window.location.href = '/join/email-certificate/' + email; // 원하는 URL로 변경
+
   } catch (error) {
     console.error(error);
   }
@@ -91,11 +99,11 @@ async function checkEmail() {
 
     if (!response.ok) {
       isEmailChecked = false;
-      if (res.code === "400") {
+      if (res.code === "JE-001") {
         alert("이미 사용중인 이메일입니다. 다른 이메일을 입력해주세요.")
         return;
       }
-      alert("잘못된 요청입니다.")
+      alert("[ERROR]" + res.code + " : " + res.message)
       return;
     }
 
@@ -105,7 +113,6 @@ async function checkEmail() {
   } catch (error) {
     console.error(error);
     isEmailChecked = false;
-    alert("잘못된 요청입니다.")
   }
 }
 
@@ -126,15 +133,13 @@ async function checkNickName() {
 
     if (!response.ok) {
       isNicknameChecked = false;
-      if (res.code === "400") {
+      if (res.code === "JE-002") {
         alert("이미 사용중인 유저명입니다. 다른 유저명을 입력해주세요.")
         return;
       }
-      alert("잘못된 요청입니다.")
+      alert("[ERROR]" + res.code + " : " + res.message)
       return;
     }
-
-    console.log(res);
 
     isNicknameChecked = true;
     alert("사용가능한 유저명입니다.")
@@ -142,7 +147,6 @@ async function checkNickName() {
   } catch (error) {
     console.error(error);
     isNicknameChecked = false;
-    alert("잘못된 요청입니다.")
   }
 }
 
@@ -158,13 +162,12 @@ async function getCertificationEmail() {
           }
         });
 
-    if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || "error");
-    }
-
     const res = await response.json();
-    console.log(res);
+
+    if (!response.ok) {
+      alert("[ERROR]" + res.code + " : " + res.message)
+      location.reload();
+    }
 
   } catch (error) {
     console.error(error);

@@ -1,6 +1,6 @@
-package com.fluffytime.login.exception;
+package com.fluffytime.login.exception.login;
 
-import com.fluffytime.login.exception.errorcode.LoginErrorCode;
+import com.fluffytime.common.exception.business.FluffyException;
 
 public class MisMatchedPassword extends FluffyException {
 

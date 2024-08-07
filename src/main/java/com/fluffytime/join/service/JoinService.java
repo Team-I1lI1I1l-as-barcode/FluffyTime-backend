@@ -6,6 +6,7 @@ import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_E
 import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_NICKNAME;
 import static com.fluffytime.join.dto.response.JoinResponseCode.TEMP_JOIN_SUCCESS;
 
+import com.fluffytime.common.exception.global.NotFoundRoleName;
 import com.fluffytime.domain.Role;
 import com.fluffytime.domain.User;
 import com.fluffytime.domain.UserRole;
@@ -17,7 +18,6 @@ import com.fluffytime.join.dto.response.JoinResponse;
 import com.fluffytime.join.exception.AlreadyExistsEmail;
 import com.fluffytime.join.exception.AlreadyExistsNickname;
 import com.fluffytime.join.exception.InvalidTempUser;
-import com.fluffytime.join.exception.NotFoundRoleName;
 import com.fluffytime.join.exception.NotFoundTempUser;
 import com.fluffytime.repository.RoleRepository;
 import com.fluffytime.repository.UserRepository;

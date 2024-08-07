@@ -3,14 +3,14 @@ package com.fluffytime.login.service;
 import static com.fluffytime.login.dto.response.LoginResponseCode.LOGIN_SUCCESS;
 import static com.fluffytime.login.dto.response.LoginResponseCode.REFRESH_TOKEN_GENERATE_SUCCESS;
 
+import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.RefreshToken;
 import com.fluffytime.domain.User;
 import com.fluffytime.login.dto.request.LoginUser;
 import com.fluffytime.login.dto.response.ApiResponse;
 import com.fluffytime.login.dto.response.UserLoginResponse;
-import com.fluffytime.login.exception.MisMatchedPassword;
-import com.fluffytime.login.exception.NotFoundToken;
-import com.fluffytime.login.exception.NotFoundUser;
+import com.fluffytime.login.exception.jwt.NotFoundToken;
+import com.fluffytime.login.exception.login.MisMatchedPassword;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -19,10 +19,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class LoginService {
 
@@ -32,99 +34,113 @@ public class LoginService {
     private final JwtTokenizer jwtTokenizer;
     private final HttpServletResponse httpServletResponse;
 
-    public ApiResponse<UserLoginResponse> verifyUser(LoginUser user) {
-        User findUser = userRepository.findByEmail(user.getEmail()).orElseThrow(NotFoundUser::new);
+    public ApiResponse<UserLoginResponse> verifyUser(LoginUser loginUser,
+        HttpServletResponse response) {
+        User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(NotFoundUser::new);
+        log.info("password = {}", loginUser.getPassword());
 
-        if (bCryptPasswordEncoder.matches(findUser.getPassword(), user.getPassword())) {
+        // !!! 파라미터순서 중요 !!!
+        if (!bCryptPasswordEncoder.matches(loginUser.getPassword(), user.getPassword())) {
             throw new MisMatchedPassword();
         }
 
-        List<String> roles = findUser.getUserRoles().stream().map(role -> role
+        // 3. 유저의 권한 꺼내오기
+        List<String> roles = user.getUserRoles().stream().map(role -> role
             .getRole()
             .getRoleName()
             .getName()
         ).toList();
 
+        // accessToken 발급하기
         String accessToken = jwtTokenizer.createAccessToken(
-            findUser.getUserId(),
-            findUser.getEmail(),
-            findUser.getNickname(),
+            user.getUserId(),
+            user.getEmail(),
+            user.getNickname(),
             roles
         );
 
+        // refresh 발급하기
         String refreshToken = jwtTokenizer.createRefreshToken(
-            findUser.getUserId(),
-            findUser.getEmail(),
-            findUser.getNickname(),
+            user.getUserId(),
+            user.getEmail(),
+            user.getNickname(),
             roles
         );
 
+        // refresh 토큰 db에 저장
         RefreshToken refreshTokenEntity = RefreshToken.builder()
             .value(refreshToken)
-            .userId(findUser.getUserId())
+            .userId(user.getUserId())
             .build();
-
         refreshTokenService.addRefreshToken(refreshTokenEntity);
 
-        UserLoginResponse response = UserLoginResponse.builder()
+        // 응답으로 보낼 정보 설정 (토큰 + 유저 정보)
+        UserLoginResponse userLoginResponse = UserLoginResponse.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
-            .userId(findUser.getUserId())
-            .email(findUser.getEmail())
+            .userId(user.getUserId())
+            .email(user.getEmail())
             .build();
 
+        // 쿠키에 토큰 저장
+        // 엑세스 토큰 쿠키
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setPath("/");
         accessTokenCookie.setMaxAge(
             Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT) / 1000); // 30분
 
+        // 리프레시 토큰 쿠키
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        // refreshTokenCookie.setSecure(true); // HTTPS 사용시
         refreshTokenCookie.setPath("/");
+        refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setMaxAge(
             Math.toIntExact(JwtTokenizer.REFRESH_TOKEN_EXPIRE_COUNT / 1000)); // 7일
 
-        httpServletResponse.addCookie(accessTokenCookie);
-        httpServletResponse.addCookie(refreshTokenCookie);
+        response.addCookie(accessTokenCookie);
+        response.addCookie(refreshTokenCookie);
 
-        return ApiResponse.response(LOGIN_SUCCESS, response);
+        return ApiResponse.response(LOGIN_SUCCESS, userLoginResponse);
     }
 
+    // 리프레시 토큰 -> acc 토큰 생성
     public ApiResponse<UserLoginResponse> getRefreshToken(HttpServletRequest req,
         HttpServletResponse res) {
-        //할일!!
-        //1. 쿠키로부터 리프레시토큰을 얻어온다.
-        String refreshToken = null;
+
+        //1. 쿠키 안에 있는 refresh token 꺼내기
         Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
+        String refreshToken = null;
+
+        if (cookies != null) { // 쿠키들이 존재한다면
             for (Cookie cookie : cookies) {
+                // 쿠키의 키 이름이 refreshToken 인 것 찾기
                 if ("refreshToken".equals(cookie.getName())) {
                     refreshToken = cookie.getValue();
                     break;
                 }
             }
         }
-        //2-1. 없다.  (오류로  응담.
+        // 만약 쿠키가 없거나, 쿠키들을 살펴봤는데 refreshToken이 없다면
         if (refreshToken == null) {
+            // 에러 메세지 반환
             throw new NotFoundToken();
         }
-        //2-2. 있을때.
-        //3. 토큰으로부터 정보를얻어와요.
-        Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
 
+        //2. 쿠키에 refreshToken이 있다면, 정보 얻어오기
+        Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
+        // 클레임 객체를 통해 주키 id 찾기
+        Long userId = Long.valueOf((Integer) claims.get("userId"));
+        // id를 이용하여 user 사용자 객체 찾기 -> 없을 시 예외 발생
         User user = userRepository.findById(userId)
             .orElseThrow(NotFoundUser::new);
-
-        //4. accessToken 생성
+        // 클래임 객체를 통해 해당 사용자 권한들 뽑기
         List roles = (List) claims.get("roles");
 
+        //3. accessToken 생성
         String accessToken = jwtTokenizer.createAccessToken(userId, user.getEmail(),
             user.getNickname(), roles);
 
-        //5. 쿠키 생성 response로 보내고.
+        //4. 쿠키 생성 후 accessToken 담아서 응답으로 보낸다.
         Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
         accessTokenCookie.setHttpOnly(true);
         accessTokenCookie.setPath("/");

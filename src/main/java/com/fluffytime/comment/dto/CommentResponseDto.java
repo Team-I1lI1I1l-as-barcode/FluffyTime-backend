@@ -1,5 +1,6 @@
 package com.fluffytime.comment.dto;
 
+import com.fluffytime.domain.Comment;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,4 +17,11 @@ public class CommentResponseDto {
     private String content;
     private String nickname;
     private LocalDateTime createdAt;
+
+    public CommentResponseDto(Comment comment) {
+        this.commentId = comment.getCommentId();
+        this.content = comment.getContent();
+        this.nickname = comment.getUser().getNickname();
+        this.createdAt = LocalDateTime.now();
+    }
 }

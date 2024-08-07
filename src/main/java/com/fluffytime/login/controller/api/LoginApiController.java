@@ -25,9 +25,9 @@ public class LoginApiController {
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<UserLoginResponse>> login(
-        @RequestBody @Valid LoginUser user) {
-        log.info("login user = {}", user.toString());
-        return ResponseEntity.ok(loginService.verifyUser(user));
+        @RequestBody @Valid LoginUser loginUser, HttpServletResponse response) {
+        log.info("loginuser = {}", loginUser.toString());
+        return ResponseEntity.ok(loginService.verifyUser(loginUser, response));
     }
 
     @PostMapping("/refreshToken")
