@@ -48,6 +48,8 @@ public class SecurityConfig {
                         "/api/explore/**",
                         "/api/posts/**",
                         "/api/comments/**",
+                        "/api/tags/**",
+                        "/api/tagposts/**",
 
                         "/static/**",
                         "/html/**",

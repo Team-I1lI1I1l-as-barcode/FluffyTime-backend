@@ -12,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service // 서비스 레이어 어노테이션
-@RequiredArgsConstructor // final 필드를 초기화하는 생성자 자동 생성
+@Service
+@RequiredArgsConstructor
 public class PostService {
 
-    private final PostRepository postRepository; // PostRepository 주입받음
+    private final PostRepository postRepository;
     private final S3Service s3Service; // S3Service 주입받음
 
     // 게시글 등록하기

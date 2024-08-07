@@ -14,4 +14,5 @@ public class PostRequest {
     private String content;
     private TempStatus tempStatus;
     private List<String> imageUrls = new ArrayList<>();
+    private List<Long> tagId = new ArrayList<>();
 }
