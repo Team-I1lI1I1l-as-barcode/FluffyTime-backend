@@ -39,12 +39,23 @@ public class MyPageService {
     }
 
     // 마이페이지 사용자 조회(nickname으로 조회)
+//    @Transactional(readOnly = true)
+//    public User findUserByNickname(String nickname) {
+//        log.info("findUserByNickname 실행");
+//        return userRepository.findByNickname(nickname).orElseThrow(
+//            () -> new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
+//                MyPageExceptionCode.NOT_FOUND_USER.getMessage()));
+//    }
     @Transactional(readOnly = true)
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
-        return userRepository.findByNickname(nickname).orElseThrow(
-            () -> new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
-                MyPageExceptionCode.NOT_FOUND_USER.getMessage()));
+        Optional<User> optionalUser = userRepository.findByNickname(nickname);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return user;
+        } else {
+            return null;
+        }
     }
 
 
@@ -58,7 +69,7 @@ public class MyPageService {
 
             // 기존 게시물 리스트에서 필요한 데이터만 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
-                .map(post -> new PostDto(post.getTitle()))
+                .map(post -> new PostDto(post.getContent()))
                 .collect(Collectors.toList());
 
             Profile profile = user.getProfile(); //프로필 객체

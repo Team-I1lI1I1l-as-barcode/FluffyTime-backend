@@ -3,12 +3,15 @@ package com.fluffytime.comment.service;
 import com.fluffytime.comment.config.error.exception.PostNotFoundException;
 import com.fluffytime.comment.config.error.exception.UserNotFoundException;
 import com.fluffytime.comment.dto.CommentRequestDto;
+import com.fluffytime.comment.dto.CommentResponseDto;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.User;
-import com.fluffytime.repository.comment.CommentRepository;
-import com.fluffytime.repository.post.PostRepository;
-import com.fluffytime.repository.user.UserRepository;
+import com.fluffytime.repository.CommentRepository;
+import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.UserRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,4 +34,26 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    //댓글 조회
+    public List<CommentResponseDto> getCommentByPostId(Long postId) {
+        List<Comment> commentList = commentRepository.findByPostPostId(postId);
+        return commentList.stream()
+            .map(CommentResponseDto::new)
+            .collect(Collectors.toList());
+    }
+
+    //댓글 수정
+    public void updateComment(Long commentId, String content) {
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("comment not found"));
+        comment.setContent(content);
+        commentRepository.save(comment);
+    }
+
+    //댓글 삭제
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new RuntimeException("comment not found"));
+        commentRepository.delete(comment);
+    }
 }
