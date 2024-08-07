@@ -35,7 +35,6 @@ public class SecurityConfig {
                     "/login",
                     "/logout",
                     "/join/**",
-
                     "/api/users/**",
 
                     "/static/**",

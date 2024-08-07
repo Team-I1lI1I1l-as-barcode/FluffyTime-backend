@@ -10,7 +10,7 @@ spring:
   # spring jpa 설정
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
