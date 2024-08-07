@@ -51,9 +51,9 @@ public class CommentRestController {
     //댓글 수정
     @PutMapping("/update/{commentId}")
     public ResponseEntity<Void> updateComment(
-        @PathVariable(name = "commentId") Long commentId, @RequestBody String content) {
+        @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDto request) {
         try {
-            commentService.updateComment(commentId, content);
+            commentService.updateComment(commentId, request.getContent());
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

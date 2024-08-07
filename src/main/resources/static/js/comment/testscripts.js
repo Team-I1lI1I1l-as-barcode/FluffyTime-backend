@@ -11,19 +11,20 @@ async function fetchComments(postId) {
   comments.forEach(comment => {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
-    commentDiv.dataset.id = comment.id;
+    commentDiv.className = 'comment';
+    commentDiv.dataset.id = comment.commentId;
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'comment-content';
-    commentDiv.textContent = `${comment.nickname}: ${comment.content}`;
+    commentDiv.textContent = `${comment.commentId} ${comment.nickname}: ${comment.content}`;
 
     const editButton = document.createElement('button');
     editButton.textContent = '수정';
-    editButton.onclick = () => showEdit(comment.id, comment.content);
+    editButton.onclick = () => showEdit(comment.commentId, comment.content);
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = '삭제';
-    deleteButton.onclick = () => deleteComment(comment.id, postId);
+    deleteButton.onclick = () => deleteComment(comment.commentId, postId);
 
     commentDiv.appendChild(contentDiv);
     commentDiv.appendChild(editButton);
@@ -113,6 +114,7 @@ async function updateComment(commentId, newContent) {
 
 //댓글 삭제
 async function deleteComment(commentId, postId) {
+  console.log('Deleting comment with Id: ', commentId);
   try {
     const response = await fetch(`/api/comments/delete/${commentId}`, {
       method: 'DELETE',
