@@ -19,14 +19,11 @@ async function getCertificationResult() {
             'Content-Type': 'application/json'
           },
         });
-    const data = await response.json();
 
     if (!response.ok) {
-      certificateResultElement.innerHTML = "만료된 인증입니다."
-      throw new Error(data.message || "error");
+      certificateResultElement.innerHTML = "만료된 인증 요청"
+      return
     }
-
-    console.log(data);
     certificateResultElement.innerHTML = "이메일 인증 성공"
 
   } catch (error) {

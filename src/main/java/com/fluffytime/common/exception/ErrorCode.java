@@ -1,10 +1,10 @@
-package com.fluffytime.login.exception.errorcode;
+package com.fluffytime.common.exception;
 
 import org.springframework.http.HttpStatus;
 
 public interface ErrorCode {
 
-    HttpStatus getStatus();
+    HttpStatus getHttpStatus();
 
     String getCode();
 

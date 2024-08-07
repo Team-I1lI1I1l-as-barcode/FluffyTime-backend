@@ -1,6 +1,6 @@
 package com.fluffytime.join.exception;
 
-import com.fluffytime.join.exception.errorcode.JoinErrorCode;
+import com.fluffytime.common.exception.business.FluffyException;
 
 public class InvalidTempUser extends FluffyException {
 

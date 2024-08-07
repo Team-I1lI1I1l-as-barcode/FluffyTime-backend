@@ -1,6 +1,6 @@
-package com.fluffytime.login.exception;
+package com.fluffytime.login.exception.jwt;
 
-import com.fluffytime.login.exception.errorcode.JwtErrorCode;
+import com.fluffytime.common.exception.business.FluffyException;
 
 public class UnsupportedToken extends FluffyException {
 

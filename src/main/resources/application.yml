@@ -40,8 +40,8 @@ logging:
   level.org.springframework.security: TRACE
 
 jwt:
-  secretKey: 12345678901234567890123456789012
-  refreshKey: 12345678901234567890123456789012
+  secretKey: FeuFYnvZF7WmtRhzt6mTiASLwfvaiVDz
+  refreshKey: hWGk5QSH2GY57O0cNnmODyjT3BA9cE8A
 
 aws:
   s3:
