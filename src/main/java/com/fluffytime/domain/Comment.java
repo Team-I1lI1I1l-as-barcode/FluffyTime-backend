@@ -12,6 +12,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,11 +47,11 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @Builder
     public Comment(String content, User user, Post post) {
         this.content = content;
         this.user = user;
         this.post = post;
-        this.createdAt = LocalDateTime.now();
     }
 
     @PrePersist
