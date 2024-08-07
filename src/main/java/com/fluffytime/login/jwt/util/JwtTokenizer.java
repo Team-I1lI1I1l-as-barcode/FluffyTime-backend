@@ -25,7 +25,7 @@ public class JwtTokenizer {
     public final static Long REFRESH_TOKEN_EXPIRE_COUNT = 7 * 24 * 60 * 60 * 1000L; // 7일
 
     // 토큰 초기와 - application.yml 에서 key값 가져오기
-    public JwtTokenizer(@Value("${jwt.refreshKey}") String accessSecret,
+    public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
         @Value("${jwt.refreshKey}") String refreshSecret) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);

@@ -191,8 +191,7 @@ async function loadDraft() {
         postElement.classList.add('temp-post');
 
         const postContent = post.content.length > 40 ? post.content.substring(0,
-            40) + '...'
-            : post.content;
+            40) + '...' : post.content;
         const postDate = new Date(post.createdAt).toLocaleDateString();
 
         postElement.innerHTML = `
@@ -278,8 +277,7 @@ function prevImage(event) {
   event.preventDefault();
   if (imagesArray.length > 1) {
     currentImageIndex = (currentImageIndex === 0) ? imagesArray.length - 1
-        : currentImageIndex
-        - 1;
+        : currentImageIndex - 1;
     displayImages(); // 이전 이미지 표시
   }
 }
@@ -288,8 +286,7 @@ function nextImage(event) {
   event.preventDefault();
   if (imagesArray.length > 1) {
     currentImageIndex = (currentImageIndex === imagesArray.length - 1) ? 0
-        : currentImageIndex
-        + 1;
+        : currentImageIndex + 1;
     displayImages(); // 다음 이미지 표시
   }
 }
