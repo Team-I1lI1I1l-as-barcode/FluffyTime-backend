@@ -11,8 +11,8 @@ const intro = getElement("intro"); // 소개글
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 
-// 마이페이지 정보를 가져오는 함수
-function fetchMyPage(url) {
+// api  요청  함수
+function fetchMyPage(url, func) {
   console.log("fetchMyPage 실행");
   fetch(url, {
     method: "GET", // GET 요청
@@ -21,25 +21,39 @@ function fetchMyPage(url) {
     }
   })
   .then(response => response.json()) // 서버에서 보낸 응답을 JSON 형식으로 변환
-  .then(data => {
-    if (data.code !== "200") { // 오류 발생 시
-      alert(data.message);
-      console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
-      window.location.href = "/";
-    } else { // 성공적인 응답 시
-      console.log("fetchMyPage 응답 Success");
-      nickName.innerText = data.nickname;
-      posts_count.innerText = data.postsList.length;
-      pet_name.innerText = data.petName;
-      pet_sex.innerText = data.petSex;
-      pet_age.innerText = data.petAge;
-      intro.innerText = data.intro;
-      renderPosts(data.postsList);
-    }
-  })
+  .then(data => func(data))
   .catch(error => {
     console.log("서버 오류 발생:" + error);
   });
+}
+
+// 마이페이지 정보 로드 함수
+function handleProfileData(data) {
+  if (data.code !== "200") { // 오류 발생 시
+    alert(data.message);
+    console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
+    window.location.href = "/";
+  } else { // 성공적인 응답 시
+    console.log("fetchMyPage 응답 Success");
+    nickName.innerText = data.nickname;
+    posts_count.innerText = data.postsList.length;
+    pet_name.innerText = data.petName;
+    pet_sex.innerText = data.petSex;
+    pet_age.innerText = data.petAge;
+    intro.innerText = data.intro;
+    renderPosts(data.postsList);
+  }
+}
+
+// 프로필 편집 페이지로 이동하는 함수
+function myPageEdit(data) {
+  if (data.code !== "200") { // 오류 발생 시
+    alert(data.message);
+    console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
+    window.location.href = "/";
+  } else { // 성공적인 응답 시
+    window.location.href = `/mypage/profile/edit/${data.nickname}`;
+  }
 }
 
 // 게시물 목록을 렌더링하는 함수
@@ -59,19 +73,15 @@ function renderPosts(posts) {
 function setupProfileEditButton() {
   console.log("setupProfileEditButton 실행");
   getElement("profile_edit_button").addEventListener('click', () => {
-    window.location.href = "/mypage/profile/edit/test";
+    fetchMyPage("/api/mypage/info", myPageEdit); // 프로필 편집 url 설정
   });
 }
 
 // 초기화 함수
 function initialize() {
   console.log("initialize 실행");
-
   setupProfileEditButton();
-
-  // 현재 URL 경로에서 파라미터 추출
-  const nickname = window.location.pathname.split('/').pop();
-  fetchMyPage(`/api/mypage/info?nickname=${encodeURIComponent(nickname)}`);
+  fetchMyPage("/api/mypage/info", handleProfileData); // 마이페이지 정보 불러오기
 }
 
 // 페이지 로드 시 초기화 함수 호출

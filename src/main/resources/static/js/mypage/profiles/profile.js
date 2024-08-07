@@ -164,7 +164,7 @@ public_status.addEventListener('change', activateSubmitButton);
 function createProfile(nickname) {
   console.log("createProfile 실행");
   fetchProfile("POST", handleCreateProfile,
-      `/api/mypage/profiles/reg?nickname=${encodeURIComponent(nickname)}`)
+      "/api/mypage/profiles/reg")
   console.log("fetchProfile 실행");
 }
 
@@ -257,7 +257,7 @@ function initialize() {
 
   // 프로필 정보 불러오기
   fetchProfile("GET", handleProfileData,
-      `/api/mypage/profiles/info?nickname=${encodeURIComponent(nickname)}`);
+      "/api/mypage/profiles/info");
 
   // 닉네임 변경시 중복확인 버튼 활성화
   username.addEventListener('keyup', () => {
@@ -287,10 +287,11 @@ function initialize() {
     if (deleteAccountMessage) { // 확인 클릭시
       console.log(nickname + " 회원님 탈퇴 알림창에 확인 클릭 ");
       fetchProfile("GET", withdrawAccount,
-          `/api/users/withdraw?nickname=${encodeURIComponent(nickname)}`);
+          "/api/users/withdraw");
     } else {
       console.log(nickname + "회원 탈퇴가 취소되었습니다.");
       alert("회원 탈퇴가 취소되었습니다. ")
+      window.location.href = "/";
     }
 
   });
