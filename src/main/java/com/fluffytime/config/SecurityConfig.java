@@ -3,6 +3,7 @@ package com.fluffytime.config;
 import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.login.security.CustomUserDetailsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtTokenizer jwtTokenizer;
 
@@ -29,64 +31,33 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                        "/login",
-                        "/logout",
-                        "/join/**",
+                .requestMatchers(
+                    "/login",
+                    "/logout",
+                    "/join/**",
+                    "/api/users/**",
 
-                        // 인증 필요
-                        // 권한 - USER
-                        // 화면
-                        "/",
-                        "/test", // 댓글 테스트용
-                        "/mypage/**",
-                        "/posts/**",
-                        "/explore/**",
-                        // api
-                        "/api/users/**",
-                        "/api/mypage/**",
-                        "/api/explore/**",
-                        "/api/posts/**",
-                        "/api/comments/**",
-                        "/api/tags/**",
-                        "/api/tagposts/**",
-
-                        "/static/**",
-                        "/html/**",
-                        "/js/**",
-                        "/css/**",
-                        "/image/**"
-
-//                    "/static/html/**",
-
-//                    "/static/css/mypage/profiles/**",
-//                    "/static/html/mypage/profiles/**",
-//                    "/static/html/mypage/**",
-//                    "/static/js/mypage/**",
-//                    "/static/js/mypage/profiles/**"
-//                    "/mypage/{nickname}",
-//                    "/mypage/profile/edit/{nickname}",
-//                    "/api/mypage/info",
-//                    "/api/mypage/profiles/info",
-//                    "/api/mypage/profiles/edit",
-//                    "/api/mypage/profiles/check-username",
-//                    "/api/users/withdraw"
-                        // 권한 - ADMIN
-                    ).permitAll()
-                    .requestMatchers("/admin").hasRole("ADMIN")
-                    .anyRequest().authenticated()
+                    "/static/**",
+                    "/html/**",
+                    "/js/**",
+                    "/css/**",
+                    "/image/**"
+                ).permitAll()
+                .anyRequest().authenticated()
             )
-            .csrf(csrf -> csrf.disable())
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
                 UsernamePasswordAuthenticationFilter.class)
+            .formLogin(form -> form.disable())
             .sessionManagement(
                 sessionManagement -> sessionManagement.sessionCreationPolicy(
                     SessionCreationPolicy.STATELESS))
-            .formLogin(form -> form.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .exceptionHandling(
-                exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint));
+                exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
+                    .accessDeniedPage("/error")
+            );
 
         return http.build();
     }
@@ -103,7 +74,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+    public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

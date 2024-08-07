@@ -20,15 +20,18 @@ async function join() {
           },
         });
 
-    const data = await response.json();
+    const res = await response.json();
 
     if (!response.ok) {
-      if (data.code === "401") {
+      if (res.code === "JE-004") {
         alert("이메일 링크 클릭 후 완료버튼을 눌러주세요.")
-      } else if (data.code === "404") {
+        return
+      } else if (res.code === "JE-003") {
         window.location.href = '/join/fail';
+      } else {
+        alert("[ERROR]" + res.code + " : " + res.message)
+        return
       }
-      throw new Error(data.message || "error");
     }
 
     window.location.href = '/join/success';
