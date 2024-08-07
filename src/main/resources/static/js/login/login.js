@@ -29,7 +29,6 @@ async function loginProcess(event) {
           },
           body: JSON.stringify(jsonData)
         });
-
     const data = await response.json();
 
     if (!response.ok) {
