@@ -40,12 +40,12 @@ logging:
   level.org.springframework.security: TRACE
 
 jwt:
-  secretKey: FeuFYnvZF7WmtRhzt6mTiASLwfvaiVDz
-  refreshKey: hWGk5QSH2GY57O0cNnmODyjT3BA9cE8A
+  secretKey: ${JWT_SECRET_KEY}
+  refreshKey: ${JWT_REFRESH_KEY}
 
 aws:
   s3:
-    bucket-name: fluffytime-bucket-yubin
+    bucket-name: ${AWS_BUCKET_NAME}
     region: ${AWS_REGION}
   credentials:
     access-key-id: ${AWS_ACCESS_KEY_ID}
