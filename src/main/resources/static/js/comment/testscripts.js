@@ -86,6 +86,7 @@ async function fetchReplies(commentId, replyDiv) {
   replies.forEach(reply => {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
+    replyElement.dataset.id = reply.replyId;
     replyElement.textContent = `${reply.replyId} ${reply.nickname}: ${reply.content}`;
 
     const editButton = document.createElement('button');

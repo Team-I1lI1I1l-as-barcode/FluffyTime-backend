@@ -1,7 +1,8 @@
 package com.fluffytime.reply.service;
 
-import com.fluffytime.comment.exception.CommentNotFoundException;
-import com.fluffytime.comment.exception.UserNotFoundException;
+import com.fluffytime.common.exception.global.NotFoundComment;
+import com.fluffytime.common.exception.global.NotFoundReply;
+import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
@@ -26,9 +27,9 @@ public class ReplyService {
     //답글 저장
     public void createReply(ReplyRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(NotFoundUser::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
-            .orElseThrow(CommentNotFoundException::new); //임시 예외처리
+            .orElseThrow(NotFoundComment::new); //임시 예외처리
 
         Reply reply = Reply.builder()
             .content(requestDto.getContent())
@@ -49,7 +50,7 @@ public class ReplyService {
     //답글 수정
     public void updateReply(Long replyId, String content) {
         Reply reply = replyRepository.findById(replyId)
-            .orElseThrow(() -> new RuntimeException("reply not found"));
+            .orElseThrow(NotFoundReply::new);
         reply.setContent(content);
         replyRepository.save(reply);
     }
@@ -57,7 +58,7 @@ public class ReplyService {
     //답글 삭제
     public void deleteReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
-            .orElseThrow(() -> new RuntimeException("reply not found"));
+            .orElseThrow(NotFoundReply::new);
         replyRepository.delete(reply);
     }
 }

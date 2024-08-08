@@ -2,9 +2,9 @@ package com.fluffytime.comment.service;
 
 import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.comment.dto.CommentResponseDto;
-import com.fluffytime.comment.exception.CommentNotFoundException;
-import com.fluffytime.comment.exception.PostNotFoundException;
-import com.fluffytime.comment.exception.UserNotFoundException;
+import com.fluffytime.common.exception.global.NotFoundComment;
+import com.fluffytime.common.exception.global.NotFoundPost;
+import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.User;
@@ -27,9 +27,9 @@ public class CommentService {
     //댓글 저장
     public void createComment(CommentRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(UserNotFoundException::new);
+            .orElseThrow(NotFoundUser::new);
         Post post = postRepository.findById(requestDto.getPostId())
-            .orElseThrow(PostNotFoundException::new);
+            .orElseThrow(NotFoundPost::new);
 
         Comment comment = Comment.builder()
             .content(requestDto.getContent())
@@ -50,7 +50,8 @@ public class CommentService {
     //댓글 수정
     public void updateComment(Long commentId, String content) {
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(CommentNotFoundException::new);
+            .orElseThrow(NotFoundComment::new);
+
         comment.setContent(content);
         commentRepository.save(comment);
     }
@@ -58,7 +59,7 @@ public class CommentService {
     //댓글 삭제
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(CommentNotFoundException::new);
+            .orElseThrow(NotFoundComment::new);
         commentRepository.delete(comment);
     }
 }
