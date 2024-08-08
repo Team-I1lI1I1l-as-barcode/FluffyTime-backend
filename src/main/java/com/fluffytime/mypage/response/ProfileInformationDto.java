@@ -14,8 +14,6 @@ import lombok.Setter;
 // 프로필 정보를 클라이언트에게 보내는 응답 DTO
 public class ProfileInformationDto {
 
-    private String code; // 상태코드
-    private String message; // 상태 메시지
     private String nickname; // 닉네임
     private String email; // 이메일
     private String intro; // 소개

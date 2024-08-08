@@ -50,5 +50,9 @@ public class Profile {
         this.publicStatus = "1";
     }
 
-
+    public Profile(String petSex, Long petAge, String petCategory) {
+        this.petSex = petSex;
+        this.petAge = petAge;
+        this.petCategory = petCategory;
+    }
 }

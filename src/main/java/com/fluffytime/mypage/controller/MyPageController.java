@@ -26,11 +26,11 @@ public class MyPageController {
         User user = myPageService.findByAccessToken(httpServletRequest);
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);
 
-        if (isAuthorized) {
-            return "/html/mypage/mypage.html";
-        } else {
-            return "/html/error/error.html";
-        }
+//        if (isAuthorized) {
+        return "/html/mypage/mypage.html";
+//        } else {
+//            return "/html/error/error.html";
+//        }
     }
 
     // 프로필 편집 페이지
@@ -40,10 +40,10 @@ public class MyPageController {
         User user = myPageService.findByAccessToken(httpServletRequest);
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);
 
-        if (isAuthorized) {
-            return "/html/mypage/profiles/profile.html";
-        } else {
-            return "/html/error/error.html";
-        }
+        //    if (isAuthorized) {
+        return "/html/mypage/profiles/profile.html";
+//        } else {
+//            return "/html/error/error.html";
+//        }
     }
 }

@@ -2,13 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
   <title>홈페이지</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 <body>
-<h1> 메인 홈페이지 입니다.</h1>
-<button id="mypageBtn">마이페이지</button>
-<button id="userpageBtn">유저페이지</button>
+<div class="container">
+  <aside class="sidebar">
+    <h2>FluffyTime</h2>
+    <ul>
+      <li>
+        <span class="material-symbols-rounded">home</span>
+        <a href="#">홈</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">search</span>
+        <a href="#">검색</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">explore</span>
+        <a href="#">탐색 탭</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">add_box</span>
+        <a href="#">만들기</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">person</span>
+        <a href="#">프로필</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">favorite</span>
+        <a href="#">알림</a>
+      </li>
+    </ul>
+    <div class="more-menu">
+      <span class="material-symbols-rounded">menu</span>
+      <a href="#">더보기</a>
+    </div>
+  </aside>
+  <main class="content">
+    <h1> 메인 홈페이지 입니다.</h1>
+    <button id="mypageBtn">마이페이지</button>
+    <button id="userpageBtn">유저페이지</button>
+  </main>
+</div>
+
 <script>
   document.getElementById("mypageBtn").addEventListener('click', event => {
     //window.location.href = "/mypage/test";
@@ -18,15 +58,19 @@
         'Content-Type': 'application/json'
       }
     })
-    .then(response => response.json()) // 서버에서 보낸 응답을 JSON 형식으로 변환
-    .then(data => {
-      if (data.code !== "200") { // 오류 발생 시
-        alert(data.message);
-        console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
-        window.location.href = "/";
-      } else { // 성공적인 응답 시
-        window.location.href = `/mypage/${data.nickname}`;
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(errorData => {
+          // 에러 메시지 포함하여 alert 호출
+          console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
+          alert('Error: ' + errorData.message);
+          window.location.href = "/";
+        });
       }
+      return response.json();
+    })  // 서버에서 보낸 응답을 JSON 형식으로 변환
+    .then(data => {
+      window.location.href = `/mypage/${data.nickname}`;
     })
     .catch(error => {
       console.log("서버 오류 발생:" + error);

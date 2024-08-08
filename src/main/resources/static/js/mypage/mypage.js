@@ -18,9 +18,20 @@ function fetchMyPage(url, func) {
     method: "GET", // GET 요청
     headers: {
       'Content-Type': 'application/json'
+
     }
   })
-  .then(response => response.json()) // 서버에서 보낸 응답을 JSON 형식으로 변환
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errorData => {
+        // 에러 메시지 포함하여 alert 호출
+        console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
+        alert('Error: ' + errorData.message);
+        window.location.href = "/";
+      });
+    }
+    return response.json();
+  }) // 서버에서 보낸 응답을 JSON 형식으로 변환
   .then(data => func(data))
   .catch(error => {
     console.log("서버 오류 발생:" + error);
@@ -29,31 +40,20 @@ function fetchMyPage(url, func) {
 
 // 마이페이지 정보 로드 함수
 function handleProfileData(data) {
-  if (data.code !== "200") { // 오류 발생 시
-    alert(data.message);
-    console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
-    window.location.href = "/";
-  } else { // 성공적인 응답 시
-    console.log("fetchMyPage 응답 Success");
-    nickName.innerText = data.nickname;
-    posts_count.innerText = data.postsList.length;
-    pet_name.innerText = data.petName;
-    pet_sex.innerText = data.petSex;
-    pet_age.innerText = data.petAge;
-    intro.innerText = data.intro;
-    renderPosts(data.postsList);
-  }
+  // 성공적인 응답 시
+  console.log("fetchMyPage 응답 Success");
+  nickName.innerText = data.nickname;
+  posts_count.innerText = data.postsList.length;
+  pet_name.innerText = data.petName;
+  pet_sex.innerText = data.petSex;
+  pet_age.innerText = data.petAge;
+  intro.innerText = data.intro;
+  renderPosts(data.postsList);
 }
 
 // 프로필 편집 페이지로 이동하는 함수
 function myPageEdit(data) {
-  if (data.code !== "200") { // 오류 발생 시
-    alert(data.message);
-    console.log("fetchMyPage 응답 에러 발생 >> " + data.message);
-    window.location.href = "/";
-  } else { // 성공적인 응답 시
-    window.location.href = `/mypage/profile/edit/${data.nickname}`;
-  }
+  window.location.href = `/mypage/profile/edit/${data.nickname}`;
 }
 
 // 게시물 목록을 렌더링하는 함수
