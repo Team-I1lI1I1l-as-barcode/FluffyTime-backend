@@ -2,36 +2,43 @@ let currentImageIndex = 0;
 let imagesArray = [];
 let currentDraftPostId = null;
 
+const postModalElement = document.getElementById('postModal');
+const draftModalElement = document.getElementById('draftModal');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const dragDropText = document.getElementById('dragDropText');
+const shareButton = document.getElementById('shareButton');
+const leftContent = document.getElementById('leftContent');
+const prevButton = document.getElementById('prevButton');
+const nextButton = document.getElementById('nextButton');
+const charCountElement = document.getElementById('charCount');
+const contentElement = document.getElementById('content');
+const completeContainer = document.getElementById('complete-container');
+
 function openModal() {
-  document.getElementById('postModal').style.display = 'flex';
+  postModalElement.style.display = 'flex';
 }
 
 function closeModal() {
-  document.getElementById('postModal').style.display = 'none';
+  postModalElement.style.display = 'none';
 }
 
 function openDraftModal() {
-  document.getElementById('draftModal').style.display = 'flex';
+  draftModalElement.style.display = 'flex';
   loadDraft();
 }
 
 function closeDraftModal() {
-  document.getElementById('draftModal').style.display = 'none';
+  draftModalElement.style.display = 'none';
 }
 
 function showComplete() {
   document.querySelector('.content').style.display = 'none';
-  document.getElementById('complete-container').style.display = 'block';
+  completeContainer.style.display = 'block';
 }
 
 function previewImages(event) {
   const files = event.target.files;
-  const previewContainer = document.getElementById('imagePreviewContainer');
-  const dragDropText = document.getElementById('dragDropText');
-  const shareButton = document.getElementById('shareButton');
-  const leftContent = document.getElementById('leftContent');
-
-  previewContainer.innerHTML = '';
+  imagePreviewContainer.innerHTML = '';
   imagesArray = [];
 
   if (files.length > 10) {
@@ -50,7 +57,7 @@ function previewImages(event) {
         img.src = e.target.result;
         img.classList.add('photo');
         img.style.objectFit = 'cover';
-        previewContainer.appendChild(img);
+        imagePreviewContainer.appendChild(img);
       }
     };
     reader.readAsDataURL(file);
@@ -61,20 +68,14 @@ function previewImages(event) {
     shareButton.style.display = 'none';
     leftContent.classList.add('fullscreen');
 
-    if (files.length > 1) {
-      document.getElementById('prevButton').style.display = 'block';
-      document.getElementById('nextButton').style.display = 'block';
-    } else {
-      document.getElementById('prevButton').style.display = 'none';
-      document.getElementById('nextButton').style.display = 'none';
-    }
+    prevButton.style.display = files.length > 1 ? 'block' : 'none';
+    nextButton.style.display = files.length > 1 ? 'block' : 'none';
   }
 }
 
 function updateCharCount() {
-  const content = document.getElementById('content').value;
-  const charCount = document.getElementById('charCount');
-  charCount.textContent = `${content.length} / 2200`;
+  const content = contentElement.value;
+  charCountElement.textContent = `${content.length} / 2200`;
 }
 
 function getJwtToken() {
@@ -96,10 +97,9 @@ function getJwtToken() {
 async function saveAsTemp(event) {
   event.preventDefault();
 
-  const content = document.getElementById('content').value;
+  const content = contentElement.value;
   const images = document.getElementById('images').files;
   const token = getJwtToken();
-  console.log('Token:', token); // 디버깅: 토큰 값 확인
 
   if (!content) {
     alert('내용을 입력하세요.');
@@ -124,33 +124,34 @@ async function saveAsTemp(event) {
     formData.append('images', images[i]);
   }
 
-  console.log('Sending request with token'); // 디버깅: 요청 보내기 전 로그
-  fetch('/api/posts/temp-reg', {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  }).then(response => {
+  try {
+    const response = await fetch('/api/posts/temp-reg', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
     if (response.ok) {
       alert('임시 저장되었습니다.');
       closeModal();
     } else {
-      alert('임시 저장에 실패했습니다.');
+      const data = await response.json();
+      alert(data.message || '임시 저장에 실패했습니다.');
     }
-  }).catch(error => {
+  } catch (error) {
     alert('임시 저장 중 오류가 발생했습니다.');
     console.error('Error:', error);
-  });
+  }
 }
 
 async function submitPost(event) {
   event.preventDefault();
 
-  const content = document.getElementById('content').value;
+  const content = contentElement.value;
   const images = document.getElementById('images').files;
   const token = getJwtToken();
-  console.log('Token:', token); // 디버깅: 토큰 값 확인
 
   if (!content) {
     alert('내용을 입력하세요.');
@@ -176,29 +177,30 @@ async function submitPost(event) {
     formData.append('images', images[i]);
   }
 
-  console.log('Sending request with token'); // 디버깅: 요청 보내기 전 로그
-  fetch('/api/posts/reg', {
-    method: 'POST',
-    body: formData,
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  }).then(response => {
+  try {
+    const response = await fetch('/api/posts/reg', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
+
     if (response.ok) {
-      return response.json();
+      const postId = await response.json();
+      document.querySelector('.content').style.display = 'none';
+      completeContainer.style.display = 'block';
+      setTimeout(() => {
+        completeContainer.style.display = 'none';
+        window.location.href = `/html/post/postDetail.html?postId=${postId}`;
+      }, 3000);
     } else {
-      throw new Error('게시물 등록에 실패했습니다.');
+      const data = await response.json();
+      throw new Error(data.message || '게시물 등록에 실패했습니다.');
     }
-  }).then(postId => {
-    document.querySelector('.content').style.display = 'none';
-    document.getElementById('complete-container').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('complete-container').style.display = 'none';
-      window.location.href = `/html/post/postDetail.html?postId=${postId}`;
-    }, 3000);
-  }).catch(error => {
+  } catch (error) {
     alert(error.message);
-  });
+  }
 }
 
 async function loadDraft() {
@@ -207,12 +209,12 @@ async function loadDraft() {
   tempPostsContainer.innerHTML = '';
 
   try {
-    console.log('Loading drafts with token'); // 디버깅: 요청 보내기 전 로그
     const response = await fetch(`/api/posts/temp-posts/list`, {
       headers: {
         'Authorization': 'Bearer ' + token
       }
     });
+
     if (response.ok) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
@@ -249,12 +251,11 @@ async function loadDraft() {
 }
 
 function continueDraft(post) {
-  document.getElementById('content').value = post.content;
+  contentElement.value = post.content;
   updateCharCount();
   currentDraftPostId = post.postId;
 
-  const previewContainer = document.getElementById('imagePreviewContainer');
-  previewContainer.innerHTML = '';
+  imagePreviewContainer.innerHTML = '';
   imagesArray = post.imageUrls;
   currentImageIndex = 0;
   displayImages();
@@ -264,23 +265,17 @@ function continueDraft(post) {
 }
 
 function displayImages() {
-  const previewContainer = document.getElementById('imagePreviewContainer');
-  previewContainer.innerHTML = '';
+  imagePreviewContainer.innerHTML = '';
 
   if (imagesArray.length > 0) {
     const img = document.createElement('img');
     img.src = imagesArray[currentImageIndex];
     img.classList.add('photo');
     img.style.objectFit = 'cover';
-    previewContainer.appendChild(img);
+    imagePreviewContainer.appendChild(img);
 
-    if (imagesArray.length > 1) {
-      document.getElementById('prevButton').style.display = 'block';
-      document.getElementById('nextButton').style.display = 'block';
-    } else {
-      document.getElementById('prevButton').style.display = 'none';
-      document.getElementById('nextButton').style.display = 'none';
-    }
+    prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none';
+    nextButton.style.display = imagesArray.length > 1 ? 'block' : 'none';
   }
 }
 
@@ -294,13 +289,13 @@ async function deleteTempPost(postId, event) {
   event.stopPropagation();
   const token = getJwtToken();
   try {
-    console.log('Deleting draft with token'); // 디버깅: 요청 보내기 전 로그
     const response = await fetch(`/api/posts/temp-delete/${postId}`, {
       method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + token
       }
     });
+
     if (response.ok) {
       loadDraft();
     } else {

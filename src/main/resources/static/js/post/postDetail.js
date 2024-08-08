@@ -5,7 +5,19 @@ let imageUrls = [];
 
 // JWT 토큰을 가져오는 함수
 function getJwtToken() {
-  return localStorage.getItem('jwtToken'); // 로컬 스토리지에서 토큰을 가져옴
+  const name = 'accessToken=';
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return '';
 }
 
 // 게시물 데이터 로드
@@ -21,44 +33,42 @@ async function loadPostData(postId) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
 
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-      const postData = await response.json();
-      currentPostId = postId;
+    const responseText = await response.text(); // 응답 텍스트를 직접 가져옵니다.
+    console.log('Response text:', responseText); // 디버그를 위해 응답 텍스트를 로그로 출력합니다.
 
-      const postContent = document.getElementById('postContent');
-      postContent.innerHTML = `<p>${postData.content}</p>`; // 게시물 내용 설정
+    const postData = JSON.parse(responseText); // JSON 파싱 시도
+    currentPostId = postId;
 
-      const imageContainer = document.getElementById('imageContainer');
-      imageContainer.innerHTML = ''; // 기존 이미지 초기화
-      if (Array.isArray(postData.imageUrls)) {
-        imageUrls = postData.imageUrls.filter(
-            url => url.startsWith("http://") || url.startsWith("https://"));
-        imageUrls.forEach((url, index) => {
-          const img = document.createElement('img');
-          img.src = url;
-          img.alt = `image ${index + 1}`;
-          img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
-          img.onerror = () => {
-            console.error('Failed to load image:', url);
-            img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
-          };
-          imageContainer.appendChild(img);
-        });
+    const postContent = document.getElementById('postContent');
+    postContent.innerHTML = `<p>${postData.content}</p>`; // 게시물 내용 설정
 
-        // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
-        if (imageUrls.length > 1) {
-          document.getElementById('prevButton').style.display = 'block';
-          document.getElementById('nextButton').style.display = 'block';
-        } else {
-          document.getElementById('prevButton').style.display = 'none';
-          document.getElementById('nextButton').style.display = 'none';
-        }
+    const imageContainer = document.getElementById('imageContainer');
+    imageContainer.innerHTML = ''; // 기존 이미지 초기화
+    if (Array.isArray(postData.imageUrls)) {
+      imageUrls = postData.imageUrls.filter(
+          url => url.startsWith("http://") || url.startsWith("https://"));
+      imageUrls.forEach((url, index) => {
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = `image ${index + 1}`;
+        img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
+        img.onerror = () => {
+          console.error('Failed to load image:', url);
+          img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
+        };
+        imageContainer.appendChild(img);
+      });
+
+      // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
+      if (imageUrls.length > 1) {
+        document.getElementById('prevButton').style.display = 'block';
+        document.getElementById('nextButton').style.display = 'block';
       } else {
-        console.error('imageUrls is not an array', postData.imageUrls);
+        document.getElementById('prevButton').style.display = 'none';
+        document.getElementById('nextButton').style.display = 'none';
       }
     } else {
-      throw new Error("Received content is not JSON");
+      console.error('imageUrls is not an array', postData.imageUrls);
     }
   } catch (error) {
     console.error('Error fetching post data:', error);
