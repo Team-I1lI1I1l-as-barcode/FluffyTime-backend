@@ -1,6 +1,5 @@
 package com.fluffytime.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,13 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,16 +19,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Table(name = "comments")
+@Table(name = "replies")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment {
+public class Reply {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id", nullable = false)
-    private Long commentId;
+    @Column(name = "reply_id", nullable = false)
+    private Long replyId;
 
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -44,25 +40,18 @@ public class Comment {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(
-        mappedBy = "comment",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private List<Reply> replyList = new ArrayList<>();
-
     @Builder
-    public Comment(String content, User user, Post post) {
+    public Reply(String content, User user, Comment comment) {
         this.content = content;
         this.user = user;
-        this.post = post;
+        this.comment = comment;
     }
 
     @PrePersist

@@ -26,12 +26,146 @@ async function fetchComments(postId) {
     deleteButton.textContent = '삭제';
     deleteButton.onclick = () => deleteComment(comment.commentId, postId);
 
+    // 답글 등록 칸과 버튼 추가
+    const replyDiv = document.createElement('div');
+    replyDiv.className = 'reply-section';
+
+    const replyTextarea = document.createElement('textarea');
+    replyTextarea.id = `reply-textarea-${comment.commentId}`;
+    replyTextarea.placeholder = '답글 내용을 입력하세요...';
+
+    const replyButton = document.createElement('button');
+    replyButton.textContent = '답글 달기';
+    replyButton.onclick = () => postReply(comment.commentId,
+        replyTextarea.value, postId);
+
+    replyDiv.appendChild(replyTextarea);
+    replyDiv.appendChild(replyButton);
+
+    // 답글 목록 추가
+    const repliesDiv = document.createElement('div');
+    repliesDiv.className = 'replies';
+
+    // 답글 조회 및 추가
+    fetchReplies(comment.commentId, repliesDiv);
+
     commentDiv.appendChild(contentDiv);
     commentDiv.appendChild(editButton);
     commentDiv.appendChild(deleteButton);
+    commentDiv.appendChild(replyDiv);
+    commentDiv.appendChild(repliesDiv);
 
     commentList.appendChild(commentDiv);
   });
+}
+
+//답글 조회
+async function fetchReplies(commentId, replyDiv) {
+  const response = await fetch(`/api/replies/comment/${commentId}`);
+  if (!response.ok) {
+    console.error('답글 목록 가져오기 실패!', response.status);
+    return;
+  }
+  const replies = await response.json();
+  replies.forEach(reply => {
+    const replyElement = document.createElement('div');
+    replyElement.className = 'reply';
+    replyElement.textContent = `${reply.replyId} ${reply.nickname}: ${reply.content}`;
+
+    const editButton = document.createElement('button');
+    editButton.textContent = '수정';
+    editButton.onclick = () => showEditReply(reply.replyId, reply.content);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = '삭제';
+    deleteButton.onclick = () => deleteReply(reply.replyId, commentId);
+
+    replyElement.appendChild(editButton);
+    replyElement.appendChild(deleteButton);
+
+    replyDiv.appendChild(replyElement);
+  });
+}
+
+// 답글 등록
+async function postReply(commentId, content, postId) {
+  const userId = document.getElementById('user-id').value;
+  try {
+    const response = await fetch('/api/replies/reg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({content, userId, commentId}),
+    });
+
+    if (response.ok) {
+      console.log('답글 등록 성공!');
+      await fetchComments(postId); // 댓글 목록 갱신
+    } else {
+      console.error('답글 등록 실패! 상태 코드: ', response.status);
+    }
+  } catch (error) {
+    console.error('답글 등록 중 예외 발생!', error);
+  }
+}
+
+// 답글 수정칸 보여주기
+function showEditReply(replyId, currentContent) {
+  const replyElement = document.querySelector(`.reply[data-id='${replyId}']`);
+  replyElement.innerHTML = ''; // 기존 내용 지우기
+
+  const editTextarea = document.createElement('textarea');
+  editTextarea.value = currentContent;
+
+  const saveButton = document.createElement('button');
+  saveButton.textContent = '수정 완료';
+  saveButton.onclick = () => updateReply(replyId, editTextarea.value);
+
+  replyElement.appendChild(editTextarea);
+  replyElement.appendChild(saveButton);
+}
+
+// 답글 수정
+async function updateReply(replyId, newContent) {
+  try {
+    const response = await fetch(`/api/replies/update/${replyId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({content: newContent}),
+    });
+
+    if (response.ok) {
+      console.log('답글 수정 성공!');
+      const commentId = document.querySelector(
+          `.reply[data-id='${replyId}']`).parentNode.dataset.id;
+      await fetchComments(2); // 댓글 목록 갱신 (postId를 적절히 대체)
+    } else {
+      console.error('답글 수정 실패! 상태 코드: ', response.status);
+    }
+  } catch (error) {
+    console.error('답글 수정 중 예외 발생!', error);
+  }
+}
+
+// 답글 삭제
+async function deleteReply(replyId, commentId) {
+  try {
+    const response = await fetch(`/api/replies/delete/${replyId}`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log('답글 삭제 성공!');
+      await fetchComments(2); // 댓글 목록 갱신 (postId를 적절히 대체)
+    } else {
+      console.error('답글 삭제 실패! 상태 코드: ', response.status);
+    }
+  } catch (error) {
+    console.error('답글 삭제 중 예외 발생!', error);
+  }
 }
 
 //댓글 등록
