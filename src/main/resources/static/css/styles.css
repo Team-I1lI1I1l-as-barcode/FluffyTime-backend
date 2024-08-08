@@ -1,0 +1,121 @@
+:root {
+  --primary-color: #FFCC00;
+  --text-color: #000000;
+  --background-color: #FFFFFF;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/*아이콘
+https://fonts.google.com/icons?icon.style=Rounded에서 'Inserting the icon'부분 사용
+채워진 아이콘은 클래스에 icon-fill 추가하거나 직접 속성 추가*/
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded', sans-serif;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle; /* 수직 중앙 정렬 */
+  font-size: 24px; /* 텍스트와 아이콘 크기 맞추기 */
+  line-height: 1;
+}
+
+.icon-fill {
+  font-variation-settings: 'FILL' 1;
+}
+
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2rem;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-family: "Sansita", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  margin: 1.5rem 0;
+}
+
+li {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.sidebar ul li a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-top: 0.2rem;
+}
+
+.sidebar ul li a:hover {
+  text-decoration: underline;
+}
+
+.more-menu {
+  position: absolute;
+  bottom: 0; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.more-menu a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  margin-left: 10px;
+  margin-top: 0.2rem;
+}
+
+.more-menu a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: -250px; /* 사이드바를 화면 밖으로 숨김 */
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.show {
+    left: 0; /* 사이드바를 표시 */
+  }
+
+  .content {
+    margin-left: 0;
+  }
+}

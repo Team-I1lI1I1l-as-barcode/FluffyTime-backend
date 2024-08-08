@@ -16,7 +16,7 @@ public class JoinRequest {
     private String email;
 
     @NotEmpty
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$", message = "패스워드는 영문 대.소문자, 숫자, 특수문자를 포함한 8~20자이어야 합니다.")
     private String password;
 
     @NotEmpty

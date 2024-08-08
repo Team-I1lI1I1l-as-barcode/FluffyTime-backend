@@ -5,6 +5,8 @@ import com.fluffytime.domain.TempStatus;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.PostRequest;
 import com.fluffytime.post.service.PostService;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +40,15 @@ public class PostRestController {
             postService.deleteTempPost(postRequest.getTempId());
         }
 
-        return ResponseEntity.ok(postId);
+        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
     }
 
     // 게시물 임시등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
         @RequestPart("images") MultipartFile[] files) {
-        return ResponseEntity.ok(handlePostRequest(postRequest, files, TempStatus.TEMP));
+        Long postId = handlePostRequest(postRequest, files, TempStatus.TEMP);
+        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
     }
 
     private Long handlePostRequest(PostRequest postRequest, MultipartFile[] files,
@@ -59,6 +62,9 @@ public class PostRestController {
                 throw new IllegalArgumentException("Too many files uploaded");
             }
 
+            // 기존에 업로드된 이미지 URL 리스트 초기화
+            postRequest.setImageUrls(new ArrayList<>());
+
             for (MultipartFile file : files) {
                 String fileName = s3Service.uploadFile(file);
                 String fileUrl = s3Service.getFileUrl(fileName);
@@ -66,7 +72,8 @@ public class PostRestController {
                 log.info("Uploaded file: {}, URL: {}", fileName, fileUrl);
             }
 
-            return postService.createPost(postRequest, files); // 게시물 생성
+            return postService.createPost(postRequest,
+                new MultipartFile[]{}); // 빈 배열로 전달하여 중복 업로드 방지
         } catch (Exception e) {
             log.error("Failed to upload files", e);
             throw new RuntimeException("Failed to upload files", e);
