@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,15 +25,15 @@ public class LoginApiController {
     private final LoginService loginService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<UserLoginResponse>> login(
+    public ResponseEntity<UserLoginResponse> login(
         @RequestBody @Valid LoginUser loginUser, HttpServletResponse response) {
         log.info("loginuser = {}", loginUser.toString());
-        return ResponseEntity.ok(loginService.verifyUser(loginUser, response));
+        return ResponseEntity.status(HttpStatus.OK).body(loginService.verifyUser(loginUser, response));
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<ApiResponse<UserLoginResponse>> refreshToken(HttpServletRequest request,
+    public ResponseEntity<UserLoginResponse> refreshToken(HttpServletRequest request,
         HttpServletResponse response) {
-        return ResponseEntity.ok(loginService.getRefreshToken(request, response));
+        return ResponseEntity.status(HttpStatus.OK).body(loginService.getRefreshToken(request, response));
     }
 }

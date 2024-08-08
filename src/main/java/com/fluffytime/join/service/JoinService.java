@@ -14,6 +14,7 @@ import com.fluffytime.join.dao.EmailCertificationDao;
 import com.fluffytime.join.dto.TempUser;
 import com.fluffytime.join.dto.request.JoinRequest;
 import com.fluffytime.join.dto.response.ApiResponse;
+import com.fluffytime.join.dto.response.CheckDuplicationResponse;
 import com.fluffytime.join.dto.response.JoinResponse;
 import com.fluffytime.join.exception.AlreadyExistsEmail;
 import com.fluffytime.join.exception.AlreadyExistsNickname;
@@ -36,7 +37,7 @@ public class JoinService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
-    public ApiResponse<JoinResponse> tempJoin(JoinRequest joinUser) {
+    public JoinResponse tempJoin(JoinRequest joinUser) {
         TempUser tempUser = TempUser.builder()
             .email(joinUser.getEmail())
             .password(bCryptPasswordEncoder.encode(joinUser.getPassword()))
@@ -46,16 +47,14 @@ public class JoinService {
 
         emailCertificationDao.saveEmailCertificationTempUser(tempUser);
 
-        JoinResponse response = JoinResponse.builder()
+        return JoinResponse.builder()
             .email(tempUser.getEmail())
             .nickname(tempUser.getNickname())
             .build();
-
-        return ApiResponse.response(TEMP_JOIN_SUCCESS, response);
     }
 
     @Transactional
-    public ApiResponse<JoinResponse> join(String email) {
+    public JoinResponse join(String email) {
 
         TempUser tempUser = emailCertificationDao.getTempUser(email)
             .orElseThrow(NotFoundTempUser::new);
@@ -83,31 +82,33 @@ public class JoinService {
 
         emailCertificationDao.removeTempUser(email);
 
-        JoinResponse response = JoinResponse.builder()
+        return JoinResponse.builder()
             .email(user.getEmail())
             .nickname(user.getNickname())
             .build();
-
-        return ApiResponse.response(JOIN_SUCCESS, response);
     }
 
     @Transactional(readOnly = true)
-    public ApiResponse<Void> checkExistsEmail(
+    public CheckDuplicationResponse checkExistsEmail(
         String email) {
         boolean isExists = userRepository.findByEmail(email).isPresent();
         if (isExists) {
             throw new AlreadyExistsEmail();
         }
-        return ApiResponse.response(NOT_DUPLICATED_EMAIL);
+        return CheckDuplicationResponse.builder()
+                .isExists(false)
+                .build();
     }
 
     @Transactional(readOnly = true)
-    public ApiResponse<Void> checkExistsNickname(
+    public CheckDuplicationResponse checkExistsNickname(
         String nickname) {
         boolean isExists = userRepository.findByNickname(nickname).isPresent();
         if (isExists) {
             throw new AlreadyExistsNickname();
         }
-        return ApiResponse.response(NOT_DUPLICATED_NICKNAME);
+        return CheckDuplicationResponse.builder()
+            .isExists(false)
+            .build();
     }
 }

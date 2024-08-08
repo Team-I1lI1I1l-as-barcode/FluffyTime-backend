@@ -1,12 +1,9 @@
 package com.fluffytime.join.service;
 
-import static com.fluffytime.join.dto.response.JoinResponseCode.SUCCEED_EMAIL_CERTIFICATION;
-import static com.fluffytime.join.dto.response.JoinResponseCode.SUCCESS_SEND_CERTIFICATION_EMAIL;
 
 import com.fluffytime.join.dao.EmailCertificationDao;
 import com.fluffytime.join.dto.TempUser;
-import com.fluffytime.join.dto.response.ApiResponse;
-import com.fluffytime.join.dto.response.SendEmailResponse;
+import com.fluffytime.join.dto.response.SucceedSendEmailResponse;
 import com.fluffytime.join.dto.response.SucceedCertificationResponse;
 import com.fluffytime.join.exception.FailedToSendCertificationEmail;
 import com.fluffytime.join.exception.NotFoundTempUser;
@@ -27,21 +24,19 @@ public class CertificationService {
 
 
     // 인증 성공 or 실패 응답을 구현해야함
-    public ApiResponse<SucceedCertificationResponse> certificateEmail(String email) {
+    public SucceedCertificationResponse certificateEmail(String email) {
         TempUser user = emailCertificationDao.getTempUser(email)
             .orElseThrow(NotFoundTempUser::new);
         user.successCertification();
         emailCertificationDao.saveEmailCertificationTempUser(user);
 
-        SucceedCertificationResponse response = SucceedCertificationResponse.builder()
+        return SucceedCertificationResponse.builder()
             .email(email)
             .build();
-
-        return ApiResponse.response(SUCCEED_EMAIL_CERTIFICATION, response);
     }
 
     // 메일 제작 및 전송
-    public ApiResponse<SendEmailResponse> sendCertificationMail(String email) {
+    public SucceedSendEmailResponse sendCertificationMail(String email) {
         try {
 
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -54,13 +49,11 @@ public class CertificationService {
             messageHelper.setText(htmlContent, true);
             javaMailSender.send(message);
 
-            SendEmailResponse sendEmailResponse = SendEmailResponse.builder()
+            return SucceedSendEmailResponse.builder()
                 .email(email)
                 .build();
 
-            return ApiResponse.response(SUCCESS_SEND_CERTIFICATION_EMAIL, sendEmailResponse);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new FailedToSendCertificationEmail();
         }
     }

@@ -75,7 +75,7 @@ async function tempJoin(event) {
 
     await getCertificationEmail();
 
-    window.location.href = '/join/email-certificate/' + email; // 원하는 URL로 변경
+    window.location.href = response.headers.get("Location"); // 원하는 URL로 변경
 
   } catch (error) {
     console.error(error);

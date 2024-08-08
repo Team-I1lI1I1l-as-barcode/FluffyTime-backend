@@ -34,7 +34,7 @@ public class LoginService {
     private final JwtTokenizer jwtTokenizer;
     private final HttpServletResponse httpServletResponse;
 
-    public ApiResponse<UserLoginResponse> verifyUser(LoginUser loginUser,
+    public UserLoginResponse verifyUser(LoginUser loginUser,
         HttpServletResponse response) {
         User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(NotFoundUser::new);
         log.info("password = {}", loginUser.getPassword());
@@ -75,12 +75,6 @@ public class LoginService {
         refreshTokenService.addRefreshToken(refreshTokenEntity);
 
         // 응답으로 보낼 정보 설정 (토큰 + 유저 정보)
-        UserLoginResponse userLoginResponse = UserLoginResponse.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .userId(user.getUserId())
-            .email(user.getEmail())
-            .build();
 
         // 쿠키에 토큰 저장
         // 엑세스 토큰 쿠키
@@ -100,11 +94,17 @@ public class LoginService {
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
 
-        return ApiResponse.response(LOGIN_SUCCESS, userLoginResponse);
+        return UserLoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .build();
+
     }
 
     // 리프레시 토큰 -> acc 토큰 생성
-    public ApiResponse<UserLoginResponse> getRefreshToken(HttpServletRequest req,
+    public UserLoginResponse getRefreshToken(HttpServletRequest req,
         HttpServletResponse res) {
 
         //1. 쿠키 안에 있는 refresh token 꺼내기
@@ -149,13 +149,11 @@ public class LoginService {
         res.addCookie(accessTokenCookie);
 
         // 6. 적절한 응답결과(ResponseEntity)를 생성해서 응답.
-        UserLoginResponse response = UserLoginResponse.builder()
+        return UserLoginResponse.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken)
             .userId(user.getUserId())
             .email(user.getEmail())
             .build();
-
-        return ApiResponse.response(REFRESH_TOKEN_GENERATE_SUCCESS, response);
     }
 }
