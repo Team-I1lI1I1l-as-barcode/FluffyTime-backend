@@ -2,28 +2,26 @@ let currentImageIndex = 0;
 let imagesArray = [];
 let currentDraftPostId = null;
 
-// 새 게시물 만들기 모달 열기
 function openModal() {
   document.getElementById('postModal').style.display = 'flex';
 }
 
-// 새 게시물 만들기 모달 닫기
 function closeModal() {
   document.getElementById('postModal').style.display = 'none';
 }
 
 function openDraftModal() {
-  document.getElementById('draftModal').style.display = 'flex'; // 임시 저장 모달 열기
-  loadDraft(); // 임시 저장 글 불러오기
+  document.getElementById('draftModal').style.display = 'flex';
+  loadDraft();
 }
 
 function closeDraftModal() {
-  document.getElementById('draftModal').style.display = 'none'; // 임시 저장 모달 닫기
+  document.getElementById('draftModal').style.display = 'none';
 }
 
 function showComplete() {
-  document.querySelector('.content').style.display = 'none'; // 게시물 등록 완료 메시지 표시
-  document.getElementById('complete-container').style.display = 'block'; // 게시물 등록 완료 메시지 표시
+  document.querySelector('.content').style.display = 'none';
+  document.getElementById('complete-container').style.display = 'block';
 }
 
 function previewImages(event) {
@@ -38,7 +36,7 @@ function previewImages(event) {
 
   if (files.length > 10) {
     alert('이미지는 최대 10장까지 업로드할 수 있습니다.');
-    event.target.value = ""; // 파일 선택 초기화
+    event.target.value = "";
     return;
   }
 
@@ -47,11 +45,11 @@ function previewImages(event) {
     const reader = new FileReader();
     reader.onload = function (e) {
       imagesArray.push(e.target.result);
-      if (i === 0) { // 첫 번째 이미지를 미리 보기로 설정
+      if (i === 0) {
         const img = document.createElement('img');
         img.src = e.target.result;
         img.classList.add('photo');
-        img.style.objectFit = 'cover'; // 이미지 꽉 차게
+        img.style.objectFit = 'cover';
         previewContainer.appendChild(img);
       }
     };
@@ -59,11 +57,10 @@ function previewImages(event) {
   }
 
   if (files.length > 0) {
-    dragDropText.style.display = 'none'; // 드래그 앤 드롭 텍스트 숨기기
-    shareButton.style.display = 'none'; // 공유하기 버튼 숨기기
-    leftContent.classList.add('fullscreen'); // 이미지를 전체 영역에 표시
+    dragDropText.style.display = 'none';
+    shareButton.style.display = 'none';
+    leftContent.classList.add('fullscreen');
 
-    // 이미지가 한 장이면 슬라이드 버튼 숨기기
     if (files.length > 1) {
       document.getElementById('prevButton').style.display = 'block';
       document.getElementById('nextButton').style.display = 'block';
@@ -77,7 +74,23 @@ function previewImages(event) {
 function updateCharCount() {
   const content = document.getElementById('content').value;
   const charCount = document.getElementById('charCount');
-  charCount.textContent = `${content.length} / 2200`; // 글자 수 업데이트
+  charCount.textContent = `${content.length} / 2200`;
+}
+
+function getJwtToken() {
+  const name = 'accessToken=';
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) === 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return '';
 }
 
 async function saveAsTemp(event) {
@@ -85,6 +98,8 @@ async function saveAsTemp(event) {
 
   const content = document.getElementById('content').value;
   const images = document.getElementById('images').files;
+  const token = getJwtToken();
+  console.log('Token:', token); // 디버깅: 토큰 값 확인
 
   if (!content) {
     alert('내용을 입력하세요.');
@@ -109,9 +124,13 @@ async function saveAsTemp(event) {
     formData.append('images', images[i]);
   }
 
+  console.log('Sending request with token'); // 디버깅: 요청 보내기 전 로그
   fetch('/api/posts/temp-reg', {
     method: 'POST',
-    body: formData
+    body: formData,
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
   }).then(response => {
     if (response.ok) {
       alert('임시 저장되었습니다.');
@@ -130,6 +149,8 @@ async function submitPost(event) {
 
   const content = document.getElementById('content').value;
   const images = document.getElementById('images').files;
+  const token = getJwtToken();
+  console.log('Token:', token); // 디버깅: 토큰 값 확인
 
   if (!content) {
     alert('내용을 입력하세요.');
@@ -142,7 +163,7 @@ async function submitPost(event) {
   }
 
   const postRequest = {
-    tempId: currentDraftPostId, // 현재 임시 저장된 글 ID를 추가
+    tempId: currentDraftPostId,
     content: content,
     tempStatus: 'SAVE',
     imageUrls: []
@@ -155,9 +176,13 @@ async function submitPost(event) {
     formData.append('images', images[i]);
   }
 
+  console.log('Sending request with token'); // 디버깅: 요청 보내기 전 로그
   fetch('/api/posts/reg', {
     method: 'POST',
-    body: formData
+    body: formData,
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
   }).then(response => {
     if (response.ok) {
       return response.json();
@@ -165,25 +190,29 @@ async function submitPost(event) {
       throw new Error('게시물 등록에 실패했습니다.');
     }
   }).then(postId => {
-    // 게시물 등록 완료 후 3초 동안 완료 메시지 표시
     document.querySelector('.content').style.display = 'none';
     document.getElementById('complete-container').style.display = 'block';
     setTimeout(() => {
       document.getElementById('complete-container').style.display = 'none';
-      window.location.href = `/html/post/postDetail.html?postId=${postId}`; // 게시물 상세 페이지로 이동
-    }, 3000); // 3초 후에 완료 메시지를 숨기고 상세 페이지로 이동
+      window.location.href = `/html/post/postDetail.html?postId=${postId}`;
+    }, 3000);
   }).catch(error => {
     alert(error.message);
   });
 }
 
 async function loadDraft() {
-  const userId = 1; // 나중에 수정
+  const token = getJwtToken();
   const tempPostsContainer = document.getElementById('tempPostsContainer');
   tempPostsContainer.innerHTML = '';
 
   try {
-    const response = await fetch(`/api/posts/temp-posts/list?userId=${userId}`);
+    console.log('Loading drafts with token'); // 디버깅: 요청 보내기 전 로그
+    const response = await fetch(`/api/posts/temp-posts/list`, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
     if (response.ok) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.indexOf("application/json") !== -1) {
@@ -203,7 +232,7 @@ async function loadDraft() {
               <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
             </div>
           `;
-          postElement.onclick = () => continueDraft(post); // 임시 저장 글 불러오기
+          postElement.onclick = () => continueDraft(post);
           tempPostsContainer.appendChild(postElement);
         });
         tempPostsContainer.style.display = 'flex';
@@ -220,7 +249,7 @@ async function loadDraft() {
 }
 
 function continueDraft(post) {
-  document.getElementById('content').value = post.content; // 임시 저장 글 내용 불러오기
+  document.getElementById('content').value = post.content;
   updateCharCount();
   currentDraftPostId = post.postId;
 
@@ -242,7 +271,7 @@ function displayImages() {
     const img = document.createElement('img');
     img.src = imagesArray[currentImageIndex];
     img.classList.add('photo');
-    img.style.objectFit = 'cover'; // 이미지 꽉 차게
+    img.style.objectFit = 'cover';
     previewContainer.appendChild(img);
 
     if (imagesArray.length > 1) {
@@ -257,18 +286,23 @@ function displayImages() {
 
 function deleteImage(event, index) {
   event.stopPropagation();
-  imagesArray.splice(index, 1); // 이미지 삭제
+  imagesArray.splice(index, 1);
   displayImages();
 }
 
 async function deleteTempPost(postId, event) {
   event.stopPropagation();
+  const token = getJwtToken();
   try {
+    console.log('Deleting draft with token'); // 디버깅: 요청 보내기 전 로그
     const response = await fetch(`/api/posts/temp-delete/${postId}`, {
-      method: 'POST' // DELETE에서 POST로 변경
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
     });
     if (response.ok) {
-      loadDraft(); // 임시 저장 글 목록 다시 불러오기
+      loadDraft();
     } else {
       alert('임시 저장 글 삭제에 실패했습니다.');
     }
@@ -283,7 +317,7 @@ function prevImage(event) {
   if (imagesArray.length > 1) {
     currentImageIndex = (currentImageIndex === 0) ? imagesArray.length - 1
         : currentImageIndex - 1;
-    displayImages(); // 이전 이미지 표시
+    displayImages();
   }
 }
 
@@ -292,6 +326,6 @@ function nextImage(event) {
   if (imagesArray.length > 1) {
     currentImageIndex = (currentImageIndex === imagesArray.length - 1) ? 0
         : currentImageIndex + 1;
-    displayImages(); // 다음 이미지 표시
+    displayImages();
   }
 }

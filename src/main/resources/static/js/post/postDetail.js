@@ -3,10 +3,20 @@ let currentImageIndex = 0;
 let editImageIndex = 0;
 let imageUrls = [];
 
+// JWT 토큰을 가져오는 함수
+function getJwtToken() {
+  return localStorage.getItem('jwtToken'); // 로컬 스토리지에서 토큰을 가져옴
+}
+
 // 게시물 데이터 로드
 async function loadPostData(postId) {
   try {
-    const response = await fetch(`/api/posts/detail/${postId}`);
+    const token = getJwtToken();
+    const response = await fetch(`/api/posts/detail/${postId}`, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    });
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
@@ -118,9 +128,13 @@ async function submitEdit() {
   editRequest.append('content', editedContent); // 수정 내용 추가
 
   try {
+    const token = getJwtToken();
     const response = await fetch(`/api/posts/edit/${currentPostId}`, {
       method: 'POST', // PATCH에서 POST로 변경
-      body: editRequest
+      body: editRequest,
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
     });
     if (!response.ok) {
       throw new Error('Failed to update post');
@@ -138,8 +152,12 @@ async function submitEdit() {
 async function deletePost() {
   if (currentPostId) {
     try {
+      const token = getJwtToken();
       const response = await fetch(`/api/posts/delete/${currentPostId}`, {
-        method: 'POST' // DELETE에서 POST로 변경
+        method: 'POST', // DELETE에서 POST로 변경
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
       });
       if (!response.ok) {
         throw new Error('Failed to delete post');

@@ -2,9 +2,14 @@ package com.fluffytime.post.service;
 
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.TempStatus;
+import com.fluffytime.domain.User;
+import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.PostRequest;
 import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,10 +22,27 @@ import org.springframework.web.multipart.MultipartFile;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository; // UserRepository 주입받음
     private final S3Service s3Service; // S3Service 주입받음
+    private final JwtTokenizer jwtTokenizer; // JWT 토크나이저 주입
 
     // 게시글 등록하기
-    public Long createPost(PostRequest postRequest, MultipartFile[] files) {
+    public Long createPost(PostRequest postRequest, MultipartFile[] files,
+        HttpServletRequest request) {
+        // HTTP 요청에서 JWT 토큰 추출
+        String token = getToken(request);
+        if (token == null) {
+            throw new IllegalArgumentException("유효한 토큰이 필요합니다.");
+        }
+
+        // 토큰을 파싱하여 클레임 추출
+        Claims claims = jwtTokenizer.parseAccessToken(token);
+        Long userId = claims.get("userId", Long.class);
+
+        // User 객체 조회
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("유효한 사용자 ID가 필요합니다."));
+
         if (files.length > 10) {
             throw new IllegalArgumentException("최대 10개의 이미지만 업로드할 수 있습니다."); // 파일 개수 제한
         }
@@ -37,6 +59,7 @@ public class PostService {
         }
 
         Post post = Post.builder()
+            .user(user) // 사용자 객체 설정
             .content(postRequest.getContent()) // 게시글 내용 설정
             .createdAt(LocalDateTime.now()) // 생성 시간 설정
             .tempStatus(postRequest.getTempStatus()) // 게시글 상태 설정
@@ -94,5 +117,16 @@ public class PostService {
         return postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP) // 임시 상태인 게시글 필터링
             .collect(Collectors.toList());
+    }
+
+    // HTTP 요청에서 JWT 토큰 추출하기
+    private String getToken(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
+        }
+
+        return null;
     }
 }

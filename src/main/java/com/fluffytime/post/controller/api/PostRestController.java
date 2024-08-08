@@ -5,6 +5,7 @@ import com.fluffytime.domain.TempStatus;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.PostRequest;
 import com.fluffytime.post.service.PostService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,8 @@ public class PostRestController {
     // 게시물 등록 및 임시 저장된 글 삭제
     @PostMapping("/reg")
     public ResponseEntity<Long> regPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files) {
-        Long postId = handlePostRequest(postRequest, files, TempStatus.SAVE);
+        @RequestPart("images") MultipartFile[] files, HttpServletRequest request) {
+        Long postId = handlePostRequest(postRequest, files, TempStatus.SAVE, request);
 
         if (postRequest.getTempId() != null) {
             // 임시 저장된 글 삭제
@@ -46,13 +47,13 @@ public class PostRestController {
     // 게시물 임시등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files) {
-        Long postId = handlePostRequest(postRequest, files, TempStatus.TEMP);
+        @RequestPart("images") MultipartFile[] files, HttpServletRequest request) {
+        Long postId = handlePostRequest(postRequest, files, TempStatus.TEMP, request);
         return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
     }
 
     private Long handlePostRequest(PostRequest postRequest, MultipartFile[] files,
-        TempStatus tempStatus) {
+        TempStatus tempStatus, HttpServletRequest request) {
         try {
             postRequest.setTempStatus(tempStatus); // 임시 상태 설정
             log.info("Received post request: {}", postRequest);
@@ -72,8 +73,8 @@ public class PostRestController {
                 log.info("Uploaded file: {}, URL: {}", fileName, fileUrl);
             }
 
-            return postService.createPost(postRequest,
-                new MultipartFile[]{}); // 빈 배열로 전달하여 중복 업로드 방지
+            return postService.createPost(postRequest, new MultipartFile[]{},
+                request); // 빈 배열로 전달하여 중복 업로드 방지
         } catch (Exception e) {
             log.error("Failed to upload files", e);
             throw new RuntimeException("Failed to upload files", e);

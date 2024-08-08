@@ -44,6 +44,7 @@ public class SecurityConfig {
                     "/css/**",
                     "/image/**"
                 ).permitAll()
+                // .requestMatchers("/api/posts/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
