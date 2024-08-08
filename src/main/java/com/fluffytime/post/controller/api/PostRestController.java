@@ -5,6 +5,7 @@ import com.fluffytime.domain.TempStatus;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.PostRequest;
 import com.fluffytime.post.service.PostService;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,14 +40,15 @@ public class PostRestController {
             postService.deleteTempPost(postRequest.getTempId());
         }
 
-        return ResponseEntity.ok(postId);
+        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
     }
 
     // 게시물 임시등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
         @RequestPart("images") MultipartFile[] files) {
-        return ResponseEntity.ok(handlePostRequest(postRequest, files, TempStatus.TEMP));
+        Long postId = handlePostRequest(postRequest, files, TempStatus.TEMP);
+        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
     }
 
     private Long handlePostRequest(PostRequest postRequest, MultipartFile[] files,
