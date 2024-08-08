@@ -185,26 +185,31 @@ async function loadDraft() {
   try {
     const response = await fetch(`/api/posts/temp-posts/list?userId=${userId}`);
     if (response.ok) {
-      const tempPosts = await response.json();
-      tempPosts.forEach(post => {
-        const postElement = document.createElement('div');
-        postElement.classList.add('temp-post');
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        const tempPosts = await response.json();
+        tempPosts.forEach(post => {
+          const postElement = document.createElement('div');
+          postElement.classList.add('temp-post');
 
-        const postContent = post.content.length > 40 ? post.content.substring(0,
-            40) + '...' : post.content;
-        const postDate = new Date(post.createdAt).toLocaleDateString();
+          const postContent = post.content.length > 40 ? post.content.substring(
+              0, 40) + '...' : post.content;
+          const postDate = new Date(post.createdAt).toLocaleDateString();
 
-        postElement.innerHTML = `
-              <div class="post-details">
-                <p class="post-content">${postContent}</p>
-                <span class="post-date">${postDate}</span>
-                <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
-              </div>
-            `;
-        postElement.onclick = () => continueDraft(post); // 임시 저장 글 불러오기
-        tempPostsContainer.appendChild(postElement);
-      });
-      tempPostsContainer.style.display = 'flex';
+          postElement.innerHTML = `
+            <div class="post-details">
+              <p class="post-content">${postContent}</p>
+              <span class="post-date">${postDate}</span>
+              <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
+            </div>
+          `;
+          postElement.onclick = () => continueDraft(post); // 임시 저장 글 불러오기
+          tempPostsContainer.appendChild(postElement);
+        });
+        tempPostsContainer.style.display = 'flex';
+      } else {
+        throw new Error("Received content is not JSON");
+      }
     } else {
       alert('임시 저장 글 불러오기에 실패했습니다.');
     }

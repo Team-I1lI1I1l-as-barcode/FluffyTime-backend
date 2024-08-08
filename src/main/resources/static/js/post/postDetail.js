@@ -10,39 +10,45 @@ async function loadPostData(postId) {
     if (!response.ok) {
       throw new Error('Network response was not ok ' + response.statusText);
     }
-    const postData = await response.json();
-    currentPostId = postId;
 
-    const postContent = document.getElementById('postContent');
-    postContent.innerHTML = `<p>${postData.content}</p>`; // 게시물 내용 설정
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      const postData = await response.json();
+      currentPostId = postId;
 
-    const imageContainer = document.getElementById('imageContainer');
-    imageContainer.innerHTML = ''; // 기존 이미지 초기화
-    if (Array.isArray(postData.imageUrls)) {
-      imageUrls = postData.imageUrls.filter(
-          url => url.startsWith("http://") || url.startsWith("https://"));
-      imageUrls.forEach((url, index) => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = `image ${index + 1}`;
-        img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
-        img.onerror = () => {
-          console.error('Failed to load image:', url);
-          img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
-        };
-        imageContainer.appendChild(img);
-      });
+      const postContent = document.getElementById('postContent');
+      postContent.innerHTML = `<p>${postData.content}</p>`; // 게시물 내용 설정
 
-      // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
-      if (imageUrls.length > 1) {
-        document.getElementById('prevButton').style.display = 'block';
-        document.getElementById('nextButton').style.display = 'block';
+      const imageContainer = document.getElementById('imageContainer');
+      imageContainer.innerHTML = ''; // 기존 이미지 초기화
+      if (Array.isArray(postData.imageUrls)) {
+        imageUrls = postData.imageUrls.filter(
+            url => url.startsWith("http://") || url.startsWith("https://"));
+        imageUrls.forEach((url, index) => {
+          const img = document.createElement('img');
+          img.src = url;
+          img.alt = `image ${index + 1}`;
+          img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
+          img.onerror = () => {
+            console.error('Failed to load image:', url);
+            img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
+          };
+          imageContainer.appendChild(img);
+        });
+
+        // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
+        if (imageUrls.length > 1) {
+          document.getElementById('prevButton').style.display = 'block';
+          document.getElementById('nextButton').style.display = 'block';
+        } else {
+          document.getElementById('prevButton').style.display = 'none';
+          document.getElementById('nextButton').style.display = 'none';
+        }
       } else {
-        document.getElementById('prevButton').style.display = 'none';
-        document.getElementById('nextButton').style.display = 'none';
+        console.error('imageUrls is not an array', postData.imageUrls);
       }
     } else {
-      console.error('imageUrls is not an array', postData.imageUrls);
+      throw new Error("Received content is not JSON");
     }
   } catch (error) {
     console.error('Error fetching post data:', error);
