@@ -27,6 +27,7 @@ public class PostService {
     private final S3Service s3Service;
     private final JwtTokenizer jwtTokenizer;
 
+    // 게시글 등록하기
     public Long createPost(PostRequest postRequest, MultipartFile[] files,
         HttpServletRequest request) {
         if (files.length > 10) {
@@ -46,8 +47,8 @@ public class PostService {
         List<String> imageUrls = postRequest.getImageUrls();
 
         for (MultipartFile file : files) {
-            String imageUrl = s3Service.uploadFile(file);
-            imageUrls.add(imageUrl);
+            String imageUrl = s3Service.uploadFile(file); // 파일 업로드
+            imageUrls.add(imageUrl); // 업로드된 파일 URL 추가
         }
 
         Post post = Post.builder()
@@ -59,7 +60,7 @@ public class PostService {
             .build();
 
         postRepository.save(post);
-        return post.getPostId();
+        return post.getPostId(); // 저장된 게시글 ID 반환
     }
 
     private String getTokenFromRequest(HttpServletRequest request) {
@@ -74,31 +75,34 @@ public class PostService {
         return null;
     }
 
-
+    // 게시글 조회하기
     public Post getPostById(Long id) {
         return postRepository.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid post Id: " + id));
+            .orElseThrow(
+                () -> new IllegalArgumentException("Invalid post Id: " + id)); // 게시글 ID로 조회
     }
 
+    // 게시글 수정하기
     public Post updatePost(Long id, PostRequest postRequest, MultipartFile[] files) {
         Post existingPost = getPostById(id);
 
         if (postRequest.getContent() != null) {
-            existingPost.setContent(postRequest.getContent());
+            existingPost.setContent(postRequest.getContent()); // 내용 수정
         }
 
         List<String> imageUrls = existingPost.getImageUrls();
         for (MultipartFile file : files) {
-            String imageUrl = s3Service.uploadFile(file);
+            String imageUrl = s3Service.uploadFile(file); // 파일 업로드
             imageUrls.add(imageUrl);
         }
         existingPost.setImageUrls(imageUrls);
         existingPost.setUpdatedAt(LocalDateTime.now());
 
-        postRepository.save(existingPost);
+        postRepository.save(existingPost); // 게시글 저장
         return existingPost;
     }
 
+    // 게시글 삭제하기
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
@@ -112,6 +116,7 @@ public class PostService {
         }
     }
 
+    // 임시 게시글 삭제하기
     public List<Post> getTempPosts() {
         return postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
