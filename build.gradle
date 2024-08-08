@@ -31,7 +31,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     // email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.2'
     runtimeOnly 'com.mysql:mysql-connector-j'

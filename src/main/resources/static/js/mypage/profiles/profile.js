@@ -20,7 +20,7 @@ let originalPetNameValue = ""; // intro 필드의 원래 값을 저장하는 변
 function setPetAgeOptions(maxAge) {
   console.log("setPetAgeOptions 실행");
   let none_option = document.createElement("option");
-  none_option.value = "none";
+  none_option.value = "0";
   none_option.text = "==선택==";
   none_option.selected = true;
   pet_age.add(none_option);
@@ -57,7 +57,25 @@ function fetchProfile(method, func, url) {
       'Content-Type': 'application/json'
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errorData => {
+        // 에러 메시지 포함하여 alert 호출
+        console.log(errorData.message);
+        if (errorData.code === "GE-005") {
+          console.log("handleProfileData 실행 >> createProfile 살행");
+          createProfile(window.location.pathname.split('/').pop());
+        } else {
+          alert('Error: ' + errorData.message);
+          window.location.href = "/";
+        }
+        // 명시적으로 에러를 던져 프로미스 체인을 중단
+        throw new Error(errorData.message);
+      });
+
+    }
+    return response.json()
+  })
   .then(data => func(data))
   .catch(error => console.log("서버 오류 발생: " + error));
 }
@@ -72,44 +90,47 @@ function fetchProfileJson(method, func, url, dto) {
     },
     body: JSON.stringify(dto)
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      return response.json().then(errorData => {
+        // 에러 메시지 포함하여 alert 호출
+        console.log(errorData.message);
+        alert('Error: ' + errorData.message);
+        window.location.href = "/";
+        // 명시적으로 에러를 던져 프로미스 체인을 중단
+        throw new Error(errorData.message);
+      });
+    }
+    return response.json()
+
+  })
   .then(data => func(data, dto.username))
   .catch(error => console.log("서버 오류 발생: " + error));
 }
 
 // 프로필 데이터 불러오기 함수 - 프로필이 없다는 에러가 뜨면 프로필 등록 api로 이동 / 없다면 데이터 불러오기
 function handleProfileData(data) {
-  if (data.code === "404") {
-    // 프로필 등록 api 부르기
-    console.log("handleProfileData 실행 >> createProfile 살행");
-    createProfile(window.location.pathname.split('/').pop());
-  } else if (data.code !== "404" && data.code !== "200") {
-    console.log("handleProfileData 에러 발생 >> " + data.message);
-    alert(data.mesaage);
-    window.location.href = "/";
-  } else {
-    console.log("handleProfileData 응답 Success");
-    nickname.innerText = data.nickname;
-    email.innerText = data.email;
-    username.value = data.nickname;
-    intro.value = data.intro;
-    pet_name.value = data.petName;
-    pet_sex.value = data.petSex;
-    pet_age.value = data.petAge;
-    pet_category.value = data.petCategory;
-    public_status.checked = data.publicStatus === "1";
+  console.log("handleProfileData 응답 Success");
+  nickname.innerText = data.nickname;
+  email.innerText = data.email;
+  username.value = data.nickname;
+  intro.value = data.intro;
+  pet_name.value = data.petName;
+  pet_sex.value = data.petSex;
+  pet_age.value = data.petAge;
+  pet_category.value = data.petCategory;
+  public_status.checked = data.publicStatus === "1";
 
-    originalIntroValue = intro.value.trim(); // intro 필드의 원래 값을 저장
-    originalPetNameValue = pet_name.value.trim(); // pet_name 필드의 원래 값을 저장
-    // 반려동물 이름이 없다면, 관련 옵션 비활성화
-    if (originalPetNameValue.length === 0) {
-      console.log("반려동물 이름 X -> 관련 옵션 비활성화");
-      petOptionsStatus(false);
-    } else {
-      // 반려동물 이름이 있다면, 관련 옵션 활성화
-      console.log("반려동물 이름 0 -> 관련 옵션 활성화");
-      petOptionsStatus(true);
-    }
+  originalIntroValue = intro.value.trim(); // intro 필드의 원래 값을 저장
+  originalPetNameValue = pet_name.value.trim(); // pet_name 필드의 원래 값을 저장
+  // 반려동물 이름이 없다면, 관련 옵션 비활성화
+  if (originalPetNameValue.length === 0) {
+    console.log("반려동물 이름 X -> 관련 옵션 비활성화");
+    petOptionsStatus(false);
+  } else {
+    // 반려동물 이름이 있다면, 관련 옵션 활성화
+    console.log("반려동물 이름 0 -> 관련 옵션 활성화");
+    petOptionsStatus(true);
   }
 }
 
@@ -123,6 +144,7 @@ intro.addEventListener('input', () => {
     submitBtn.disabled = true; // 제출 버튼 비활성화
   }
 });
+
 // 반려동물 이름 입력시 관련 옵션 활성화/비활성화 + 제출 버튼 활성화
 pet_name.addEventListener('input', () => {
   const petNameValue = pet_name.value.trim();
@@ -163,35 +185,26 @@ public_status.addEventListener('change', activateSubmitButton);
 // 프로필 등록 함수
 function createProfile(nickname) {
   console.log("createProfile 실행");
-  fetchProfile("POST", handleCreateProfile,
-      `/api/mypage/profiles/reg?nickname=${encodeURIComponent(nickname)}`)
   console.log("fetchProfile 실행");
+  fetchProfile("POST", handleCreateProfile,
+      "/api/mypage/profiles/reg")
+  window.location.href = `/mypage/profile/edit/${nickname}`;
 }
 
 // 프로필 등록 api 후처리 함수
 function handleCreateProfile(data) {
-  if (data.code === "404") {
-    console.log(data.message);
-    alert(data.message);
-    window.location.href = "/";
-  } else if (data.result === true) {
-    console.log("handleCreateProfile 실행 >> true");
-    alert("프로필 등록이 완료되었습니다.");
-    window.location.reload();
-  } else {
+  if (!data.result) {
     console.log("handleCreateProfile 실행 >> false");
     alert("프로필 등록이 실패되었습니다.");
     window.location.href = "/";
+  } else {
+    alert("프로필 등록되었습니다.");
   }
 }
 
 // 프로필 데이터 수정 함수
 function saveProfileData(data, nickname) {
-  if (data.code !== "200") {
-    console.log("saveProfileData 실행 >> 에러 발생 " + data.message);
-    alert(data.message);
-    window.location.href = "/";
-  } else if (data.result) {
+  if (data.result) {
     console.log("saveProfileData 실행 >>  true");
     alert("업데이트가 완료되었습니다.");
     window.location.href = `/mypage/profile/edit/${nickname}`;// 새로고침
@@ -217,7 +230,7 @@ function check_username(data) {
 function createReqeustDto(nickname) {
   console.log("createReqeustDto 실행");
   // 최신 폼 필드 값을 가져와서 ProfileRequestDto 생성
-  const ProfileRequestDto = {
+  return {
     nickname: nickname,
     username: username.value,
     intro: intro.value,
@@ -227,7 +240,6 @@ function createReqeustDto(nickname) {
     petCategory: pet_category.value,
     publicStatus: public_status.checked ? "1" : "0"
   };
-  return ProfileRequestDto;
 }
 
 // 회원 탈퇴
@@ -252,12 +264,9 @@ function initialize() {
   // 제출하기 버튼 초기 비활성화
   submitBtn.disabled = true;
 
-  // 현재 URL 경로에서 파라미터 추출
-  const nickname = window.location.pathname.split('/').pop();
-
   // 프로필 정보 불러오기
   fetchProfile("GET", handleProfileData,
-      `/api/mypage/profiles/info?nickname=${encodeURIComponent(nickname)}`);
+      "/api/mypage/profiles/info");
 
   // 닉네임 변경시 중복확인 버튼 활성화
   username.addEventListener('keyup', () => {
@@ -275,6 +284,8 @@ function initialize() {
   // 제출하기 버튼을 누를시 api 요청 (프로필 수정)
   submitBtn.addEventListener('click', event => {
     event.preventDefault(); // 기본 폼 제출 방지
+    // 현재 URL 경로에서 파라미터 추출
+    const nickname = window.location.pathname.split('/').pop();
     fetchProfileJson("PATCH", saveProfileData, "/api/mypage/profiles/edit",
         createReqeustDto(nickname));
 
@@ -287,10 +298,11 @@ function initialize() {
     if (deleteAccountMessage) { // 확인 클릭시
       console.log(nickname + " 회원님 탈퇴 알림창에 확인 클릭 ");
       fetchProfile("GET", withdrawAccount,
-          `/api/users/withdraw?nickname=${encodeURIComponent(nickname)}`);
+          "/api/users/withdraw");
     } else {
       console.log(nickname + "회원 탈퇴가 취소되었습니다.");
       alert("회원 탈퇴가 취소되었습니다. ")
+      window.location.href = "/";
     }
 
   });
