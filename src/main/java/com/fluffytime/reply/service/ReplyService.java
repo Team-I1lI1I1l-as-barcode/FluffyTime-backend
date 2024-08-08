@@ -1,7 +1,7 @@
 package com.fluffytime.reply.service;
 
-import com.fluffytime.comment.config.error.exception.PostNotFoundException;
-import com.fluffytime.comment.config.error.exception.UserNotFoundException;
+import com.fluffytime.comment.exception.CommentNotFoundException;
+import com.fluffytime.comment.exception.UserNotFoundException;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
@@ -28,7 +28,7 @@ public class ReplyService {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFoundException::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
-            .orElseThrow(PostNotFoundException::new); //임시 예외처리
+            .orElseThrow(CommentNotFoundException::new); //임시 예외처리
 
         Reply reply = Reply.builder()
             .content(requestDto.getContent())
