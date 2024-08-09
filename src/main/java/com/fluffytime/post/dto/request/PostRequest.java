@@ -1,4 +1,4 @@
-package com.fluffytime.post.dto;
+package com.fluffytime.post.dto.request;
 
 import com.fluffytime.domain.TempStatus;
 import java.util.ArrayList;

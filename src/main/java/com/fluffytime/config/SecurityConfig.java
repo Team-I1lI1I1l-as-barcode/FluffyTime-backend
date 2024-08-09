@@ -36,7 +36,6 @@ public class SecurityConfig {
                     "/logout",
                     "/join/**",
                     "/api/users/**",
-                    // "/api/posts/**",
 
                     "/static/**",
                     "/html/**",
@@ -44,7 +43,6 @@ public class SecurityConfig {
                     "/css/**",
                     "/image/**"
                 ).permitAll()
-                // .requestMatchers("/api/posts/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),

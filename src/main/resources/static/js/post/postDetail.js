@@ -3,90 +3,73 @@ let currentImageIndex = 0;
 let editImageIndex = 0;
 let imageUrls = [];
 
-// JWT 토큰을 가져오는 함수
-function getJwtToken() {
-  const name = 'accessToken=';
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const ca = decodedCookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) === 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return '';
-}
-
 // 게시물 데이터 로드
 async function loadPostData(postId) {
+  console.log(`게시물 데이터 로드 시작: ${postId}`);
   try {
-    const token = getJwtToken();
-    const response = await fetch(`/api/posts/detail/${postId}`, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    });
+    const response = await fetch(`/api/posts/detail/${postId}`);
     if (!response.ok) {
+      console.error('서버 응답 상태:', response.status);  // 응답 상태 출력
       throw new Error('Network response was not ok ' + response.statusText);
     }
 
-    const responseText = await response.text(); // 응답 텍스트를 직접 가져옵니다.
-    console.log('Response text:', responseText); // 디버그를 위해 응답 텍스트를 로그로 출력합니다.
+    const responseText = await response.text();
+    console.log('서버 응답 텍스트:', responseText);
 
-    const postData = JSON.parse(responseText); // JSON 파싱 시도
+    const postData = JSON.parse(responseText);
     currentPostId = postId;
 
-    const postContent = document.getElementById('postContent');
-    postContent.innerHTML = `<p>${postData.content}</p>`; // 게시물 내용 설정
+    // 게시물 내용 설정
+    document.getElementById('postContent').innerText = postData.data.content;
 
+    // 이미지 URL 업데이트
+    imageUrls = postData.data.imageUrls;
+
+    // 이미지 컨테이너 초기화 및 이미지 추가
     const imageContainer = document.getElementById('imageContainer');
-    imageContainer.innerHTML = ''; // 기존 이미지 초기화
-    if (Array.isArray(postData.imageUrls)) {
-      imageUrls = postData.imageUrls.filter(
-          url => url.startsWith("http://") || url.startsWith("https://"));
-      imageUrls.forEach((url, index) => {
-        const img = document.createElement('img');
-        img.src = url;
-        img.alt = `image ${index + 1}`;
-        img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
-        img.onerror = () => {
-          console.error('Failed to load image:', url);
-          img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
-        };
-        imageContainer.appendChild(img);
-      });
+    imageContainer.innerHTML = ''; // 기존 이미지 제거
 
-      // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
-      if (imageUrls.length > 1) {
-        document.getElementById('prevButton').style.display = 'block';
-        document.getElementById('nextButton').style.display = 'block';
-      } else {
-        document.getElementById('prevButton').style.display = 'none';
-        document.getElementById('nextButton').style.display = 'none';
-      }
+    imageUrls.forEach((url, index) => {
+      const img = document.createElement('img');
+      img.src = url;
+      img.alt = `image ${index + 1}`;
+      img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지를 활성화
+      img.onerror = () => {
+        console.error('이미지 로드 실패:', url);
+        img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
+      };
+      imageContainer.appendChild(img);
+    });
+
+    // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
+    if (imageUrls.length > 1) {
+      document.getElementById('prevButton').style.display = 'block';
+      document.getElementById('nextButton').style.display = 'block';
     } else {
-      console.error('imageUrls is not an array', postData.imageUrls);
+      document.getElementById('prevButton').style.display = 'none';
+      document.getElementById('nextButton').style.display = 'none';
     }
+
   } catch (error) {
-    console.error('Error fetching post data:', error);
+    console.error('게시물 데이터 로드 중 오류 발생:', error);
   }
 }
 
 // 모달 열기
 function openModal() {
+  console.log('모달 열기');
   document.getElementById('postModal').style.display = 'flex';
 }
 
 // 모달 닫기
 function closeModal() {
+  console.log('모달 닫기');
   document.getElementById('postModal').style.display = 'none';
 }
 
 // 드롭다운 메뉴 토글
 function toggleDropdownMenu() {
+  console.log('드롭다운 메뉴 토글');
   const dropdownMenu = document.getElementById('dropdownMenu');
   dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none'
       : 'block';
@@ -94,26 +77,26 @@ function toggleDropdownMenu() {
 
 // 수정 모달 열기
 function openEditModal() {
+  console.log('수정 모달 열기');
   document.getElementById('editModal').style.display = 'flex';
   document.getElementById('editContent').value = document.querySelector(
-      '#postContent p').innerText; // 수정 내용 설정
+      '#postContent p').innerText;
 
   const editImagePreviewContainer = document.getElementById(
       'editImagePreviewContainer');
-  editImagePreviewContainer.innerHTML = ''; // 기존 이미지 초기화
+  editImagePreviewContainer.innerHTML = '';
   imageUrls.forEach((url, index) => {
     const img = document.createElement('img');
     img.src = url;
     img.alt = 'Preview Image';
-    img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지 활성화
+    img.className = index === 0 ? 'active' : '';
     img.onerror = () => {
-      console.error('Failed to load image:', url);
-      img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소 제거
+      console.error('이미지 로드 실패:', url);
+      img.parentElement.removeChild(img);
     };
     editImagePreviewContainer.appendChild(img);
   });
 
-  // 이미지가 한 장일 경우 슬라이드 버튼 숨기기
   if (imageUrls.length > 1) {
     document.getElementById('prevEditButton').style.display = 'block';
     document.getElementById('nextEditButton').style.display = 'block';
@@ -122,69 +105,67 @@ function openEditModal() {
     document.getElementById('nextEditButton').style.display = 'none';
   }
 
-  toggleDropdownMenu(); // 드롭다운 메뉴 닫기
+  toggleDropdownMenu();
 }
 
 // 수정 모달 닫기
 function closeEditModal() {
+  console.log('수정 모달 닫기');
   document.getElementById('editModal').style.display = 'none';
 }
 
 // 게시물 수정
 async function submitEdit() {
+  console.log('게시물 수정 시작');
   const editedContent = document.getElementById('editContent').value;
 
   const editRequest = new FormData();
-  editRequest.append('content', editedContent); // 수정 내용 추가
+  editRequest.append('content', editedContent);
 
   try {
-    const token = getJwtToken();
     const response = await fetch(`/api/posts/edit/${currentPostId}`, {
-      method: 'POST', // PATCH에서 POST로 변경
+      method: 'POST',
       body: editRequest,
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
     });
     if (!response.ok) {
       throw new Error('Failed to update post');
     }
+    console.log('게시물 수정 완료');
     alert('게시물이 수정되었습니다.');
-    closeEditModal(); // 수정 모달 닫기
-    loadPostData(currentPostId); // 수정된 게시물 데이터 로드
+    closeEditModal();
+    loadPostData(currentPostId);
   } catch (error) {
-    console.error('Error updating post:', error);
+    console.error('게시물 수정 중 오류 발생:', error);
     alert('게시물 수정에 실패했습니다.');
   }
 }
 
 // 게시물 삭제
 async function deletePost() {
+  console.log('게시물 삭제 시작');
   if (currentPostId) {
     try {
-      const token = getJwtToken();
       const response = await fetch(`/api/posts/delete/${currentPostId}`, {
-        method: 'POST', // DELETE에서 POST로 변경
-        headers: {
-          'Authorization': 'Bearer ' + token
-        }
+        method: 'POST',
       });
       if (!response.ok) {
         throw new Error('Failed to delete post');
       }
+      console.log('게시물 삭제 완료');
       alert('게시물이 삭제되었습니다.');
-      window.location.href = '/'; // 게시물 삭제 후 메인 페이지로 리다이렉트
+      window.location.href = '/';
     } catch (error) {
-      console.error('Error deleting post:', error);
+      console.error('게시물 삭제 중 오류 발생:', error);
       alert('게시물 삭제에 실패했습니다.');
     }
   } else {
-    console.error('No postId found in URL');
+    console.error('URL에서 postId를 찾을 수 없습니다.');
   }
 }
 
 // 활성화된 이미지 표시
 function showImage(index) {
+  console.log(`이미지 표시: ${index}`);
   const images = document.querySelectorAll('#imageContainer img');
   images.forEach((img, idx) => {
     img.className = (idx === index) ? 'active' : '';
@@ -194,6 +175,7 @@ function showImage(index) {
 // 이전 이미지 표시
 function prevImage(event) {
   event.preventDefault();
+  console.log('이전 이미지 표시');
   if (imageUrls.length > 1) {
     currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
         : currentImageIndex - 1;
@@ -204,6 +186,7 @@ function prevImage(event) {
 // 다음 이미지 표시
 function nextImage(event) {
   event.preventDefault();
+  console.log('다음 이미지 표시');
   if (imageUrls.length > 1) {
     currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
         : currentImageIndex + 1;
@@ -213,6 +196,7 @@ function nextImage(event) {
 
 // 활성화된 수정 이미지 표시
 function showEditImage(index) {
+  console.log(`수정 이미지 표시: ${index}`);
   const images = document.querySelectorAll('#editImagePreviewContainer img');
   images.forEach((img, idx) => {
     img.className = (idx === index) ? 'active' : '';
@@ -222,6 +206,7 @@ function showEditImage(index) {
 // 이전 수정 이미지 표시
 function prevEditImage(event) {
   event.preventDefault();
+  console.log('이전 수정 이미지 표시');
   if (imageUrls.length > 1) {
     editImageIndex = (editImageIndex === 0) ? imageUrls.length - 1
         : editImageIndex - 1;
@@ -232,6 +217,7 @@ function prevEditImage(event) {
 // 다음 수정 이미지 표시
 function nextEditImage(event) {
   event.preventDefault();
+  console.log('다음 수정 이미지 표시');
   if (imageUrls.length > 1) {
     editImageIndex = (editImageIndex === imageUrls.length - 1) ? 0
         : editImageIndex + 1;
@@ -241,12 +227,14 @@ function nextEditImage(event) {
 
 // URL에서 postId를 추출하여 로드
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('페이지 로드 완료');
   const urlParams = new URLSearchParams(window.location.search);
   const postId = urlParams.get('postId');
   if (postId) {
-    loadPostData(postId); // 게시물 데이터 로드
-    openModal(); // 모달 열기
+    console.log(`게시물 ID: ${postId}`);
+    loadPostData(postId);
+    openModal();
   } else {
-    console.error('No postId found in URL');
+    console.error('URL에서 postId를 찾을 수 없습니다.');
   }
 });
