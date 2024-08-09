@@ -2,6 +2,8 @@
   --primary-color: #FFCC00;
   --text-color: #000000;
   --background-color: #FFFFFF;
+  --content-text: #2c3e50;
+  --border-color: #ddd;
 }
 
 * {
@@ -14,6 +16,7 @@ body {
   font-family: Arial, sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
+  overflow-x: hidden;
 }
 
 /*아이콘
@@ -41,8 +44,13 @@ https://fonts.google.com/icons?icon.style=Rounded에서 'Inserting the icon'부�
   background-color: var(--background-color);
   color: var(--text-color);
   padding: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: relative;
+  overflow-y: auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .sidebar h2 {
@@ -97,9 +105,21 @@ li {
   text-decoration: underline;
 }
 
+/* 메인 콘텐츠를 사이드바와 함께 표시하도록 설정 */
+.content-container {
+  margin-left: 250px; /* 사이드바의 너비만큼 왼쪽 여백 추가 */
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  flex-grow: 1; /* 남은 공간을 차지 */
+  display: flex;
+  justify-content: center; /* 수평 중앙 정렬 */
+}
+
+/* 콘텐츠 */
 .content {
-  flex: 1;
+  width: 600px; /* 고정된 콘텐츠 너비 */
   padding: 1rem;
+  background-color: var(--background-color);
 }
 
 @media (max-width: 768px) {
@@ -115,7 +135,12 @@ li {
     left: 0; /* 사이드바를 표시 */
   }
 
+  .content-container {
+    margin-left: 0;
+  }
+
   .content {
+    width: 100%; /* 작은 화면에서 콘텐츠 너비를 100%로 확장 */
     margin-left: 0;
   }
 }
