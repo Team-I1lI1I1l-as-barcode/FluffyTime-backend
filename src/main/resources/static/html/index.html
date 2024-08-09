@@ -50,6 +50,8 @@
   </main>
 </div>
 <script>
+
+  // 마이페이지
   document.getElementById("mypageBtn").addEventListener('click', event => {
     //window.location.href = "/mypage/test";
     fetch("/api/mypage/info", {
@@ -76,8 +78,10 @@
       console.log("서버 오류 발생:" + error);
     });
   });
+
+  // 유저페이지
   document.getElementById("userpageBtn").addEventListener('click', event => {
-    window.location.href = "/mypage/test";
+    window.location.href = "/userpages/testuser3";
   });
 
 </script>

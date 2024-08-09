@@ -39,10 +39,10 @@ function fetchMyPage(url, func) {
   });
 }
 
-// 마이페이지 정보 로드 함수
-function handleProfileData(data) {
+// 유저페이지 정보 로드 함수
+function handleUserData(data) {
   // 성공적인 응답 시
-  console.log("fetchMyPage 응답 Success");
+  console.log("handleUserData 응답 Success");
   nickName.innerText = data.nickname;
   posts_count.innerText = data.postsList.length;
   pet_name.innerText = data.petName;
@@ -64,36 +64,13 @@ function handleProfileData(data) {
   renderPosts(data.postsList);
 }
 
-// 프로필 편집 페이지로 이동하는 함수
-function myPageEdit(data) {
-  window.location.href = `/mypage/profile/edit/${data.nickname}`;
-}
-
-// 게시물 목록을 렌더링하는 함수
-function renderPosts(posts) {
-  console.log("renderPosts 실행");
-  const postListElement = getElement('post_list');
-  postListElement.innerHTML = ''; // 기존 게시물 리스트 비우기
-
-  posts.forEach(post => {
-    const li = document.createElement('li');
-    li.textContent = post.title; // 게시물 제목 추가
-    postListElement.appendChild(li);
-  });
-}
-
-// 프로필 편집 버튼 설정 함수
-function setupProfileEditButton() {
-  console.log("setupProfileEditButton 실행");
-  getElement("profile_edit_button").addEventListener('click', () => {
-    fetchMyPage("/api/mypage/info", myPageEdit); // 프로필 편집 url 설정
-  });
-}
-
 // 초기화 함수
 function initialize() {
-  console.log("initialize 실행");
-  fetchMyPage("/api/mypage/info", handleProfileData); // 마이페이지 정보 불러오기
+  const nickname = window.location.pathname.split('/').pop();
+//`/api/mypage/profiles/check-username?nickname=${encodeURIComponent(
+//             username.value)}`);
+  fetchMyPage(`/api/users/pages?nickname=${encodeURIComponent(nickname)}`,
+      handleUserData); // 마이페이지 정보 불러오기
 }
 
 // 페이지 로드 시 초기화 함수 호출
