@@ -25,7 +25,7 @@ public class JwtTokenizer {
     public final static Long REFRESH_TOKEN_EXPIRE_COUNT = 7 * 24 * 60 * 60 * 1000L; // 7일
 
     // 토큰 초기와 - application.yml 에서 key값 가져오기
-    public JwtTokenizer(@Value("${jwt.refreshKey}") String accessSecret,
+    public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
         @Value("${jwt.refreshKey}") String refreshSecret) {
         this.accessSecret = accessSecret.getBytes(StandardCharsets.UTF_8);
         this.refreshSecret = refreshSecret.getBytes(StandardCharsets.UTF_8);
@@ -69,10 +69,11 @@ public class JwtTokenizer {
      * */
     public Long getUserIdFromToken(String token) {
         // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
-        String[] tokenArr = token.split(" ");
-        token = tokenArr[1];
+//        String[] tokenArr = token.split(" ");
+//        token = tokenArr[1];
         // 토큰을 파싱하여 클레임 객체를 얻고, 해당 클레임에서 userId를 Long형으로 반환
-        Claims claims = parseToken(token, accessSecret);
+//        Claims claims = parseToken(token, accessSecret);
+        Claims claims = parseAccessToken(token);
         return Long.valueOf((Integer) claims.get("userId"));
     }
 

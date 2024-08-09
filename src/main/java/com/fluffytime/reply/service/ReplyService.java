@@ -1,16 +1,16 @@
-package com.fluffytime.comment.service;
+package com.fluffytime.reply.service;
 
-import com.fluffytime.comment.dto.CommentRequestDto;
-import com.fluffytime.comment.dto.CommentResponseDto;
 import com.fluffytime.common.exception.global.NotFoundComment;
-import com.fluffytime.common.exception.global.NotFoundPost;
+import com.fluffytime.common.exception.global.NotFoundReply;
 import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Comment;
-import com.fluffytime.domain.Post;
+import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.reply.dto.ReplyRequestDto;
+import com.fluffytime.reply.dto.ReplyResponseDto;
 import com.fluffytime.repository.CommentRepository;
-import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.ReplyRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,70 +18,65 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
-public class CommentService {
+public class ReplyService {
 
+    private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
 
-    //댓글 저장
-    public void createComment(CommentRequestDto requestDto) {
+    //답글 저장
+    public void createReply(ReplyRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(NotFoundUser::new);
-        Post post = postRepository.findById(requestDto.getPostId())
-            .orElseThrow(NotFoundPost::new);
+        Comment comment = commentRepository.findById(requestDto.getCommentId())
+            .orElseThrow(NotFoundComment::new); //임시 예외처리
 
-        Comment comment = Comment.builder()
+        Reply reply = Reply.builder()
             .content(requestDto.getContent())
             .user(user)
-            .post(post)
+            .comment(comment)
             .build();
-        commentRepository.save(comment);
+        replyRepository.save(reply);
     }
 
-    //댓글 조회
-    public List<CommentResponseDto> getCommentByPostId(Long postId) {
-        List<Comment> commentList = commentRepository.findByPostPostId(postId);
-        return commentList.stream()
-            .map(CommentResponseDto::new)
+    //답글 조회
+    public List<ReplyResponseDto> getRepliesByCommentId(Long commentId) {
+        List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
+        return replyList.stream()
+            .map(ReplyResponseDto::new)
             .collect(Collectors.toList());
     }
 
-    //댓글 수정
-    public void updateComment(Long commentId, String content) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
-
-        comment.setContent(content);
-        commentRepository.save(comment);
+    //답글 수정
+    public void updateReply(Long replyId, String content) {
+        Reply reply = replyRepository.findById(replyId)
+            .orElseThrow(NotFoundReply::new);
+        reply.setContent(content);
+        replyRepository.save(reply);
     }
 
-    //댓글 삭제
-    public void deleteComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
-        commentRepository.delete(comment);
+    //답글 삭제
+    public void deleteReply(Long replyId) {
+        Reply reply = replyRepository.findById(replyId)
+            .orElseThrow(NotFoundReply::new);
+        replyRepository.delete(reply);
     }
 
     //accessToken으로 사용자 찾기
     @Transactional(readOnly = true)
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        log.info("findByAccessToken 실행");
         String accessToken = null;
         Cookie[] cookies = httpServletRequest.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("accessToken".equals(cookie.getName())) {
                     accessToken = cookie.getValue();
-                    log.info("accessToken: " + accessToken);
                     break;
                 }
             }
@@ -99,10 +94,10 @@ public class CommentService {
         return user;
     }
 
-    //댓글 ID로 댓글 조회하기
-    public CommentResponseDto getCommentByCommentId(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
-        return new CommentResponseDto(comment);
+    //답글 ID로 답글 조회하기
+    public ReplyResponseDto getReplyByReplyId(Long replyId) {
+        Reply reply = replyRepository.findById(replyId)
+            .orElseThrow(NotFoundReply::new);
+        return new ReplyResponseDto(reply);
     }
 }
