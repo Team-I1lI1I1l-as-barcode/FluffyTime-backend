@@ -1,8 +1,12 @@
 package com.fluffytime.reply.controller.api;
 
+import com.fluffytime.comment.exception.NotPermissionDelete;
+import com.fluffytime.comment.exception.NotPermissionModify;
+import com.fluffytime.domain.User;
 import com.fluffytime.reply.dto.ReplyRequestDto;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import com.fluffytime.reply.service.ReplyService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +29,10 @@ public class ReplyRestController {
 
     //답글 저장
     @PostMapping("/reg")
-    public ResponseEntity<Void> createReply(@RequestBody ReplyRequestDto requestDto) {
+    public ResponseEntity<Void> createReply(@RequestBody ReplyRequestDto requestDto,
+        HttpServletRequest httpServletRequest) {
+        User user = replyService.findByAccessToken(httpServletRequest);
+        requestDto.setUserId(user.getUserId());
         replyService.createReply(requestDto);
         return ResponseEntity.ok().build();
     }
@@ -41,9 +48,14 @@ public class ReplyRestController {
     //답글 수정
     @PutMapping("/update/{replyId}")
     public ResponseEntity<Void> updateReply(@PathVariable(name = "replyId") Long replyId,
-        @RequestBody ReplyRequestDto requestDto) {
+        @RequestBody ReplyRequestDto request, HttpServletRequest httpServletRequest) {
         try {
-            replyService.updateReply(replyId, requestDto.getContent());
+            User user = replyService.findByAccessToken(httpServletRequest);
+            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId);
+            if (!reply.getUserId().equals(user.getUserId())) {
+                throw new NotPermissionModify();
+            }
+            replyService.updateReply(replyId, request.getContent());
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -52,8 +64,14 @@ public class ReplyRestController {
 
     //답글 삭제
     @DeleteMapping("/delete/{replyId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable(name = "replyId") Long replyId) {
+    public ResponseEntity<Void> deleteComment(@PathVariable(name = "replyId") Long replyId,
+        HttpServletRequest httpServletRequest) {
         try {
+            User user = replyService.findByAccessToken(httpServletRequest);
+            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId);
+            if (!reply.getUserId().equals(user.getUserId())) {
+                throw new NotPermissionDelete();
+            }
             replyService.deleteReply(replyId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {

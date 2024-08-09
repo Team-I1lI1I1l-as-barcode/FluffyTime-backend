@@ -87,38 +87,22 @@ public class CommentService {
             }
         }
 
-        if (accessToken == null) {
-            log.warn("No accessToken found in cookies");
-        } else {
-            log.info("AccessToken extracted: " + accessToken);
-        }
-
         Long userId = null;
-        try {
-            userId = jwtTokenizer.getUserIdFromToken(accessToken);
-            log.info("Extracted userId from token: " + userId);
-        } catch (Exception e) {
-            log.error("Error extracting userId from token", e);
-            throw new RuntimeException("Invalid access token", e);
-        }
-
+        userId = jwtTokenizer.getUserIdFromToken(accessToken);
         User user = findUserById(userId).orElseThrow(NotFoundUser::new);
-
-        log.info("User found: " + user.getNickname());
         return user;
     }
 
     //사용자 조회
     public Optional<User> findUserById(Long userId) {
-        log.info("findUserById 실행" + userId);
         Optional<User> user = userRepository.findById(userId);
-
-        if (user.isPresent()) {
-            log.info("User found: " + user.get().getNickname());
-        } else {
-            log.warn("No user found with ID: " + userId);
-        }
-
         return user;
+    }
+
+    //댓글 ID로 댓글 조회하기
+    public CommentResponseDto getCommentByCommentId(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(NotFoundComment::new);
+        return new CommentResponseDto(comment);
     }
 }

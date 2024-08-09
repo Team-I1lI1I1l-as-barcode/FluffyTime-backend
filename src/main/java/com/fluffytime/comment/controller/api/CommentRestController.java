@@ -61,9 +61,10 @@ public class CommentRestController {
         HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
-            CommentResponseDto comment = commentService.getCommentByPostId(commentId).stream()
-                .filter(c -> c.getUserId().equals(user.getUserId())).findFirst()
-                .orElseThrow(NotPermissionModify::new);
+            CommentResponseDto comment = commentService.getCommentByCommentId(commentId);
+            if (!comment.getUserId().equals(user.getUserId())) {
+                throw new NotPermissionModify();
+            }
             commentService.updateComment(commentId, request.getContent());
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
@@ -77,9 +78,10 @@ public class CommentRestController {
         HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
-            CommentResponseDto comment = commentService.getCommentByPostId(commentId).stream()
-                .filter(c -> c.getUserId().equals(user.getUserId())).findFirst()
-                .orElseThrow(NotPermissionDelete::new);
+            CommentResponseDto comment = commentService.getCommentByCommentId(commentId);
+            if (!comment.getUserId().equals(user.getUserId())) {
+                throw new NotPermissionDelete();
+            }
             commentService.deleteComment(commentId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {

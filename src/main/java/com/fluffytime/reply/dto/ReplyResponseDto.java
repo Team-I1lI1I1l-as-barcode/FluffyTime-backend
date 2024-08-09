@@ -14,12 +14,14 @@ import lombok.Setter;
 public class ReplyResponseDto {
 
     private Long replyId;
+    private Long userId;
     private String content;
     private String nickname;
     private LocalDateTime createdAt;
 
     public ReplyResponseDto(Reply reply) {
         this.replyId = reply.getReplyId();
+        this.userId = reply.getUser().getUserId();
         this.content = reply.getContent();
         this.nickname = reply.getUser().getNickname();
         this.createdAt = LocalDateTime.now();

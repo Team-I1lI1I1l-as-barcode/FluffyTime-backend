@@ -1,5 +1,5 @@
 //댓글 조회
-async function fetchComments(postId) {
+async function fetchComments(postId, currentUserId) {
   const response = await fetch(`/api/comments/post/${postId}`);
   if (!response.ok) {
     console.error('댓글 목록 가져오기 실패!', response.status);
@@ -26,6 +26,9 @@ async function fetchComments(postId) {
     deleteButton.textContent = '삭제';
     deleteButton.onclick = () => deleteComment(comment.commentId, postId);
 
+    commentDiv.appendChild(editButton);
+    commentDiv.appendChild(deleteButton);
+
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글';
     replyButton.onclick = () => toggleReplyInput(comment.commentId);
@@ -38,8 +41,6 @@ async function fetchComments(postId) {
     fetchReplies(comment.commentId, repliesDiv);
 
     commentDiv.appendChild(contentDiv);
-    commentDiv.appendChild(editButton);
-    commentDiv.appendChild(deleteButton);
     commentDiv.appendChild(replyButton);
     commentDiv.appendChild(repliesDiv);
 
@@ -112,7 +113,7 @@ async function postReply(commentId, content, postId) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({content, userId, commentId}),
+      body: JSON.stringify({content, commentId}),
     });
 
     if (response.ok) {
