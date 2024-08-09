@@ -5,6 +5,7 @@ import com.fluffytime.domain.User;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
+import com.fluffytime.mypage.response.ImageResultDto;
 import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
 import com.fluffytime.mypage.response.RequestResultDto;
@@ -14,12 +15,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -86,4 +90,32 @@ public class MyPageRestController {
         RequestResultDto requestResultDto = myPageService.AccountDelete(user.getNickname());
         return ResponseEntity.status(HttpStatus.OK).body(requestResultDto);
     }
+
+    // 프로필 이미지 등록
+    @PostMapping("/api/mypage/profiles/images/reg")
+    public ResponseEntity<?> profileImagesReg(@RequestParam("nickname") String nickname,
+        @RequestPart("images") MultipartFile file) { // 폼데이터에서 파일을 MultipartFile로 추출
+        log.info("프로필 이미지를 등록합니다.");
+        ImageResultDto imageResultDto = myPageService.uploadProfileImage(nickname, file);
+        return ResponseEntity.status(HttpStatus.OK).body(imageResultDto);
+    }
+
+    // 프로필 이미지 수정
+    @PatchMapping("/api/mypage/profiles/images/edit")
+    public ResponseEntity<?> profileImagesEdit(@RequestParam("nickname") String nickname,
+        @RequestPart("images") MultipartFile file) { // 폼데이터에서 파일을 MultipartFile로 추출
+        log.info("프로필 이미지를 업데이트합니다.");
+        ImageResultDto imageResultDto = myPageService.uploadProfileImage(nickname, file);
+        return ResponseEntity.status(HttpStatus.OK).body(imageResultDto);
+    }
+
+    // 프로필 이미지 삭제
+    @DeleteMapping("/api/mypage/profiles/images/delete")
+    public ResponseEntity<?> profileImagesDelete(@RequestParam("nickname") String nickname) {
+        log.info("프로필 이미지를 삭제합니다.");
+        ImageResultDto imageResultDto = myPageService.deleteProfileImage(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(imageResultDto);
+    }
+
+
 }

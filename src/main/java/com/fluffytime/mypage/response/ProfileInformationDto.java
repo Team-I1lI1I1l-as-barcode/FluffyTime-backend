@@ -22,4 +22,5 @@ public class ProfileInformationDto {
     private Long petAge; // 반려동물 나이
     private String petCategory; // 반려동물 카테고리
     private String publicStatus; // 프로필 공개/비공개 여부
+    private String fileUrl; // 프로필 사진 등록 URL
 }

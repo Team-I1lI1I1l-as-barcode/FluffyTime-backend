@@ -3,16 +3,21 @@ package com.fluffytime.mypage.service;
 import com.fluffytime.common.exception.global.NotFoundProfile;
 import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Profile;
+import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.User;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.mypage.exception.NoProfileImage;
 import com.fluffytime.mypage.exception.NotFoundMyPage;
 import com.fluffytime.mypage.request.PostDto;
 import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
+import com.fluffytime.mypage.response.ImageResultDto;
 import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
 import com.fluffytime.mypage.response.RequestResultDto;
+import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.ProfileImagesRepository;
 import com.fluffytime.repository.ProfileRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -24,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +39,9 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
+    private final ProfileImagesRepository profileImagesRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final S3Service s3Service;
 
 
     // 마이페이지 사용자 조회(userId로 조회)
@@ -48,12 +56,7 @@ public class MyPageService {
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
         Optional<User> optionalUser = userRepository.findByNickname(nickname);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return user;
-        } else {
-            return null;
-        }
+        return optionalUser.orElse(null);
     }
 
     // accessToken 토큰으로 사용자 찾기
@@ -72,19 +75,15 @@ public class MyPageService {
         }
         log.info(accessToken);
         // accessToken값으로  UserId 추출
-        Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
+        Long userId = Long.valueOf(
+            ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
         // id(pk)에 해당되는 사용자 추출
-        User user = findUserById(userId).get();
-        return user;
+        return findUserById(userId).get();
     }
 
     // 접근한 사용자와 실제 권한을 가진 사용자가 동일한지 판단하는 메서드
     public boolean isUserAuthorized(String accessNickname, String actuallyNickname) {
-        if (accessNickname.equals(actuallyNickname)) {
-            return true;
-        } else {
-            return false;
-        }
+        return accessNickname.equals(actuallyNickname);
     }
 
     // 마이페이지 정보 불러오기 응답 dto 구성
@@ -109,10 +108,21 @@ public class MyPageService {
             if (profile == null) {
                 return myPageInformationDto;
             } else {
+                ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
+                String fileUrl; // 프로필 이미지 업로드 URL
+                if (profileImages == null) {
+                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 미등록 상태");
+                    fileUrl = null;
+                } else {
+                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 등록 상태");
+                    fileUrl = profileImages.getFilePath();
+                }
+
                 myPageInformationDto.setPetName(profile.getPetName()); // 반려동물 이름
                 myPageInformationDto.setPetSex(profile.getPetSex()); // 반려동물 성별
                 myPageInformationDto.setPetAge(profile.getPetAge()); // 반려동물 나이
                 myPageInformationDto.setIntro(profile.getIntro()); //소개글
+                myPageInformationDto.setFileUrl(fileUrl);
                 return myPageInformationDto;
             }
         } else {
@@ -133,6 +143,7 @@ public class MyPageService {
             String email = user.getEmail(); // 이메일
 
             Profile profile = user.getProfile(); // 프로필 객체
+            ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
             // 사용자는 있으나, 프로필이 없는 경우 기본 뼈대 프로필 생성 (회원가입 후 프로필을 수정하지 않은 경우에 해당)
             if (profile == null) {
                 throw new NotFoundProfile();
@@ -143,7 +154,14 @@ public class MyPageService {
             String intro = profile.getIntro(); //소개글
             String category = profile.getPetCategory(); // 카테고리
             String publicStatus = profile.getPublicStatus(); // 계정 비공개/공개 여부
-
+            String fileUrl; // 프로필 이미지 업로드 URL
+            if (profileImages == null) {
+                log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 미등록 상태");
+                fileUrl = null;
+            } else {
+                log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 등록 상태");
+                fileUrl = profileImages.getFilePath();
+            }
             return ProfileInformationDto.builder()
                 .nickname(nickname)
                 .email(email)
@@ -153,6 +171,7 @@ public class MyPageService {
                 .petAge(petAge)
                 .petCategory(category)
                 .publicStatus(publicStatus)
+                .fileUrl(fileUrl)
                 .build();
 
         } else {
@@ -234,7 +253,56 @@ public class MyPageService {
                 .build();
 
         }
+    }
+
+    // 프로필 이미지 등록 / 수정
+    public ImageResultDto uploadProfileImage(String nickname,
+        MultipartFile file) {
+        log.info("uploadProfileImage 실행 ");
+        ImageResultDto imageResultDto = new ImageResultDto();
+        imageResultDto.setResult(true);
+        if (file == null || file.isEmpty()) {
+            imageResultDto.setResult(false);
+            throw new NoProfileImage(); // 파일이 없거나 비어있는 경우 예외 처리
+        }
+        String s3iFileName = s3Service.uploadFile(file); // 파일 업로드
+        String Url = s3Service.getFileUrl(s3iFileName);
+        ProfileImages profileImage = ProfileImages.builder()
+            .fileName(file.getOriginalFilename()) // 원본 파일 이름
+            .s3iFileName(s3iFileName)
+            .filePath(Url) // S3에 저장된 파일 URL 또는 경로
+            .fileSize(file.getSize()) // 파일 크기
+            .mimeType(file.getContentType()) // MIME 타입
+            .build();
+        User user = findUserByNickname(nickname);
+        Profile profile = user.getProfile();
+        profile.setProfileImages(profileImage);
+        profileRepository.save(profile);
+        imageResultDto.setFileUrl(Url);
+        return imageResultDto;
+    }
 
 
+    // 이미지 삭제하기
+    public ImageResultDto deleteProfileImage(String nickname) {
+        log.info("uploadProfileImage 실행");
+        User user = findUserByNickname(nickname);
+        String ProfileImageId;
+        ImageResultDto imageResultDto = new ImageResultDto();
+        imageResultDto.setResult(true);
+        if (user == null) {
+            log.info("uploadProfileImage 실행 >> 해당 유저가 없습니다. ");
+            imageResultDto.setResult(false);
+            throw new NotFoundUser();
+        }
+        Profile profile = user.getProfile();
+        if (profile.getProfileImages() == null) {
+            log.info("uploadProfileImage 실행 >> 등록된 프로필 사진이 없습니다. ");
+            throw new NoProfileImage();
+        }
+        imageResultDto.setFileUrl(profile.getProfileImages().getFilePath());
+        profile.setProfileImages(null);
+        profileRepository.save(profile);
+        return imageResultDto;
     }
 }
