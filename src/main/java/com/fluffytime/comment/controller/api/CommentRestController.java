@@ -2,7 +2,11 @@ package com.fluffytime.comment.controller.api;
 
 import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.comment.dto.CommentResponseDto;
+import com.fluffytime.comment.exception.NotPermissionDelete;
+import com.fluffytime.comment.exception.NotPermissionModify;
 import com.fluffytime.comment.service.CommentService;
+import com.fluffytime.domain.User;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +33,10 @@ public class CommentRestController {
     //댓글 등록
     @PostMapping("/reg")
     public ResponseEntity<Map<String, String>> createComment(
-        @Valid @RequestBody CommentRequestDto requestDto) {
+        @Valid @RequestBody CommentRequestDto requestDto, HttpServletRequest httpServletRequest) {
         try {
+            User user = commentService.findByAccessToken(httpServletRequest);
+            requestDto.setUserId(user.getUserId());
             commentService.createComment(requestDto);
             return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "댓글 등록 성공!"));
@@ -43,7 +49,7 @@ public class CommentRestController {
     //댓글 조회(게시글마다)
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<CommentResponseDto>> getCommentByPostId(
-        @PathVariable(name = "postId") Long postId) {
+        @PathVariable(name = "postId") Long postId, HttpServletRequest httpServletRequest) {
         List<CommentResponseDto> commentList = commentService.getCommentByPostId(postId);
         return ResponseEntity.ok(commentList);
     }
@@ -51,8 +57,13 @@ public class CommentRestController {
     //댓글 수정
     @PutMapping("/update/{commentId}")
     public ResponseEntity<Void> updateComment(
-        @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDto request) {
+        @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDto request,
+        HttpServletRequest httpServletRequest) {
         try {
+            User user = commentService.findByAccessToken(httpServletRequest);
+            CommentResponseDto comment = commentService.getCommentByPostId(commentId).stream()
+                .filter(c -> c.getUserId().equals(user.getUserId())).findFirst()
+                .orElseThrow(NotPermissionModify::new);
             commentService.updateComment(commentId, request.getContent());
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {
@@ -62,8 +73,13 @@ public class CommentRestController {
 
     //댓글 삭제
     @DeleteMapping("/delete/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable(name = "commentId") Long commentId) {
+    public ResponseEntity<Void> deleteComment(@PathVariable(name = "commentId") Long commentId,
+        HttpServletRequest httpServletRequest) {
         try {
+            User user = commentService.findByAccessToken(httpServletRequest);
+            CommentResponseDto comment = commentService.getCommentByPostId(commentId).stream()
+                .filter(c -> c.getUserId().equals(user.getUserId())).findFirst()
+                .orElseThrow(NotPermissionDelete::new);
             commentService.deleteComment(commentId);
             return ResponseEntity.ok().build();
         } catch (RuntimeException e) {

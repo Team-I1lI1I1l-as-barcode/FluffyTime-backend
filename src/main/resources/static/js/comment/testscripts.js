@@ -106,7 +106,6 @@ async function fetchReplies(commentId, replyDiv) {
 
 // 답글 등록
 async function postReply(commentId, content, postId) {
-  const userId = document.getElementById('user-id').value;
   try {
     const response = await fetch('/api/replies/reg', {
       method: 'POST',
@@ -186,7 +185,6 @@ async function deleteReply(replyId, commentId) {
 //댓글 등록
 async function postComment(postId) {
   const content = document.getElementById('comment-content').value;
-  const userId = document.getElementById('user-id').value;
   const statusMessage = document.getElementById('status-message');
 
   try {
@@ -195,7 +193,7 @@ async function postComment(postId) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({content, userId, postId}),
+      body: JSON.stringify({content, postId}),
     });
 
     const data = await response.json();

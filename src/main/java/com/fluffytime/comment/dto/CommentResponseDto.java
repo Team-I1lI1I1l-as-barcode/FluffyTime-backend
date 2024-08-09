@@ -17,6 +17,7 @@ import lombok.Setter;
 public class CommentResponseDto {
 
     private Long commentId;
+    private Long userId;
     private String content;
     private String nickname;
     private LocalDateTime createdAt;
@@ -24,6 +25,7 @@ public class CommentResponseDto {
 
     public CommentResponseDto(Comment comment) {
         this.commentId = comment.getCommentId();
+        this.userId = comment.getUser().getUserId();
         this.content = comment.getContent();
         this.nickname = comment.getUser().getNickname();
         this.createdAt = LocalDateTime.now();
