@@ -8,6 +8,7 @@ const pet_name = getElement("pet_name"); // 반려동물 이름
 const pet_sex = getElement("pet_sex"); // 반려동물 성별
 const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
+const img = getElement('img'); // 이미지 미리보기
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 
@@ -45,8 +46,20 @@ function handleProfileData(data) {
   nickName.innerText = data.nickname;
   posts_count.innerText = data.postsList.length;
   pet_name.innerText = data.petName;
-  pet_sex.innerText = data.petSex;
-  pet_age.innerText = data.petAge;
+  if (data.petSex === "none") {
+    pet_sex.innerText = " ";
+  } else {
+    pet_sex.innerText = data.petSex;
+  }
+  if (data.petAge === 0) {
+    pet_age.innerText = " ";
+  } else {
+    pet_age.innerText = data.petAge;
+  }
+  if (data.fileUrl !== null) {
+    console.log("등록된 프로필 사진을 불러옵니다.");
+    img.src = data.fileUrl;
+  }
   intro.innerText = data.intro;
   renderPosts(data.postsList);
 }

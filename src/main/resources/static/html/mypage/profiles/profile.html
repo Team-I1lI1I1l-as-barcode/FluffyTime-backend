@@ -5,22 +5,79 @@
   <title>프로필 편집</title>
   <script src="/js/mypage/profiles/profile.js" defer></script>
   <link rel="stylesheet" href="/css/mypage/profiles/edit.css"/>
+  <style>
+    #imagePreview img {
+      max-width: 100%;
+      height: auto;
+    }
+
+  </style>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 <body>
+<!--<div class="container">-->
+<!--  <aside class="sidebar">-->
+<!--    <h2>FluffyTime</h2>-->
+<!--    <ul>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">home</span>-->
+<!--        <a href="#">홈</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">search</span>-->
+<!--        <a href="#">검색</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">explore</span>-->
+<!--        <a href="#">탐색 탭</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">add_box</span>-->
+<!--        <a href="#">만들기</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">person</span>-->
+<!--        <a href="#">프로필</a>-->
+<!--      </li>-->
+<!--      <li>-->
+<!--        <span class="material-symbols-rounded">favorite</span>-->
+<!--        <a href="#">알림</a>-->
+<!--      </li>-->
+<!--    </ul>-->
+<!--    <div class="more-menu">-->
+<!--      <span class="material-symbols-rounded">menu</span>-->
+<!--      <a href="#">더보기</a>-->
+<!--    </div>-->
+<!--  </aside>-->
 <h3>프로필 편집 페이지</h3>
+<!-- HTML 폼으로 이미지 파일을 업로드하는 폼 -->
+<form id="profileImageForm" method="post" enctype="multipart/form-data">
+  <!-- 이미지 파일 입력 필드 -->
+  <input type="file" id="images" name="images" style="display: none;"/>
+  <!-- 이미지 업로드 버튼 -->
+</form>
 
-<form id="profile_edit_form">
-  <p>
-    <span>[사진이 들어갈 곳]</span>
-    &nbsp&nbsp&nbsp<span id="nickname"></span>
-    <span
-    ><button>사진 변경</button>
-          <a href="/mypage/profile/edit/1">프로필 사진 바꾸기</a>
-          <a href="/mypage/profile/edit/1">사진 업로드</a>
-          <a href="/mypage/profile/edit/1">현재 사진 삭제</a>
-          <a href="/mypage/profile/edit/1">취소</a>
-        </span>
-  </p>
+<!-- 이미지 미리보기 및 출력 영역 -->
+<div id="imagePreview"
+     style="display: flex; justify-content: center; align-items: center; height: 70px; width: 70px; border: 1px solid; border-radius: 50%; overflow: hidden;">
+  <img src="../../../image/profile/profile.png"
+       style="height: 100%; width: 100%; object-fit: cover; border-radius: 50%;" id="img">
+</div>
+
+<form id="profile_edit_form" method=post>
+  <span id="nickname"></span>
+  <button id="imageBtn">사진 변경</button>
+  <div style="border : 1px solid; padding: 3px;">
+    <p style="font-size: 20px; font-weight: bold;"> 프로필 사진 바꾸기</p>
+    <a id="profile_image_upload"
+       style="font-size: 10px; color: blue; font-weight: bold; cursor: pointer;">사진 업로드</a><br>
+    <a id="profile_image_delete"
+       style="font-size: 10px; color: red; font-weight: bold; cursor: pointer;">현재 사진 삭제</a><br>
+    <a id="profile_image_cancel" style="font-size: 10px; cursor: pointer;">취소</a><br>
+  </div>
+
 
   <p>이메일</p>
   <p id="email"></p>
@@ -76,5 +133,6 @@
   계정 삭제
   <button id="delete_account">삭제</button>
 </p>
+<!--</div>-->
 </body>
 </html>

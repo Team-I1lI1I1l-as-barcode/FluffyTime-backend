@@ -24,16 +24,18 @@ public class MyPageInformationDto {
     private String petSex;   // 애완동물 성별
     private Long petAge;  // 애완동물 나이
     private String intro;    // 소개글
+    private String fileUrl; // 프로필 사진 등록 URL
 
     @Builder
     public MyPageInformationDto(String nickname,
         List<PostDto> postsList,
-        String petName, String petSex, Long petAge, String intro) {
+        String petName, String petSex, Long petAge, String intro, String fileUrl) {
         this.nickname = nickname;
         this.postsList = postsList;
         this.petName = petName;
         this.petSex = petSex;
         this.petAge = petAge;
         this.intro = intro;
+        this.fileUrl = fileUrl;
     }
 }
