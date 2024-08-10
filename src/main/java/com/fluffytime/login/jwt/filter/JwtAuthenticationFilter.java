@@ -1,5 +1,7 @@
 package com.fluffytime.login.jwt.filter;
 
+import static com.fluffytime.login.jwt.util.JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT;
+
 import com.fluffytime.login.jwt.dao.RefreshTokenDao;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.login.security.CustomUserDetails;
@@ -57,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
                     accessTokenCookie.setPath("/");
                     accessTokenCookie.setHttpOnly(true); // 클라이언트 스크립트에서 쿠키 접근 방지
-                    accessTokenCookie.setMaxAge(3600); // 만료 시간 설정 (예: 1시간)
+                    accessTokenCookie.setMaxAge(Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT) / 1000); // 만료 시간 설정 (예: 1시간)
                     response.addCookie(accessTokenCookie);
                 } else {
                     refreshTokenDao.removeRefreshToken(email);

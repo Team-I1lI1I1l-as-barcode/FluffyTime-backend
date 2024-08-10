@@ -16,19 +16,24 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 
+@Slf4j
 @RequiredArgsConstructor
-public class LoginFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenizer jwtTokenizer;
     private final RefreshTokenDao refreshTokenDao;
+    private final RequestCache requestCache = new HttpSessionRequestCache();
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
@@ -89,6 +94,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
+
+        response.sendRedirect("/");
+        log.info("로그인에 성공하였습니다.");
     }
 
     @Override

@@ -35,6 +35,7 @@ async function loginProcess(event) {
       return;
     }
     console.log("로그인 성공")
+
     // window.location.href = '/'; // 원하는 URL로 변경
 
   } catch (error) {
