@@ -44,7 +44,11 @@ function handleUserData(data) {
   // 성공적인 응답 시
   console.log("handleUserData 응답 Success");
   nickName.innerText = data.nickname;
-  posts_count.innerText = data.postsList.length;
+  if (data.postsList === null) {
+    posts_count.innerText = 0;
+  } else {
+    posts_count.innerText = data.postsList.length;
+  }
   pet_name.innerText = data.petName;
   if (data.petSex === "none") {
     pet_sex.innerText = " ";
@@ -62,6 +66,26 @@ function handleUserData(data) {
   }
   intro.innerText = data.intro;
   renderPosts(data.postsList);
+}
+
+// 게시물 목록을 렌더링하는 함수
+function renderPosts(posts) {
+  console.log("renderPosts 실행");
+  const postListElement = document.querySelector('#post_list');
+  if (posts !== null) {
+    // 기존 자식 요소들을 하나씩 제거
+    while (postListElement.firstChild) {
+      postListElement.removeChild(postListElement.firstChild);
+    }
+
+    posts.forEach(post => {
+      const img = document.createElement('img'); // <img> 요소 생성
+      img.src = post.imageUrl; // 이미지 URL 설정
+      img.alt = post.title; // 이미지 설명 설정
+
+      postListElement.appendChild(img); // <img>를 섹션에 추가
+    });
+  }
 }
 
 // 초기화 함수
