@@ -1,4 +1,4 @@
-package com.fluffytime.login.exception.login;
+package com.fluffytime.login.exception;
 
 import com.fluffytime.common.exception.ErrorCode;
 import lombok.AllArgsConstructor;

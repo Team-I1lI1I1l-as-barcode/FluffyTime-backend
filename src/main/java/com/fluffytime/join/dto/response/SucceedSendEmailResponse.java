@@ -6,13 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SendEmailResponse {
+@NoArgsConstructor
+public class SucceedSendEmailResponse {
 
     private String email;
 
     @Builder
-    public SendEmailResponse(String email) {
+    public SucceedSendEmailResponse(String email) {
         this.email = email;
     }
 

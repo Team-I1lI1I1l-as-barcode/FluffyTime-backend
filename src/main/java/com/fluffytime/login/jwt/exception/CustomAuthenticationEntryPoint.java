@@ -1,8 +1,9 @@
 package com.fluffytime.login.jwt.exception;
 
-import com.fluffytime.login.exception.jwt.JwtErrorCode;
+import com.fluffytime.login.jwt.util.JwtResponseProvider;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 // 시큐리티가 인증되지 않은 사용자가 인증이 필요한 리소스에 접근 할때 동작하게 하는 인터페이스
 // 사용자가 로그인하지 않은 상태에서 보호된 페이지에 접근하려고 할 때
@@ -27,18 +29,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         // 요청 속성에서 예외 메시지 가져오기
         String exception = (String) request.getAttribute("exception");
 
-        // 예외 메세지가 null이 아닐 경우만
-//        if (exception != null) {
-        //어떤요청인지를 구분..
         //RESTful로 요청한건지..  그냥 페이지 요청한건지 구분해서 다르게 동작하도록 구현.
         if (isRestRequest(request)) { // RESTful 요청이라면
             handleRestResponse(request, response, exception); // 관련 핸들러 실행
         } else { // 페이지 요청이라면
             handlePageResponse(request, response, exception); // 관련 핸들러 실행
         }
-//        } else {
-//            handlePageResponse(request, response, null);
-//        }
     }
 
     // 사용자 요청이 RESTful인지 판별
@@ -60,11 +56,34 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         log.error("Page Request - Commence Get Exception : {}", exception);
 
         // 에러 존재할 시
+        // 에러가 존재할 경우 종류에 따라서 응답 설정
         if (exception != null) {
-            // 추가적인 페이지 요청에 대한 예외 처리 로직을 여기에 추가할 수 있습니다.
+            if (exception.equals("INVALID_TOKEN")) {
+                // 예외 코드가 INVALID_TOKEN인 경우: 유효하지 않은 JWT 토큰
+                log.error("entry point >> invalid token");
+                setResponse(response, JwtErrorCode.INVALID_TOKEN);
+            } else if (exception.equals("EXPIRED_TOKEN")) {
+                // 예외 코드가 EXPIRED_TOKEN인 경우 : 만료된 JWT 토큰
+                log.error("entry point >> expired token");
+                setResponse(response, JwtErrorCode.EXPIRED_TOKEN);
+            } else if (exception.equals("UNSUPPORTED_TOKEN")) {
+                // 예외 코드가 UNSUPPORTED_TOKEN인 경우 : 지원되지 않는 형식의 JWT 토큰
+                log.error("entry point >> unsupported token");
+                setResponse(response, JwtErrorCode.UNSUPPORTED_TOKEN);
+            } else if (exception.equals("NOT_FOUND_TOKEN")) {
+                // 예외 코드가 NOT_FOUND_TOKEN인 경우 : JWT 토큰이 요청에 없음
+                log.error("entry point >> not found token");
+                setResponse(response, JwtErrorCode.NOT_FOUND_TOKEN);
+            } else {
+                // 위 조건에 해당하지 않는 경우 : 알 수 없는 에러
+                setResponse(response, JwtErrorCode.UNKNOWN_ERROR);
+            }
         }
-        //페이지로 요청이 들어왔을 때 인증되지 않은 사용자라면 무조건 /login으로 리디렉션 시키겠다.
+
+        Cookie[] cookies = request.getCookies();
+
         response.sendRedirect("/login");
+        //페이지로 요청이 들어왔을 때 인증되지 않은 사용자라면 무조건 /login으로 리디렉션 시키겠다.
 
     }
 

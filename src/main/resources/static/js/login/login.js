@@ -29,13 +29,14 @@ async function loginProcess(event) {
           },
           body: JSON.stringify(jsonData)
         });
-    const data = await response.json();
 
     if (!response.ok) {
       alert("로그인 에러")
-      throw new Error(data.message || "error");
+      return;
     }
-    window.location.href = '/'; // 원하는 URL로 변경
+    console.log("로그인 성공")
+    // window.location.href = '/'; // 원하는 URL로 변경
+
   } catch (error) {
     console.error(error);
   }
