@@ -73,9 +73,10 @@ async function tempJoin(event) {
       }
     }
 
-    await getCertificationEmail();
-
-    window.location.href = '/join/email-certificate/' + email; // 원하는 URL로 변경
+    const result = await getCertificationEmail();
+    if (result) {
+      window.location.href = '/join/email-certificate/' + email;
+    } // 원하는 URL로 변경
 
   } catch (error) {
     console.error(error);
@@ -167,9 +168,12 @@ async function getCertificationEmail() {
     if (!response.ok) {
       alert("[ERROR]" + res.code + " : " + res.message)
       location.reload();
+      return false;
     }
 
+    return true;
   } catch (error) {
     console.error(error);
+    return false;
   }
 }
