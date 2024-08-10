@@ -5,6 +5,7 @@
   <title>마이페이지</title>
   <script src="/js/mypage/mypage.js" defer></script>
   <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/mypage/mypage.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
@@ -43,52 +44,66 @@
       <a href="#">더보기</a>
     </div>
   </aside>
-  <header id="user_information_container">
-    <h1>마이페이지</h1>
-    <span id="profile_picture"></span>
-    <br/>
-    <br/>
-    <!-- 이미지 미리보기 및 출력 영역 -->
-    <div id="imagePreview"
-         style="display: flex; justify-content: center; align-items: center; height: 70px; width: 70px; border: 1px solid; border-radius: 50%; overflow: hidden;">
-      <img src="../../../image/profile/profile.png"
-           style="height: 100%; width: 100%; object-fit: cover; border-radius: 50%;" id="img">
-    </div>
-    <p>
-      <span id="nickename"></span>&nbsp&nbsp&nbsp
-      <span>
+
+  <div id="mypage_container">
+    <header id="user_information_container">
+      <span id="profile_picture"></span>
+      <br/>
+      <br/>
+      <form id="profileImageForm" method="post" enctype="multipart/form-data">
+        <!-- 이미지 파일 입력 필드 -->
+        <input type="file" id="images" name="images" style="display: none;"/>
+        <!-- 이미지 업로드 버튼 -->
+      </form>
+      <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
+      <div id="profile_container">
+        <!-- 이미지 미리보기 및 출력 영역 -->
+        <div id="imagePreview">
+          <span class="material-symbols-rounded">photo_camera</span>
+          <img src="../../../image/profile/profile.png" id="img">
+        </div>
+        <div id="profile_information_container">
+          <p id="nickename"></p>
           <button id="profile_edit_button">
             프로필 편집
           </button>
-  </span>
-    </p>
-    <span>
-        게시물  <span id="posts_count"></span>&nbsp&nbsp&nbsp
-        팔로워 0 <span id="follower_count"></span>&nbsp&nbsp&nbsp
-        팔로우 0 <span id="follow_count"></span>&nbsp&nbsp&nbsp
-      </span>
-    <br/><br/>
-    <span>
-        <span id="pet_name"></span>&nbsp&nbsp&nbsp
-        <span id="pet_sex"></span>&nbsp&nbsp&nbsp
-        <span id="pet_age"></span>
-      </span>
-    <p><span id="intro"></span></p>
-    <hr/>
-  </header>
+          <div id="profile_information_user">
+            <p>게시물 <span id="posts_count"></span></p>
+            <p>팔로워 0 <span id="follower_count"></span></p>
+            <p> 팔로우 0 <span id="follow_count"></span></p>
+          </div>
+          <div id="profile_information_pet">
+            <p id="pet_name"></p>
+            <p id="pet_sex"></p>
+            <p id="pet_age"></p>
+          </div>
+          <div id="profile_information_intro">
+            <p id="intro"></p>
+          </div>
+        </div>
+      </div>
+      <nav>
+        <span class="material-symbols-rounded">content_paste</span><a
+          href="javascript:window.location.reload();">게시물</a>
+        <span class="material-symbols-rounded">bookmark</span><a
+          href="javascript:window.location.reload();">저장됨</a>
+        <span class="material-symbols-rounded">sell</span><a
+          href="javascript:window.location.reload();">태그됨</a>
+      </nav>
+    </header>
 
-  <nav>
-    <a href="/mypage/1">게시물</a>
-    <a href="/mypage/1">저장됨</a>
-    <a href="/mypage/1">태그됨</a>
-  </nav>
 
-  <section class="posts">
-    <!--내 게시글 리스트 -->
-    <div id="post_container">
-      <ul id="post_list"></ul>
-    </div>
-  </section>
+
+    <section class="posts" id="post_list">
+      <!--      포스트가 있을 시 js를 이용하여 포스트 추가 -->
+      <!--      포스트 없을시 보여질 화면 부분 -->
+      <div id="no_post">
+        <p id="post_create" class="material-symbols-rounded">add_circle</p>
+        <p id="post_comment1">첫 게시물 공유하기</p>
+        <p id="post_comment2">사진을 공유하면 회원님의 프로필에 표시됩니다.</p>
+      </div>
+    </section>
+  </div>
 </div>
 </body>
 </html>

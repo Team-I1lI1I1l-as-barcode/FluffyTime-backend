@@ -99,6 +99,11 @@ public class MyPageService {
                 .map(post -> new PostDto(post.getContent()))
                 .collect(Collectors.toList());
 
+            // 게시물 리스트가 비어있을때
+            if (postsList.isEmpty()) {
+                postsList = null;
+            }
+
             MyPageInformationDto myPageInformationDto = MyPageInformationDto.builder()
                 .nickname(nickName)
                 .postsList(postsList)
