@@ -32,7 +32,10 @@ async function loginProcess(event) {
 
     if (!response.ok) {
       alert("로그인 에러")
+      return;
     }
+    console.log("로그인 성공")
+    // window.location.href = '/'; // 원하는 URL로 변경
 
   } catch (error) {
     console.error(error);

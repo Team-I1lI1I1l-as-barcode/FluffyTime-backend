@@ -1,6 +1,8 @@
 package com.fluffytime.login.jwt.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +22,7 @@ public class JwtTokenizer {
     // refreshToken에 사용될 비밀 키를 담을 배열 선언
     private final byte[] refreshSecret;
     // accessToken 유지 시간(ms)
-    public final static Long ACCESS_TOKEN_EXPIRE_COUNT = 30 * 60 * 1000L; // 30분
+    public final static Long ACCESS_TOKEN_EXPIRE_COUNT = 2 * 60 * 1000L; // 30분
     // refreshToken 유지 시간(ms)
     public final static Long REFRESH_TOKEN_EXPIRE_COUNT = 7 * 24 * 60 * 60 * 1000L; // 7일
 
@@ -64,18 +66,6 @@ public class JwtTokenizer {
             .compact(); // JWT를 생성하고, 문자열 형태로 변환하여 반환
     }
 
-    /*
-     * 토큰에서 유저 메일 얻기
-     * */
-    public Long getUserIdFromToken(String token) {
-        // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
-        String[] tokenArr = token.split(" ");
-        token = tokenArr[1];
-        // 토큰을 파싱하여 클레임 객체를 얻고, 해당 클레임에서 userId를 Long형으로 반환
-        Claims claims = parseToken(token, accessSecret);
-        return Long.valueOf((Integer) claims.get("userId"));
-    }
-
     // 액세스 토큰을 파싱하여 클레임 객체를 반환하는 메서드
     public Claims parseAccessToken(String accessToken) {
         return parseToken(accessToken, accessSecret);
@@ -105,5 +95,29 @@ public class JwtTokenizer {
      * */
     public static Key getSigningKey(byte[] secretKey) {
         return Keys.hmacShaKeyFor(secretKey);
+    }
+
+    /*
+     * 토큰에서 유저 아이디 얻기
+     * */
+    public Long getUserIdFromToken(String token) {
+        // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
+        String[] tokenArr = token.split(" ");
+        token = tokenArr[1];
+        // 토큰을 파싱하여 클레임 객체를 얻고, 해당 클레임에서 userId를 Long형으로 반환
+        Claims claims = parseToken(token, accessSecret);
+        return Long.valueOf((Integer) claims.get("userId"));
+    }
+
+    /*
+    * 토큰에서 유저 이메일 얻기
+    * */
+    public String getUserEmailFromToken(String token) {
+        // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
+        String[] tokenArr = token.split(" ");
+        token = tokenArr[1];
+        // 토큰을 파싱하여 클레임 객체를 얻고, 해당 클레임에서 userId를 Long형으로 반환
+        Claims claims = parseToken(token, accessSecret);
+        return claims.getSubject();
     }
 }

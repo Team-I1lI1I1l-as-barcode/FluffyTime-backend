@@ -1,10 +1,6 @@
 package com.fluffytime.join.service;
 
 import static com.fluffytime.domain.RoleName.ROLE_USER;
-import static com.fluffytime.join.dto.response.JoinResponseCode.JOIN_SUCCESS;
-import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_EMAIL;
-import static com.fluffytime.join.dto.response.JoinResponseCode.NOT_DUPLICATED_NICKNAME;
-import static com.fluffytime.join.dto.response.JoinResponseCode.TEMP_JOIN_SUCCESS;
 
 import com.fluffytime.common.exception.global.NotFoundRoleName;
 import com.fluffytime.domain.Role;
@@ -13,7 +9,6 @@ import com.fluffytime.domain.UserRole;
 import com.fluffytime.join.dao.EmailCertificationDao;
 import com.fluffytime.join.dto.TempUser;
 import com.fluffytime.join.dto.request.JoinRequest;
-import com.fluffytime.join.dto.response.ApiResponse;
 import com.fluffytime.join.dto.response.CheckDuplicationResponse;
 import com.fluffytime.join.dto.response.JoinResponse;
 import com.fluffytime.join.exception.AlreadyExistsEmail;
