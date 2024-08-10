@@ -135,10 +135,12 @@ function setupProfileEditButton() {
 // 초기화 함수
 function initialize() {
   console.log("initialize 실행");
+
   const profileForm = document.getElementById('profileImageForm');
   const nickname = window.location.pathname.split('/').pop();
 
   setupProfileEditButton();
+
   fetchMyPage("/api/mypage/info", handleProfileData); // 마이페이지 정보 불러오기
 
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림

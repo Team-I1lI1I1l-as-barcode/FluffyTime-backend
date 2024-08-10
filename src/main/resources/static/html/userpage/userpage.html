@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <title>유저페이지</title>
-  <script src="/js/mypage/mypage.js" defer></script>
+  <script src="/js/userpage/userpage.js" defer></script>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
@@ -48,27 +48,30 @@
     <span id="profile_picture"></span>
     <br/>
     <br/>
-    <p>프로필 사진</p>
+    <div id="imagePreview"
+         style="display: flex; justify-content: center; align-items: center; height: 70px; width: 70px; border: 1px solid; border-radius: 50%; overflow: hidden;">
+      <img src="../../../image/profile/profile.png"
+           style="height: 100%; width: 100%; object-fit: cover; border-radius: 50%;" id="img">
+    </div>
     <p>
-      사용자 이름 : <span id="nickename"></span>&nbsp&nbsp&nbsp<span>
+      <span id="nickename"></span>&nbsp&nbsp&nbsp
           <button id="follow">팔로우/팔로우 취소</button>&nbsp&nbsp&nbsp
-          <button>더보기</button></span
-    >
+          <button>더보기</button></span>
       <a href="/userpage.html">유저차단</a>
       <a href="/userpage.html">취소</a>
     </p>
     <span>
-        게시물 개수 : <span id="posts_count">&nbsp&nbsp&nbsp</span> 팔로워 수 :
-        <span id="follower_count">&nbsp&nbsp&nbsp</span> 팔로우 수 :
-        <span id="follow_count">&nbsp&nbsp&nbsp</span>
+        게시물  <span id="posts_count"></span>&nbsp&nbsp&nbsp
+        팔로워 0  <span id="follower_count"></span>&nbsp&nbsp&nbsp
+        팔로우 0 <span id="follow_count"></span>&nbsp&nbsp&nbsp
       </span>
     <br/><br/>
     <span>
-        애완동물 이름 : <span id="pet_name"></span>&nbsp&nbsp&nbsp 애완동물 성별
-        : <span id="pet_sex"></span>&nbsp&nbsp&nbsp 애완동물 나이 :
-        <span id="pet_age"></span>
+      <span id="pet_name"></span>&nbsp&nbsp&nbsp
+      <span id="pet_sex"></span>&nbsp&nbsp&nbsp
+      <span id="pet_age"></span>
       </span>
-    <p>소개글 : <span id="intro"></span></p>
+    <p><span id="intro"></span></p>
     <hr/>
   </header>
 

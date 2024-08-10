@@ -21,7 +21,7 @@ public class MyPageController {
 
     // 마이페이지
     @GetMapping("/mypage/{nickname}")
-    public String mypage(@PathVariable(name = "nickname") String nickname,
+    public String myPage(@PathVariable(name = "nickname") String nickname,
         HttpServletRequest httpServletRequest) {
         User user = myPageService.findByAccessToken(httpServletRequest);
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);

@@ -44,14 +44,14 @@ public class MyPageService {
     private final S3Service s3Service;
 
 
-    // 마이페이지 사용자 조회(userId로 조회)
+    // 사용자 조회(userId로 조회)
     @Transactional(readOnly = true)
     public Optional<User> findUserById(Long userId) {
         log.info("findUserById 실행");
         return userRepository.findById(userId);
     }
 
-    // 마이페이지 사용자 조회(nickname으로 조회)
+    // 사용자 조회(nickname으로 조회)
     @Transactional(readOnly = true)
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
