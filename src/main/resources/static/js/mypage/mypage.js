@@ -89,7 +89,7 @@ function handleProfileData(data) {
   if (data.petAge === 0) {
     pet_age.innerText = " ";
   } else {
-    pet_age.innerText = data.petAge;
+    pet_age.innerText = data.petAge + "살";
   }
   if (data.fileUrl !== null) {
     console.log("등록된 프로필 사진을 불러옵니다.");

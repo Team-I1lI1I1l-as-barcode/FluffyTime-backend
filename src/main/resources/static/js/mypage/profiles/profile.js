@@ -18,6 +18,10 @@ const img = getElement('img'); // 이미지 미리보기
 const profileImageUpload = getElement('profile_image_upload'); // 사진 업로드 a태그
 const profileImageDelete = getElement('profile_image_delete'); // 현재 사진 삭제 a태그
 const profileImageCancel = getElement('profile_image_cancel'); // 취소 a 태그
+// 모달 관련 요소
+const modal = document.getElementById('modal');
+const overlay = document.getElementById('modal-overlay');
+const closeModalButtons = document.querySelectorAll('#profile_image_cancel');
 
 let originalIntroValue = ""; // intro 필드의 원래 값
 let originalPetNameValue = ""; // pet_name 필드의 원래 값
@@ -140,19 +144,64 @@ function handleProfileData(data) {
   originalIntroValue = intro.value.trim();
   originalPetNameValue = petName.value.trim();
 
-  petOptionsStatus(originalPetNameValue.length > 0);
+  // 반려동물 이름이 없다면, 관련 옵션 비활성화
+  if (originalPetNameValue.length === 0) {
+    console.log("반려동물 이름 X -> 관련 옵션 비활성화");
+    petOptionsStatus(false);
+  } else {
+    // 반려동물 이름이 있다면, 관련 옵션 활성화
+    console.log("반려동물 이름 0 -> 관련 옵션 활성화");
+    petOptionsStatus(true);
+  }
 }
 
-// 제출 버튼 활성화 여부 검토
-function toggleSubmitButton() {
-  submitBtn.disabled = intro.value.trim() === originalIntroValue &&
-      petName.value.trim() === originalPetNameValue;
-}
+// intro 입력시 제출 버튼 활성화 여부 검토
+intro.addEventListener('input', () => {
+  const introValue = intro.value.trim();
+  // intro 필드 값이 원래 값과 다르면 제출 버튼 활성화
+  if (introValue !== originalIntroValue) {
+    submitBtn.disabled = false; // 제출 버튼 활성화
+  } else {
+    submitBtn.disabled = true; // 제출 버튼 비활성화
+  }
+});
 
-// 반려동물 성별, 나이, 카테고리, 공개 상태 선택 시 제출 버튼 상태 변경
+// 반려동물 이름 입력시 관련 옵션 활성화/비활성화 + 제출 버튼 활성화
+pet_name.addEventListener('input', () => {
+  const petNameValue = pet_name.value.trim();
+  // intro 필드 값이 원래 값과 다르면 제출 버튼 활성화
+
+  // 반려동물 이름이 비어있는 경우
+  if (petNameValue.length === 0) {
+    petOptionsStatus(false); // 옵션 비활성화
+    submitBtn.disabled = true; // 제출 버튼 비활성화
+  } else if (petNameValue !== originalPetNameValue) {
+    // 반려동물 이름이 비어있지 않고, 원래 값과 다르면
+    petOptionsStatus(true); // 옵션 활성화
+    submitBtn.disabled = false; // 제출 버튼 활성화
+  } else {
+    // 반려동물 이름이 원래 값과 같으면
+    petOptionsStatus(true); // 옵션 활성화
+    submitBtn.disabled = true; // 제출 버튼 비활성화
+  }
+});
+
+// 데이터 변화시 제출 버튼을 활성화하는 버튼
 function activateSubmitButton() {
-  submitBtn.disabled = false;
+  submitBtn.disabled = false; // 제출 버튼 활성화
 }
+
+// 반려동물 성별 선택시 제출 버튼 상태 변경
+pet_sex.addEventListener('change', activateSubmitButton);
+
+// 반려동물 나이 선택시 제출 버튼 상태 변경
+pet_age.addEventListener('change', activateSubmitButton);
+
+// 카테고리 선택시 제출 버튼 상태 변경
+petCategory.addEventListener('change', activateSubmitButton);
+
+// 계정 활성화 비활성화 선택시 제출 버튼 상태 변경
+publicStatus.addEventListener('change', activateSubmitButton);
 
 // 프로필 등록 함수
 function createProfile(nickname) {
@@ -228,12 +277,14 @@ function deleteImage(data) {
 
 // 초기화 함수
 function initialize() {
+  // 반려동물 나이 옵션 설정
   setPetAgeOptions(100);
+  // 닉네임 중복확인 버튼 초기 비활성화
   checkUsernameBtn.disabled = true;
+  // 제출하기 버튼 초기 비활성화
   submitBtn.disabled = true;
   const nickname = window.location.pathname.split('/').pop();
   const profileForm = document.getElementById('profileImageForm');
-
   // 초기화 - 프로필 정보 불러오기
   fetchProfile("GET", handleProfileData, "/api/mypage/profiles/info");
 
@@ -273,12 +324,21 @@ function initialize() {
   // 초기화 - 사진 변경 버튼시 파일 선택 버튼이 눌림
   imageBtn.addEventListener('click', event => {
     event.preventDefault();
-    // 프로필 파일이 없을 시 사진 파일 선택창 열기
-    document.getElementById("images").click();
-
+    const img = getElement('img');
+    // 모달 창 열기
+    event.preventDefault();
+    modal.classList.add('show');
+    overlay.style.display = 'block';
     // 프로필 파일 존재시 프로필 이미지 변경, 삭제, 취소 모달창 열기 - 구현 해야함
   });
-
+// 모달 닫기
+  closeModalButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      modal.classList.remove('show');
+      overlay.style.display = 'none';
+    });
+  });
   // 초기화 - 프로필 사진 등록
   document.getElementById("images").addEventListener('change', event => {
     event.preventDefault();
@@ -310,10 +370,6 @@ function initialize() {
             nickname)}`)
   });
 
-  // 초기화 - 프로필 사진 취소(창 닫기)
-  profileImageCancel.addEventListener('click', (event) => {
-    event.preventDefault();
-  });
 }
 
 // 페이지 로드 시 초기화 함수 호출
