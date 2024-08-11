@@ -3,12 +3,14 @@ package com.fluffytime.post.service;
 import com.fluffytime.common.exception.global.NotFoundPost;
 import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Post;
+import com.fluffytime.domain.PostImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.security.CustomUserDetails;
+import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.request.PostRequest;
 import com.fluffytime.post.dto.response.ApiResponse;
+import com.fluffytime.post.dto.response.PostResponse;
 import com.fluffytime.post.dto.response.PostResponseCode;
 import com.fluffytime.post.exception.ContentLengthExceeded;
 import com.fluffytime.post.exception.FileSizeExceeded;
@@ -16,46 +18,44 @@ import com.fluffytime.post.exception.FileUploadFailed;
 import com.fluffytime.post.exception.PostNotInTempStatus;
 import com.fluffytime.post.exception.TooManyFiles;
 import com.fluffytime.post.exception.UnsupportedFileFormat;
+import com.fluffytime.repository.PostImagesRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final PostImagesRepository postImagesRepository;
+    private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
 
     // 게시글 등록하기
     @Transactional
-    public ApiResponse<Long> createPost(PostRequest postRequest, MultipartFile[] files) {
+    public ApiResponse<Long> createPost(PostRequest postRequest, MultipartFile[] files,
+        HttpServletRequest request) {
         validateFiles(files);
 
-        // 현재 인증된 사용자 ID 가져오기
-        Long userId = getCurrentUserId();
-
-        // 유저 정보 가져오기
-        User user = userRepository.findById(userId)
-            .orElseThrow(NotFoundUser::new);
+        // 토큰에서 사용자 ID 추출
+        User user = findUserByAccessToken(request);
 
         if (postRequest.getTempStatus() == null) {
             postRequest.setTempStatus(TempStatus.SAVE);
-        }
-
-        List<String> imageUrls = uploadFiles(files).getData();
-
-        if (postRequest.getContent().length() > 2200) {
-            throw new ContentLengthExceeded();
         }
 
         Post post = Post.builder()
@@ -63,72 +63,107 @@ public class PostService {
             .content(postRequest.getContent())
             .createdAt(LocalDateTime.now())
             .tempStatus(postRequest.getTempStatus())
-            .imageUrls(imageUrls)
             .build();
 
         postRepository.save(post);
+
+        if (files != null && files.length > 0) {
+            savePostImages(files, post);
+        }
+
         return ApiResponse.response(PostResponseCode.CREATE_POST_SUCCESS, post.getPostId());
+    }
+
+    // 이미지 파일 저장 로직
+    private void savePostImages(MultipartFile[] files, Post post) {
+        for (MultipartFile file : files) {
+            try {
+                String fileName = s3Service.uploadFile(file);
+                String fileUrl = s3Service.getFileUrl(fileName);
+
+                PostImages postImage = PostImages.builder()
+                    .filename(fileName)
+                    .filepath(fileUrl)
+                    .filesize(file.getSize())
+                    .mimetype(file.getContentType())
+                    .post(post)
+                    .build();
+
+                postImagesRepository.save(postImage);
+            } catch (Exception e) {
+                throw new FileUploadFailed();
+            }
+        }
+    }
+
+    // accessToken을 통해 사용자 정보 추출
+    @Transactional(readOnly = true)
+    public User findUserByAccessToken(HttpServletRequest httpServletRequest) {
+        log.info("findUserByAccessToken 실행");
+
+        String accessToken = null;
+        Cookie[] cookies = httpServletRequest.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            log.error("토큰이 존재하지 않습니다.");
+            throw new IllegalArgumentException("토큰이 존재하지 않습니다.");
+        }
+
+        log.info("Extracted Token: {}", accessToken);
+
+        try {
+            Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
+            return userRepository.findById(userId)
+                .orElseThrow(NotFoundUser::new);
+
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid token: {}", accessToken, e);
+            throw new BadCredentialsException("유효하지 않은 토큰입니다.", e);
+        } catch (Exception e) {
+            log.error("An error occurred while processing the token: {}", accessToken, e);
+            throw new BadCredentialsException("토큰 처리 중 오류가 발생했습니다.", e);
+        }
     }
 
     // 임시 게시글 등록하기
     @Transactional
-    public ApiResponse<Long> createTempPost(PostRequest postRequest, MultipartFile[] files) {
+    public ApiResponse<Long> createTempPost(PostRequest postRequest, MultipartFile[] files,
+        HttpServletRequest request) {
         validateFiles(files);
 
-        Long userId = getCurrentUserId();
-        User user = userRepository.findById(userId)
-            .orElseThrow(NotFoundUser::new);
-
-        List<String> imageUrls = uploadFiles(files).getData();
+        User user = findUserByAccessToken(request);
 
         Post post = Post.builder()
             .user(user)
             .content(postRequest.getContent())
             .createdAt(LocalDateTime.now())
             .tempStatus(TempStatus.TEMP)
-            .imageUrls(imageUrls)
             .build();
 
         postRepository.save(post);
+
+        if (files != null && files.length > 0) {
+            savePostImages(files, post);
+        }
+
         return ApiResponse.response(PostResponseCode.TEMP_SAVE_POST_SUCCESS, post.getPostId());
     }
 
-    // 파일 업로드 메서드 확장
-    private ApiResponse<List<String>> uploadFiles(MultipartFile[] files) {
-        List<String> imageUrls = List.of(files).stream().map(file -> {
-            try {
-                String fileName = s3Service.uploadFile(file);
-                return s3Service.getFileUrl(fileName);
-            } catch (Exception e) {
-                throw new FileUploadFailed();
-            }
-        }).collect(Collectors.toList());
-
-        return ApiResponse.response(PostResponseCode.UPLOAD_FILE_SUCCESS, imageUrls);
-    }
-
-    // 현재 인증된 사용자 ID 가져오기
-    private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            // CustomUserDetails에서 이메일을 통해 사용자 ID를 가져옴
-            String email = userDetails.getUsername(); // 이메일 가져오기
-            return userRepository.findByEmail(email)
-                .orElseThrow(NotFoundUser::new)
-                .getUserId();  // 사용자 ID 반환
-        } else {
-            throw new NotFoundUser();
-        }
-    }
-
-
+    // 파일 검증 로직
     private void validateFiles(MultipartFile[] files) {
         if (files.length > 10) {
             throw new TooManyFiles();
         }
         for (MultipartFile file : files) {
-            if (file.getSize() > 10485760) {
+            if (file.getSize() > 10485760) { // 10MB 이상
                 throw new FileSizeExceeded();
             }
             if (!isSupportedFormat(file.getContentType())) {
@@ -137,6 +172,7 @@ public class PostService {
         }
     }
 
+    // 지원되는 파일 형식인지 확인
     private boolean isSupportedFormat(String contentType) {
         return contentType != null && (contentType.equals("image/jpeg") || contentType.equals(
             "image/png"));
@@ -144,16 +180,37 @@ public class PostService {
 
     // 게시글 조회하기
     @Transactional(readOnly = true)
-    public ApiResponse<Post> getPostById(Long id) {
+    public ApiResponse<PostResponse> getPostById(Long id) {
         Post post = postRepository.findById(id)
             .orElseThrow(NotFoundPost::new);
-        return ApiResponse.response(PostResponseCode.GET_POST_SUCCESS, post);
+
+        // PostResponse로 변환
+        PostResponse postResponse = new PostResponse(
+            post.getPostId(),
+            post.getContent(),
+            post.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
+                image.getImageId(),
+                image.getFilename(),
+                image.getFilepath(),
+                image.getFilesize(),
+                image.getMimetype(),
+                image.getDescription(),
+                image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
+            )).collect(Collectors.toList()),
+            post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+            post.getUpdatedAt() != null ? post.getUpdatedAt()
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+        );
+
+        return ApiResponse.response(PostResponseCode.GET_POST_SUCCESS, postResponse);
     }
 
     // 게시글 수정하기
     @Transactional
-    public ApiResponse<Post> updatePost(Long id, PostRequest postRequest, MultipartFile[] files) {
-        Post existingPost = getPostById(id).getData();
+    public ApiResponse<PostResponse> updatePost(Long id, PostRequest postRequest,
+        MultipartFile[] files) {
+        Post existingPost = postRepository.findById(id)
+            .orElseThrow(NotFoundPost::new);
 
         if (postRequest.getContent() != null && postRequest.getContent().length() > 2200) {
             throw new ContentLengthExceeded();
@@ -161,14 +218,30 @@ public class PostService {
         existingPost.setContent(postRequest.getContent());
 
         if (files != null && files.length > 0) {
-            ApiResponse<List<String>> uploadResponse = uploadFiles(files);
-            List<String> imageUrls = uploadResponse.getData();
-            existingPost.setImageUrls(imageUrls);
+            savePostImages(files, existingPost);
         }
 
         existingPost.setUpdatedAt(LocalDateTime.now());
         postRepository.save(existingPost);
-        return ApiResponse.response(PostResponseCode.UPDATE_POST_SUCCESS, existingPost);
+
+        PostResponse postResponse = new PostResponse(
+            existingPost.getPostId(),
+            existingPost.getContent(),
+            existingPost.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
+                image.getImageId(),
+                image.getFilename(),
+                image.getFilepath(),
+                image.getFilesize(),
+                image.getMimetype(),
+                image.getDescription(),
+                image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
+            )).collect(Collectors.toList()),
+            existingPost.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+            existingPost.getUpdatedAt() != null ? existingPost.getUpdatedAt()
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+        );
+
+        return ApiResponse.response(PostResponseCode.UPDATE_POST_SUCCESS, postResponse);
     }
 
     // 게시글 삭제하기
@@ -184,9 +257,12 @@ public class PostService {
     // 임시 게시글 삭제하기
     @Transactional
     public ApiResponse<Void> deleteTempPost(Long id) {
-        Post post = getPostById(id).getData();
+        Post post = postRepository.findById(id)
+            .orElseThrow(NotFoundPost::new);
+
         if (post.getTempStatus() == TempStatus.TEMP) {
             postRepository.deleteById(id);
+            log.info("게시물 ID {}가 성공적으로 삭제되었습니다.", id);
             return ApiResponse.response(PostResponseCode.DELETE_TEMP_POST_SUCCESS);
         } else {
             throw new PostNotInTempStatus();
@@ -195,10 +271,28 @@ public class PostService {
 
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
-    public ApiResponse<List<Post>> getTempPosts() {
+    public ApiResponse<List<PostResponse>> getTempPosts() {
         List<Post> tempPosts = postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
             .collect(Collectors.toList());
-        return ApiResponse.response(PostResponseCode.GET_TEMP_POSTS_SUCCESS, tempPosts);
+
+        List<PostResponse> tempPostResponses = tempPosts.stream().map(post -> new PostResponse(
+            post.getPostId(),
+            post.getContent(),
+            post.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
+                image.getImageId(),
+                image.getFilename(),
+                image.getFilepath(),
+                image.getFilesize(),
+                image.getMimetype(),
+                image.getDescription(),
+                image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
+            )).collect(Collectors.toList()),
+            post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
+            post.getUpdatedAt() != null ? post.getUpdatedAt()
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+        )).collect(Collectors.toList());
+
+        return ApiResponse.response(PostResponseCode.GET_TEMP_POSTS_SUCCESS, tempPostResponses);
     }
 }

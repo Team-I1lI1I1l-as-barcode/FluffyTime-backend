@@ -12,7 +12,21 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
 
     private Long postId;
     private String content;
-    private List<String> imageUrls;
+    private List<ImageResponse> imageUrls;
     private String createdAt;
     private String updatedAt;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class ImageResponse {
+
+        private Long imageId;
+        private String filename;
+        private String filepath;
+        private Long filesize;
+        private String mimetype;
+        private String description;
+        private String uploadDate;
+    }
 }
