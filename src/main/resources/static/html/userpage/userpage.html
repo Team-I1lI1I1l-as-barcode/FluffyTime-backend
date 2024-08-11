@@ -4,8 +4,8 @@
   <meta charset="UTF-8"/>
   <title>유저페이지</title>
   <script src="/js/userpage/userpage.js" defer></script>
-  <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/userpage/userpage.css">
+  <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
@@ -56,6 +56,19 @@
         <!-- 이미지 업로드 버튼 -->
       </form>
       <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
+
+      <!-- 모달 오버레이 -->
+      <div id="modal-overlay" class="modal-overlay"></div>
+
+      <!-- 모달 창 -->
+      <div id="modal" class="modal">
+        <div id="modal-content">
+          <a id="block_follow">유저 차단</a>
+          <!--          <a id="block_follow_cancel">유저 차단 해제</a>-->
+          <a id="block_cancel">취소</a>
+        </div>
+      </div>
+
       <div id="profile_container">
         <!-- 이미지 미리보기 및 출력 영역 -->
         <div id="imagePreview">
@@ -66,6 +79,9 @@
           <button id="follow_button">
             팔로우
           </button>
+          <!-- 더보기 버튼 -->
+          <span id="more" class="material-symbols-rounded">more_horiz</span>
+
           <div id="profile_information_user">
             <p>게시물 <span id="posts_count"></span></p>
             <p>팔로워 0 <span id="follower_count"></span></p>

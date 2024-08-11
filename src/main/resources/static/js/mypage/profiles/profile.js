@@ -15,10 +15,10 @@ const submitBtn = getElement("submit");
 const deleteAccountBtn = getElement("delete_account");
 const imageBtn = getElement('imageBtn'); // 사진변경 버튼
 const img = getElement('img'); // 이미지 미리보기
+
+// 모달 관련 요소
 const profileImageUpload = getElement('profile_image_upload'); // 사진 업로드 a태그
 const profileImageDelete = getElement('profile_image_delete'); // 현재 사진 삭제 a태그
-const profileImageCancel = getElement('profile_image_cancel'); // 취소 a 태그
-// 모달 관련 요소
 const modal = document.getElementById('modal');
 const overlay = document.getElementById('modal-overlay');
 const closeModalButtons = document.querySelectorAll('#profile_image_cancel');
@@ -326,10 +326,8 @@ function initialize() {
     event.preventDefault();
     const img = getElement('img');
     // 모달 창 열기
-    event.preventDefault();
     modal.classList.add('show');
     overlay.style.display = 'block';
-    // 프로필 파일 존재시 프로필 이미지 변경, 삭제, 취소 모달창 열기 - 구현 해야함
   });
 // 모달 닫기
   closeModalButtons.forEach(button => {

@@ -9,6 +9,15 @@ const pet_sex = getElement("pet_sex"); // 반려동물 성별
 const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
+const more = getElement('more'); // ``` 버튼
+
+// 모달 관련 요소
+const blockFollow = getElement('block_follow'); // 유저 차단
+// const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단 해제
+const modal = document.getElementById('modal');
+const overlay = document.getElementById('modal-overlay');
+const closeModalButtons = document.querySelectorAll('#block_cancel');
+
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 
@@ -91,10 +100,26 @@ function renderPosts(posts) {
 // 초기화 함수
 function initialize() {
   const nickname = window.location.pathname.split('/').pop();
-//`/api/mypage/profiles/check-username?nickname=${encodeURIComponent(
-//             username.value)}`);
+
+  // 초기화 - 마이페이지 정보 불러오기
   fetchMyPage(`/api/users/pages?nickname=${encodeURIComponent(nickname)}`,
-      handleUserData); // 마이페이지 정보 불러오기
+      handleUserData);
+
+  // 초기화 - ... 버튼시 파일 선택 버튼이 눌림
+  more.addEventListener('click', event => {
+    event.preventDefault();
+    // 모달 창 열기
+    overlay.style.display = 'block';
+    modal.classList.add('show');
+  });
+// 모달 닫기
+  closeModalButtons.forEach(button => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault();
+      modal.classList.remove('show');
+      overlay.style.display = 'none';
+    });
+  });
 }
 
 // 페이지 로드 시 초기화 함수 호출
