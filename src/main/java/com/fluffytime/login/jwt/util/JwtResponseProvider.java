@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtResponseProvider {
 
@@ -17,7 +19,7 @@ public class JwtResponseProvider {
         throws IOException {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(exceptionCode.getHttpStatus().value());
-
+        log.info("응답생성중");
         HashMap<String, Object> errorInfo = new HashMap<>();
         errorInfo.put("code", exceptionCode.getCode());
         errorInfo.put("message", exceptionCode.getMessage());

@@ -1,7 +1,8 @@
 package com.fluffytime.config;
 
 import com.fluffytime.login.jwt.dao.RefreshTokenDao;
-import com.fluffytime.login.jwt.filter.LoginFilter;
+import com.fluffytime.login.jwt.filter.CustomLogoutFilter;
+import com.fluffytime.login.jwt.filter.CustomLoginFilter;
 import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
@@ -17,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,8 +35,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        LoginFilter loginFilter = new LoginFilter(
-            authenticationManager(authenticationConfiguration), jwtTokenizer, refreshTokenDao
+        CustomLoginFilter loginFilter = new CustomLoginFilter(
+            authenticationManager(authenticationConfiguration),
+            jwtTokenizer,
+            refreshTokenDao
         );
         loginFilter.setFilterProcessesUrl("/api/users/login");
 
@@ -55,8 +59,9 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer), LoginFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer), CustomLoginFilter.class)
             .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new CustomLogoutFilter(jwtTokenizer,refreshTokenDao), LogoutFilter.class)
             .formLogin(form -> form.disable())
             .sessionManagement(
                 sessionManagement -> sessionManagement.sessionCreationPolicy(

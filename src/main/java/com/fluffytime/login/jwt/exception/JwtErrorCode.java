@@ -22,7 +22,8 @@ public enum JwtErrorCode implements ErrorCode {
         "JWT filter internal server error"),
     FAIL_LOGIN(HttpStatus.UNAUTHORIZED, "JWTE-007", "로그인 실패"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "JWTE-008", "유저 인증 실패"),
-    NOT_FOUND_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "JWTE-009", "AccessToken을 찾을 수 없습니다.");
+    NOT_FOUND_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED, "JWTE-009", "AccessToken을 찾을 수 없습니다."),
+    SUCCESS(HttpStatus.OK, "JWTE-010", "로그인성공");
 
     private final HttpStatus httpStatus;
     private final String code;

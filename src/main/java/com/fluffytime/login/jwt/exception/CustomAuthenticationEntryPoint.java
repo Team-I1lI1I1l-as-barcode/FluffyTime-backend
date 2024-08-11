@@ -80,8 +80,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             }
         }
 
-        Cookie[] cookies = request.getCookies();
-
+        log.info("여기가 실행됏네요");
         response.sendRedirect("/login");
         //페이지로 요청이 들어왔을 때 인증되지 않은 사용자라면 무조건 /login으로 리디렉션 시키겠다.
 
