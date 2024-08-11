@@ -41,6 +41,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String accessToken = getToken(request, "accessToken");
         String refreshToken = getToken(request, "refreshToken");
 
+        log.info("accessToken = {}", accessToken);
+        log.info("refreshToken = {}", refreshToken);
+
+
         if (StringUtils.hasText(refreshToken) && !StringUtils.hasText(accessToken)) {
             // 리프레쉬 토큰 검증
             Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
