@@ -105,18 +105,6 @@ public class JwtTokenizer {
     }
 
     /*
-     * 토큰에서 유저 아이디 얻기
-     * */
-    public Long getUserIdFromToken(String token) {
-        // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
-        String[] tokenArr = token.split(" ");
-        token = tokenArr[1];
-        // 토큰을 파싱하여 클레임 객체를 얻고, 해당 클레임에서 userId를 Long형으로 반환
-        Claims claims = parseToken(token, accessSecret);
-        return Long.valueOf((Integer) claims.get("userId"));
-    }
-
-    /*
     * 토큰에서 유저 이메일 얻기
     * */
     public String getEmailFromRefreshToken(String token) {
