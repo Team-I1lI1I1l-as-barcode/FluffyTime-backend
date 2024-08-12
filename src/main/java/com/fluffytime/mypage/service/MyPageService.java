@@ -272,6 +272,7 @@ public class MyPageService {
         }
         String s3iFileName = s3Service.uploadFile(file); // 파일 업로드
         String Url = s3Service.getFileUrl(s3iFileName);
+
         ProfileImages profileImage = ProfileImages.builder()
             .fileName(file.getOriginalFilename()) // 원본 파일 이름
             .s3iFileName(s3iFileName)
@@ -279,6 +280,7 @@ public class MyPageService {
             .fileSize(file.getSize()) // 파일 크기
             .mimeType(file.getContentType()) // MIME 타입
             .build();
+
         User user = findUserByNickname(nickname);
         Profile profile = user.getProfile();
         profile.setProfileImages(profileImage);
