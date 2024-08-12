@@ -121,6 +121,7 @@ async function tempJoin(event) {
     joinBtn.innerText="인증메일 전송 중..."
 
 
+
     const sendResult = await getCertificationEmail();
     if (sendResult) {
       window.location.href = response.headers.get("Location"); // 원하는 URL로 변경
@@ -258,10 +259,13 @@ async function getCertificationEmail() {
     if (!response.ok) {
       joinBtn.innerText = "회원가입"
       alert("[ERROR]" + res.code + " : " + res.message)
+
       return false;
     }
+
     return true;
   } catch (error) {
     console.error(error);
+    return false;
   }
 }
