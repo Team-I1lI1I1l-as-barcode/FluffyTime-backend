@@ -47,7 +47,10 @@ public class GlobalExceptionHandler {
         return createErrorResponseEntity(GlobalErrorCode.NOT_ACCESS_PERMISSION);
     }
 
+
     private ResponseEntity<ErrorResponse> createErrorResponseEntity(ErrorCode code) {
         return ResponseEntity.status(code.getHttpStatus()).body(ErrorResponse.of(code));
     }
+
+
 }

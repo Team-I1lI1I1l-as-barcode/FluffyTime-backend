@@ -18,8 +18,4 @@ public class LoginController {
         return "/html/admin/admin.html";
     }
 
-    @GetMapping("/error")
-    public String errorPage() {
-        return "/html/error/error.html";
-    }
 }

@@ -20,8 +20,8 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Getter
@@ -61,6 +61,13 @@ public class User {
         orphanRemoval = true
     )
     private List<Comment> commentList = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Reply> replyList = new ArrayList<>();
 
     // 유저 - 프로필 (일대일 단방향)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

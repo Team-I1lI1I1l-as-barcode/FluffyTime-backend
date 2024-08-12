@@ -2,7 +2,6 @@ package com.fluffytime.domain;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -43,13 +42,16 @@ public class Post {
     @Column(name = "temp_status", nullable = false)
     private TempStatus tempStatus;
 
-    @ElementCollection
-    private List<String> imageUrls;
-
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<PostImages> postImages = new ArrayList<>();
 
     @OneToMany(
         mappedBy = "post",
@@ -67,13 +69,12 @@ public class Post {
 
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
-        LocalDateTime updatedAt, TempStatus tempStatus, List<String> imageUrls, User user) {
+        LocalDateTime updatedAt, TempStatus tempStatus, User user) {
         this.postId = postId;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.tempStatus = tempStatus;
-        this.imageUrls = imageUrls;
         this.user = user;
     }
 }

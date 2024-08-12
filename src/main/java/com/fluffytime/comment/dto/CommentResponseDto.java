@@ -1,7 +1,10 @@
 package com.fluffytime.comment.dto;
 
 import com.fluffytime.domain.Comment;
+import com.fluffytime.reply.dto.ReplyResponseDto;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,11 +20,15 @@ public class CommentResponseDto {
     private String content;
     private String nickname;
     private LocalDateTime createdAt;
+    private List<ReplyResponseDto> replyList;
 
     public CommentResponseDto(Comment comment) {
         this.commentId = comment.getCommentId();
         this.content = comment.getContent();
         this.nickname = comment.getUser().getNickname();
         this.createdAt = LocalDateTime.now();
+        this.replyList = comment.getReplyList().stream()
+            .map(ReplyResponseDto::new)
+            .collect(Collectors.toList());
     }
 }
