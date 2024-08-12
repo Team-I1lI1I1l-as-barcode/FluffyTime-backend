@@ -73,7 +73,7 @@ public class PostRestController {
 
     // 임시 등록 게시물 삭제하기
     @PostMapping("/temp-delete/{id}")
-    public ResponseEntity<?> deleteTempPost(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTempPost(@PathVariable(name = "id") Long id) {
         log.info("임시 게시물 삭제 요청 받음, ID: {}", id);
         ApiResponse<Void> response = postService.deleteTempPost(id);
         log.info("임시 게시물 삭제 성공, ID: {}", id);
@@ -92,8 +92,8 @@ public class PostRestController {
     }
 
     // 게시물 상세 정보 조회하기
-    @GetMapping("/detail/{id}")//postId
-    public ResponseEntity<?> getPost(@PathVariable Long id) {
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<?> getPost(@PathVariable(name = "id") Long id) {
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
         ApiResponse<PostResponse> postResponse = postService.getPostById(id);
         log.info("게시물 상세 정보 조회 성공, ID: {}", id);
@@ -103,7 +103,7 @@ public class PostRestController {
 
     // 게시물 수정하기
     @PostMapping("/edit/{id}")
-    public ResponseEntity<?> editPost(@PathVariable Long id,
+    public ResponseEntity<?> editPost(@PathVariable(name = "id") Long id,
         @RequestParam("content") String content,
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         HttpServletRequest request) {
@@ -126,7 +126,8 @@ public class PostRestController {
 
     // 게시물 삭제하기
     @PostMapping("/delete/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<?> deletePost(@PathVariable(name = "id") Long id,
+        HttpServletRequest request) {
         log.info("게시물 삭제 요청 받음, ID: {}", id);
 
         // PostService에서 액세스 토큰을 통해 사용자 정보 추출

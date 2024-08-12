@@ -1,5 +1,21 @@
+let postId;
+
+//어느 게시글의 댓글인지
+document.addEventListener('DOMContentLoaded', async () => {
+  // 현재 URL의 경로를 가져옵니다.
+  const path = window.location.pathname;
+
+  // 경로를 '/'로 분리하여 배열로 만듭니다.
+  const pathSegments = path.split('/');
+
+  // 배열의 마지막 요소가 postId입니다.
+  postId = pathSegments[pathSegments.length - 1];
+
+  await fetchComments(postId); // 페이지 로드 시 postId 2번의 댓글 목록을 가져옴
+});
+
 //댓글 조회
-async function fetchComments(postId) {
+async function fetchComments() {
   const response = await fetch(`/api/comments/post/${postId}`);
   if (!response.ok) {
     console.error('댓글 목록 가져오기 실패!', response.status);
@@ -109,7 +125,7 @@ async function fetchReplies(commentId, replyDiv) {
 }
 
 // 답글 등록
-async function postReply(commentId, content, postId) {
+async function postReply(commentId, content) {
   try {
     const response = await fetch('/api/replies/reg', {
       method: 'POST',
@@ -187,7 +203,7 @@ async function deleteReply(replyId, commentId) {
 }
 
 //댓글 등록
-async function postComment(postId) {
+async function postComment() {
   const content = document.getElementById('comment-content').value;
   const statusMessage = document.getElementById('status-message');
 
@@ -203,28 +219,18 @@ async function postComment(postId) {
     const data = await response.json();
 
     if (response.ok) {
-      statusMessage.textContent = '댓글 등록 성공!';
-      statusMessage.className = 'status-message';
       document.getElementById('comment-content').value = '';
       console.log('댓글 등록 성공!');
       console.log('서버 응답: ', data);
-      await fetchComments(2);
+      await fetchComments(postId);
     } else {
-      statusMessage.textContent = '댓글 등록 실패!';
-      statusMessage.className = 'error-message';
+
       console.error('댓글 등록 실패! 상태 코드: ', response.status, '서버 응답: ', data);
     }
   } catch (error) {
-    statusMessage.textContent = '댓글 등록 실패!';
-    statusMessage.className = 'error-message';
     console.error('댓글 등록 중 예외 발생!', error);
   }
 }
-
-//어느 게시글의 댓글인지
-document.addEventListener('DOMContentLoaded', async () => {
-  await fetchComments(2); // 페이지 로드 시 postId 2번의 댓글 목록을 가져옴
-});
 
 //수정칸 보여주기
 function showEdit(commentId, currentContent) {
@@ -265,7 +271,7 @@ async function updateComment(commentId, newContent) {
 }
 
 //댓글 삭제
-async function deleteComment(commentId, postId) {
+async function deleteComment(commentId) {
   console.log('Deleting comment with Id: ', commentId);
   try {
     const response = await fetch(`/api/comments/delete/${commentId}`, {

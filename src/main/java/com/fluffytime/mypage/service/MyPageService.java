@@ -94,9 +94,11 @@ public class MyPageService {
             log.info("createMyPageResponseDto 실행 >> 해당 유저가 존재하여 MyPageInformationDto를 구성");
             String nickName = user.getNickname(); // 닉네임
 
-            // 기존 게시물 리스트에서 필요한 데이터만 담은 postDto 리스트로 변환
+            // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
-                .map(post -> new PostDto(post.getContent()))
+                // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
+                .map(post -> new PostDto(post.getPostId(),
+                    post.getPostImages().get(0).getFilepath()))
                 .collect(Collectors.toList());
 
             // 게시물 리스트가 비어있을때
@@ -148,11 +150,12 @@ public class MyPageService {
             String email = user.getEmail(); // 이메일
 
             Profile profile = user.getProfile(); // 프로필 객체
-            ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
             // 사용자는 있으나, 프로필이 없는 경우 기본 뼈대 프로필 생성 (회원가입 후 프로필을 수정하지 않은 경우에 해당)
             if (profile == null) {
+                log.info("해당 사용자 프로필 없음");
                 throw new NotFoundProfile();
             }
+            ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
             String petName = profile.getPetName(); // 반려동물 이름
             String petSex = profile.getPetSex(); // 반려동물 성별
             Long petAge = profile.getPetAge(); // 반려동물 나이
@@ -202,6 +205,7 @@ public class MyPageService {
         User user = findUserByNickname(nickname);
 
         if (user != null) { // 사용자가 있을때 프로필이 없다면 프로필 생성
+            basicProfile.setUser(user);
             log.info("createProfile 실행 >> 해당 유저가 존재하여 프로필을 등록 하고 updateResultDto 구성");
             user.setProfile(basicProfile);
             userRepository.save(user);

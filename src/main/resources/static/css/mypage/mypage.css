@@ -5,6 +5,8 @@
   background-color: var(--background-color);
   color: var(--text-color);
   overflow-y: auto;
+  width: 250px;
+  height: 100vh;
 }
 
 /* 프로필 영역 */
@@ -209,5 +211,6 @@
   height: 30vh;
   object-fit: cover;
   border: 1px solid #ccc;
+  cursor: pointer;
 }
 
