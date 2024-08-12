@@ -11,20 +11,24 @@ async function fetchComments(postId) {
   comments.forEach(comment => {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
-    commentDiv.className = 'comment';
     commentDiv.dataset.id = comment.commentId;
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'comment-content';
     commentDiv.textContent = `${comment.commentId} ${comment.nickname}: ${comment.content}`;
 
-    const editButton = document.createElement('button');
-    editButton.textContent = '수정';
-    editButton.onclick = () => showEdit(comment.commentId, comment.content);
+    if (comment.author) {
+      const editButton = document.createElement('button');
+      editButton.textContent = '수정';
+      editButton.onclick = () => showEdit(comment.commentId, comment.content);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = '삭제';
-    deleteButton.onclick = () => deleteComment(comment.commentId, postId);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '삭제';
+      deleteButton.onclick = () => deleteComment(comment.commentId, postId);
+
+      commentDiv.appendChild(editButton);
+      commentDiv.appendChild(deleteButton);
+    }
 
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글';
@@ -38,8 +42,6 @@ async function fetchComments(postId) {
     fetchReplies(comment.commentId, repliesDiv);
 
     commentDiv.appendChild(contentDiv);
-    commentDiv.appendChild(editButton);
-    commentDiv.appendChild(deleteButton);
     commentDiv.appendChild(replyButton);
     commentDiv.appendChild(repliesDiv);
 
@@ -86,18 +88,21 @@ async function fetchReplies(commentId, replyDiv) {
   replies.forEach(reply => {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
+    replyElement.dataset.id = reply.replyId;
     replyElement.textContent = `${reply.replyId} ${reply.nickname}: ${reply.content}`;
 
-    const editButton = document.createElement('button');
-    editButton.textContent = '수정';
-    editButton.onclick = () => showEditReply(reply.replyId, reply.content);
+    if (reply.author) {
+      const editButton = document.createElement('button');
+      editButton.textContent = '수정';
+      editButton.onclick = () => showEditReply(reply.replyId, reply.content);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = '삭제';
-    deleteButton.onclick = () => deleteReply(reply.replyId, commentId);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '삭제';
+      deleteButton.onclick = () => deleteReply(reply.replyId, commentId);
 
-    replyElement.appendChild(editButton);
-    replyElement.appendChild(deleteButton);
+      replyElement.appendChild(editButton);
+      replyElement.appendChild(deleteButton);
+    }
 
     replyDiv.appendChild(replyElement);
   });
@@ -105,14 +110,13 @@ async function fetchReplies(commentId, replyDiv) {
 
 // 답글 등록
 async function postReply(commentId, content, postId) {
-  const userId = document.getElementById('user-id').value;
   try {
     const response = await fetch('/api/replies/reg', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({content, userId, commentId}),
+      body: JSON.stringify({content, commentId}),
     });
 
     if (response.ok) {
@@ -185,7 +189,6 @@ async function deleteReply(replyId, commentId) {
 //댓글 등록
 async function postComment(postId) {
   const content = document.getElementById('comment-content').value;
-  const userId = document.getElementById('user-id').value;
   const statusMessage = document.getElementById('status-message');
 
   try {
@@ -194,7 +197,7 @@ async function postComment(postId) {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({content, userId, postId}),
+      body: JSON.stringify({content, postId}),
     });
 
     const data = await response.json();

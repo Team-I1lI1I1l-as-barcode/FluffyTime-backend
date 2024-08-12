@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum CommentErrorCode implements ErrorCode {
-    INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "CE-001", "올바르지 않은 입력값입니다.");
+    NOT_PERMISSION_MODIFY(HttpStatus.NOT_MODIFIED, "CE-001", "수정 권한이 없습니다."),
+    NOT_PERMISSION_DELETE(HttpStatus.NOT_MODIFIED, "CE-002", "삭제 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
