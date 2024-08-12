@@ -49,6 +49,11 @@ public class Profile {
     @Column(name = "public_status", nullable = false, length = 10)
     private String publicStatus;
 
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     // 프로필 - 프로필 사진 (일대일 단방향)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_image_id")
