@@ -1,4 +1,4 @@
-package com.fluffytime.mypage.response;
+package com.fluffytime.userpage.response;
 
 import com.fluffytime.mypage.request.PostDto;
 import java.util.List;
@@ -13,8 +13,8 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-// 마이페이지 정보를 클라이언트에게 보내는 응답 DTO
-public class MyPageInformationDto {
+// 유저페이지 정보를 클라이언트에게 보내는 응답 DTO
+public class UserPageInformationDto {
 
     private String nickname;  // 사용자 이름
     private List<PostDto> postsList;// 게시물 리스트
@@ -27,7 +27,7 @@ public class MyPageInformationDto {
     private String fileUrl; // 프로필 사진 등록 URL
 
     @Builder
-    public MyPageInformationDto(String nickname,
+    public UserPageInformationDto(String nickname,
         List<PostDto> postsList,
         String petName, String petSex, Long petAge, String intro, String fileUrl) {
         this.nickname = nickname;
