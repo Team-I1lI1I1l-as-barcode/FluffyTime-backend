@@ -8,6 +8,8 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  width: 250px;
+  height: 100vh;
 }
 
 /*프로필 편집 텍스트*/

@@ -14,6 +14,7 @@ import lombok.Setter;
 // 유저의 게시글 가져오는 DTO
 public class PostDto {
 
-    private String title;
+    private Long postId; // 게시글 id
+    private String imageUrl; // s3i 이미지 저장 url
 
 }

@@ -44,20 +44,20 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                        "/login",
-                        "/logout",
-                        "/join/**",
-                        "/api/users/**",
-//                    "/error",
+                .requestMatchers(
+                    "/login",
+                    "/logout",
+                    "/join/**",
+                    "/api/users/**",
+                    "/error",
+                    "/static/**",
+                    "/html/**",
+                    "/js/**",
+                    "/css/**",
+                    "/image/**"
+                ).permitAll()
+                .anyRequest().authenticated()
 
-                        "/static/**",
-                        "/html/**",
-                        "/js/**",
-                        "/css/**",
-                        "/image/**"
-                    ).permitAll()
-                    .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer),
                 CustomLoginFilter.class)

@@ -6,6 +6,7 @@
   <title>게시물 상세보기</title>
   <link rel="stylesheet" href="/css/post/postDetail.css">
   <script src="/js/post/postDetail.js" defer></script>
+  <script src="/js/comment/comment.js"></script>
 </head>
 <body>
 <div class="modal" id="postModal">
@@ -27,7 +28,12 @@
         닉네임~~~
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
-      <div id="postContent" class="content"></div> <!-- 게시물 내용 컨테이너 -->
+      <div id="postContent" class="content"></div><!-- 게시물 내용 컨테이너 -->
+      <div>
+        <textarea id="comment-content" placeholder="댓글 내용 적기" required></textarea>
+        <button id="commentButton">댓글 달기</button> <!--postId에 댓글 달기-->
+      </div>
+      <div id="comment-list"></div>
     </div>
   </div>
 </div>

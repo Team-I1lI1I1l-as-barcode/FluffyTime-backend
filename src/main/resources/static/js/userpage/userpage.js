@@ -90,7 +90,13 @@ function renderPosts(posts) {
     posts.forEach(post => {
       const img = document.createElement('img'); // <img> 요소 생성
       img.src = post.imageUrl; // 이미지 URL 설정
-      img.alt = post.title; // 이미지 설명 설정
+      img.alt = post.postId;
+
+      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+      img.addEventListener('click', event => {
+        console.log(img.alt + "게시물 클릭 ");
+        window.location.href = `/posts/detail/${img.alt}`;
+      });
 
       postListElement.appendChild(img); // <img>를 섹션에 추가
     });

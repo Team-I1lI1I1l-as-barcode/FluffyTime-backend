@@ -12,6 +12,7 @@ const img = getElement('img'); // 이미지 미리보기
 const imagePreview = getElement('imagePreview'); // 프로필 이미지 영역
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
+const postCreate = getElement("post_create"); // 게시물 추가 + 기호
 
 // api  요청  함수
 function fetchMyPage(url, func) {
@@ -86,7 +87,7 @@ function handleProfileData(data) {
   } else {
     pet_sex.innerText = data.petSex;
   }
-  if (data.petAge === 0) {
+  if (data.petAge === null) {
     pet_age.innerText = " ";
   } else {
     pet_age.innerText = data.petAge + "살";
@@ -117,7 +118,13 @@ function renderPosts(posts) {
     posts.forEach(post => {
       const img = document.createElement('img'); // <img> 요소 생성
       img.src = post.imageUrl; // 이미지 URL 설정
-      img.alt = post.title; // 이미지 설명 설정
+      img.alt = post.postId;
+
+      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+      img.addEventListener('click', event => {
+        console.log(img.alt + "게시물 클릭 ");
+        window.location.href = `/posts/detail/${img.alt}`;
+      });
 
       postListElement.appendChild(img); // <img>를 섹션에 추가
     });
@@ -167,6 +174,13 @@ function initialize() {
               nickname)}`);
     }
   });
+
+  // 초기화 - 게시물이 없을때 + 버튼을 누를시 게시글 생성으로 페이지로 이동
+  postCreate.addEventListener('click', (event) => {
+    event.preventDefault();
+    window.location.href = "/posts/reg";
+  });
+
 }
 
 // 페이지 로드 시 초기화 함수 호출
