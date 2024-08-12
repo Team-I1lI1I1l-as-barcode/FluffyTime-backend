@@ -8,8 +8,8 @@ const match = pathname.match(/([^\/]+)\/?$/);
 const email = match ? match[1] : '';
 
 async function getCertificationResult() {
-  const certificateResultElement = document.querySelector(
-      ".certificate_result");
+  const successMessageElement = document.querySelector(".success-message")
+  const failMessageElement = document.querySelector(".fail-message")
 
   try {
     const response = await fetch(
@@ -21,10 +21,12 @@ async function getCertificationResult() {
         });
 
     if (!response.ok) {
-      certificateResultElement.innerHTML = "만료된 인증 요청"
+      successMessageElement.classList.add('hidden');
+      failMessageElement.classList.remove('hidden');
       return
     }
-    certificateResultElement.innerHTML = "이메일 인증 성공"
+      successMessageElement.classList.remove('hidden');
+      failMessageElement.classList.add('hidden');
 
   } catch (error) {
     console.error(error);
