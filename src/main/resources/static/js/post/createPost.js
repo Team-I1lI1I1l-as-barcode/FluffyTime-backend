@@ -248,7 +248,7 @@ async function submitPost(event) {
 
     setTimeout(() => {
       completeContainer.style.display = 'none';
-      window.location.href = `/html/post/postDetail.html?postId=${postId}`;
+      window.location.href = `/posts/detail/${postId}`;
     }, 2000);
   } catch (error) {
     console.error('게시물 등록 실패:', error.message);
