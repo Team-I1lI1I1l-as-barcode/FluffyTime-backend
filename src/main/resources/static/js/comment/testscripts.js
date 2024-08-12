@@ -1,5 +1,5 @@
 //댓글 조회
-async function fetchComments(postId, currentUserId) {
+async function fetchComments(postId) {
   const response = await fetch(`/api/comments/post/${postId}`);
   if (!response.ok) {
     console.error('댓글 목록 가져오기 실패!', response.status);
@@ -11,23 +11,24 @@ async function fetchComments(postId, currentUserId) {
   comments.forEach(comment => {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
-    commentDiv.className = 'comment';
     commentDiv.dataset.id = comment.commentId;
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'comment-content';
     commentDiv.textContent = `${comment.commentId} ${comment.nickname}: ${comment.content}`;
 
-    const editButton = document.createElement('button');
-    editButton.textContent = '수정';
-    editButton.onclick = () => showEdit(comment.commentId, comment.content);
+    if (comment.author) {
+      const editButton = document.createElement('button');
+      editButton.textContent = '수정';
+      editButton.onclick = () => showEdit(comment.commentId, comment.content);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = '삭제';
-    deleteButton.onclick = () => deleteComment(comment.commentId, postId);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '삭제';
+      deleteButton.onclick = () => deleteComment(comment.commentId, postId);
 
-    commentDiv.appendChild(editButton);
-    commentDiv.appendChild(deleteButton);
+      commentDiv.appendChild(editButton);
+      commentDiv.appendChild(deleteButton);
+    }
 
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글';
@@ -90,16 +91,18 @@ async function fetchReplies(commentId, replyDiv) {
     replyElement.dataset.id = reply.replyId;
     replyElement.textContent = `${reply.replyId} ${reply.nickname}: ${reply.content}`;
 
-    const editButton = document.createElement('button');
-    editButton.textContent = '수정';
-    editButton.onclick = () => showEditReply(reply.replyId, reply.content);
+    if (reply.author) {
+      const editButton = document.createElement('button');
+      editButton.textContent = '수정';
+      editButton.onclick = () => showEditReply(reply.replyId, reply.content);
 
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = '삭제';
-    deleteButton.onclick = () => deleteReply(reply.replyId, commentId);
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = '삭제';
+      deleteButton.onclick = () => deleteReply(reply.replyId, commentId);
 
-    replyElement.appendChild(editButton);
-    replyElement.appendChild(deleteButton);
+      replyElement.appendChild(editButton);
+      replyElement.appendChild(deleteButton);
+    }
 
     replyDiv.appendChild(replyElement);
   });

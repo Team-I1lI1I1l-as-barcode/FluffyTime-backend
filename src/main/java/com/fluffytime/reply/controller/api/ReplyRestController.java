@@ -40,8 +40,12 @@ public class ReplyRestController {
     //답글 조회
     @GetMapping("/comment/{commentId}")
     public ResponseEntity<List<ReplyResponseDto>> getRepliesByCommentId(
-        @PathVariable(name = "commentId") Long commentId) {
-        List<ReplyResponseDto> replyList = replyService.getRepliesByCommentId(commentId);
+        @PathVariable(name = "commentId") Long commentId, HttpServletRequest httpServletRequest) {
+
+        User user = replyService.findByAccessToken(httpServletRequest);
+        Long currentUserId = user.getUserId();
+        List<ReplyResponseDto> replyList = replyService.getRepliesByCommentId(commentId,
+            currentUserId);
         return ResponseEntity.ok(replyList);
     }
 
@@ -51,7 +55,8 @@ public class ReplyRestController {
         @RequestBody ReplyRequestDto request, HttpServletRequest httpServletRequest) {
         try {
             User user = replyService.findByAccessToken(httpServletRequest);
-            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId);
+            Long currentUserId = user.getUserId();
+            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId, currentUserId);
             if (!reply.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionModify();
             }
@@ -68,7 +73,8 @@ public class ReplyRestController {
         HttpServletRequest httpServletRequest) {
         try {
             User user = replyService.findByAccessToken(httpServletRequest);
-            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId);
+            Long currentUserId = user.getUserId();
+            ReplyResponseDto reply = replyService.getReplyByReplyId(replyId, currentUserId);
             if (!reply.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionDelete();
             }

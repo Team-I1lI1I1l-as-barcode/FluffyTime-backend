@@ -48,10 +48,10 @@ public class CommentService {
     }
 
     //댓글 조회
-    public List<CommentResponseDto> getCommentByPostId(Long postId) {
+    public List<CommentResponseDto> getCommentByPostId(Long postId, Long currentUserId) {
         List<Comment> commentList = commentRepository.findByPostPostId(postId);
         return commentList.stream()
-            .map(CommentResponseDto::new)
+            .map(comment -> new CommentResponseDto(comment, currentUserId))
             .collect(Collectors.toList());
     }
 
@@ -100,9 +100,9 @@ public class CommentService {
     }
 
     //댓글 ID로 댓글 조회하기
-    public CommentResponseDto getCommentByCommentId(Long commentId) {
+    public CommentResponseDto getCommentByCommentId(Long commentId, Long currentUserId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(NotFoundComment::new);
-        return new CommentResponseDto(comment);
+        return new CommentResponseDto(comment, currentUserId);
     }
 }

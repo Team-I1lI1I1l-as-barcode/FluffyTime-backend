@@ -50,7 +50,12 @@ public class CommentRestController {
     @GetMapping("/post/{postId}")
     public ResponseEntity<List<CommentResponseDto>> getCommentByPostId(
         @PathVariable(name = "postId") Long postId, HttpServletRequest httpServletRequest) {
-        List<CommentResponseDto> commentList = commentService.getCommentByPostId(postId);
+
+        User user = commentService.findByAccessToken(httpServletRequest);
+        Long currentUserId = user.getUserId();
+        List<CommentResponseDto> commentList = commentService.getCommentByPostId(postId,
+            currentUserId);
+
         return ResponseEntity.ok(commentList);
     }
 
@@ -61,7 +66,9 @@ public class CommentRestController {
         HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
-            CommentResponseDto comment = commentService.getCommentByCommentId(commentId);
+            Long currentUserId = user.getUserId();
+            CommentResponseDto comment = commentService.getCommentByCommentId(commentId,
+                currentUserId);
             if (!comment.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionModify();
             }
@@ -78,7 +85,9 @@ public class CommentRestController {
         HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
-            CommentResponseDto comment = commentService.getCommentByCommentId(commentId);
+            Long currentUserId = user.getUserId();
+            CommentResponseDto comment = commentService.getCommentByCommentId(commentId,
+                currentUserId);
             if (!comment.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionDelete();
             }

@@ -46,10 +46,10 @@ public class ReplyService {
     }
 
     //답글 조회
-    public List<ReplyResponseDto> getRepliesByCommentId(Long commentId) {
+    public List<ReplyResponseDto> getRepliesByCommentId(Long commentId, Long currentUserId) {
         List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
         return replyList.stream()
-            .map(ReplyResponseDto::new)
+            .map(reply -> new ReplyResponseDto(reply, currentUserId))
             .collect(Collectors.toList());
     }
 
@@ -95,9 +95,9 @@ public class ReplyService {
     }
 
     //답글 ID로 답글 조회하기
-    public ReplyResponseDto getReplyByReplyId(Long replyId) {
+    public ReplyResponseDto getReplyByReplyId(Long replyId, Long currentUserId) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(NotFoundReply::new);
-        return new ReplyResponseDto(reply);
+        return new ReplyResponseDto(reply, currentUserId);
     }
 }
