@@ -20,7 +20,7 @@ public class JwtTokenizer {
     // refreshToken에 사용될 비밀 키를 담을 배열 선언
     private final byte[] refreshSecret;
     // accessToken 유지 시간(ms)
-    public final static Long ACCESS_TOKEN_EXPIRE_COUNT = 1 * 60 * 1000L; // 30분
+    public final static Long ACCESS_TOKEN_EXPIRE_COUNT = 60 * 60 * 1000L; // 30분
     // refreshToken 유지 시간(ms)
     public final static Long REFRESH_TOKEN_EXPIRE_COUNT = 7 * 24 * 60 * 60 * 1000L; // 7일
 
@@ -105,8 +105,8 @@ public class JwtTokenizer {
     }
 
     /*
-    * 토큰에서 유저 이메일 얻기
-    * */
+     * 토큰에서 유저 이메일 얻기
+     * */
     public String getEmailFromRefreshToken(String token) {
         Claims claims = parseToken(token, refreshSecret);
         return claims.getSubject();
