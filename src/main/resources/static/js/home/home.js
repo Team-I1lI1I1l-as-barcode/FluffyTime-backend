@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
   const postsContainer = document.getElementById('posts-container');
   const loading = document.getElementById('loading');
-  let page = 1;
-  const itemsPerPage = 7;
+  let currentPage = 1;
+  const itemsPerPage = 24;
   let isLoading = false;
-  let hasMorePosts = true;
 
-  async function fetchPosts(page) {
+  async function fetchPosts(page = 1) {
+    console.log('fetchPosts 시작 ' + currentPage);
     try {
       const response = await fetch(
           `/api/explore?page=${page}&perPage=${itemsPerPage}`, {
@@ -16,15 +16,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
           });
 
+      const data = await response.json();
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
-      const data = await response.json();
-
       // 데이터가 배열인지 확인
       if (data && Array.isArray(data.list)) {
-        return data.list;
+        return data.list || [];
       } else {
         console.error('Expected an array but got:', data);
         return []; // 배열이 아닌 경우 빈 배열 반환
@@ -73,10 +73,12 @@ document.addEventListener('DOMContentLoaded', function () {
     isLoading = true;
     loading.style.display = 'block';
 
-    fetchPosts(page).then(posts => {
+    fetchPosts(currentPage).then(posts => {
       if (posts.length > 0) {
         renderPosts(posts);
-        page += 1;
+        currentPage++;
+        console.log(posts.length);
+        console.log(currentPage);
       } else {
         hasMorePosts = false;
         // 사용자에게 더 이상 게시물이 없음을 알리는 메시지 표시
