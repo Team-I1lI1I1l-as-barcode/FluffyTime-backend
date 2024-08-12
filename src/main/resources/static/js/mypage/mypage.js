@@ -118,6 +118,13 @@ function renderPosts(posts) {
     posts.forEach(post => {
       const img = document.createElement('img'); // <img> 요소 생성
       img.src = post.imageUrl; // 이미지 URL 설정
+      img.alt = post.postId;
+
+      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+      img.addEventListener('click', event => {
+        console.log(img.alt + "게시물 클릭 ");
+        window.location.href = `/posts/detail/${img.alt}`;
+      });
 
       postListElement.appendChild(img); // <img>를 섹션에 추가
     });
@@ -168,11 +175,12 @@ function initialize() {
     }
   });
 
-  // 초기화 - 게사물이 없을때 + 버튼을 누를시 게시글 생성으로 페이지로 이동
+  // 초기화 - 게시물이 없을때 + 버튼을 누를시 게시글 생성으로 페이지로 이동
   postCreate.addEventListener('click', (event) => {
     event.preventDefault();
     window.location.href = "/posts/reg";
-  })
+  });
+
 }
 
 // 페이지 로드 시 초기화 함수 호출

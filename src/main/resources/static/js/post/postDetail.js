@@ -228,10 +228,17 @@ function toggleDropdownMenu() {
 // URL에서 postId를 추출하여 로드
 document.addEventListener('DOMContentLoaded', () => {
   console.log('페이지 로드 완료');
-  const urlParams = new URLSearchParams(window.location.search);
-  const postId = urlParams.get('postId');
+
+  // 현재 URL의 경로를 가져옵니다.
+  const path = window.location.pathname;
+
+  // 경로를 '/'로 분리하여 배열로 만듭니다.
+  const pathSegments = path.split('/');
+
+  // 배열의 마지막 요소가 postId입니다.
+  const postId = pathSegments[pathSegments.length - 1];
+
   if (postId) {
-    console.log(`게시물 ID: ${postId}`);
     loadPostData(postId);
     openModal();
   } else {

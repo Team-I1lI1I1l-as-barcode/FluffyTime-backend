@@ -84,9 +84,11 @@ public class UserPageService {
             log.info("createMyPageResponseDto 실행 >> 해당 유저가 존재하여 UserPageInformationDto를 구성");
             String nickName = user.getNickname(); // 닉네임
 
-            // 기존 게시물 리스트에서 필요한 데이터만 담은 postDto 리스트로 변환
+            // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
-                .map(post -> new PostDto(post.getContent()))
+                // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
+                .map(post -> new PostDto(post.getPostId(),
+                    post.getPostImages().get(0).getFilepath()))
                 .collect(Collectors.toList());
 
             // 게시물 리스트가 비어있을때
