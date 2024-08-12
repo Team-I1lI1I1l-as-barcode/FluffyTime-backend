@@ -7,26 +7,25 @@ const postModalElement = document.getElementById('postModal');
 const draftModalElement = document.getElementById('draftModal');
 const imagePreviewContainer = document.getElementById('imagePreviewContainer');
 const dragDropText = document.getElementById('dragDropText');
-const shareButton = document.getElementById('shareButton');
+const shareButton = document.getElementById('shareButton'); // 공유 버튼
 const leftContent = document.getElementById('leftContent');
 const prevButton = document.getElementById('prevButton');
 const nextButton = document.getElementById('nextButton');
-const charCountElement = document.getElementById('charCount');
+const charCountElement = document.getElementById('charCount'); // 글자 수 카운터
 const contentElement = document.getElementById('content');
 const completeContainer = document.getElementById('complete-container');
 const tagsInputElement = document.getElementById('tagsInput');
 const tagListElement = document.getElementById('tagList');
 
-//태그~~
-// 태그 입력 필드에서 엔터를 눌렀을 때 태그 추가
+// // 태그 입력 필드에서 엔터를 눌렀을 때 태그 추가
 // tagsInputElement.addEventListener('keypress', function (event) {
 //   if (event.key === 'Enter') {
-//     event.preventDefault();
-//     addTag(tagsInputElement.value.trim());
+//     event.preventDefault(); // 기본 엔터 동작(줄바꿈) 방지
+//     addTag(tagsInputElement.value.trim()); // 태그 추가 함수 호출 (공백 제거)
 //     tagsInputElement.value = '';
 //   }
 // });
-//
+
 // // 태그 추가 함수
 // function addTag(tag) {
 //   if (tag.length > 0 && tag.startsWith('#')) {
@@ -34,47 +33,49 @@ const tagListElement = document.getElementById('tagList');
 //       alert('최대 10개의 태그만 추가할 수 있습니다.');
 //       return;
 //     }
-//     if (tagsArray.includes(tag)) {
+//     if (tagsArray.includes(tag)) { // 이미 동일한 태그가 존재하는 경우
 //       alert('이미 추가된 태그입니다.');
 //       return;
 //     }
-//     tagsArray.push(tag);
-//     updateTagList();
+//     tagsArray.push(tag); // 태그 배열에 추가
+//     updateTagList(); // 태그 리스트 업데이트
 //   } else {
 //     alert('태그는 #으로 시작해야 합니다.');
 //   }
 // }
-//
-// // 태그 리스트 업데이트 함수
+
+// // 태그 리스트를 화면에 업데이트하는 함수
 // function updateTagList() {
-//   tagListElement.innerHTML = '';
-//   tagsArray.forEach((tag, index) => {
-//     const tagElement = document.createElement('span');
-//     tagElement.classList.add('tag');
-//     tagElement.innerText = tag;
-//     const removeTagElement = document.createElement('span');
-//     removeTagElement.innerText = '×';
-//     removeTagElement.classList.add('remove-tag');
-//     removeTagElement.onclick = () => removeTag(index);
-//     tagElement.appendChild(removeTagElement);
-//     tagListElement.appendChild(tagElement);
+//   tagListElement.innerHTML = ''; // 기존 태그 리스트를 초기화
+//   tagsArray.forEach((tag, index) => { // 모든 태그에 대해
+//     const tagElement = document.createElement('span'); // 새로운 태그 요소 생성
+//     tagElement.classList.add('tag'); // 태그 클래스 추가
+//     tagElement.innerText = tag; // 태그 텍스트 설정
+
+//     const removeTagElement = document.createElement('span'); // 제거 버튼 요소 생성
+//     removeTagElement.innerText = '×'; // 제거 버튼 텍스트 설정
+//     removeTagElement.classList.add('remove-tag'); // 제거 버튼 클래스 추가
+//     removeTagElement.onclick = () => removeTag(index); // 제거 버튼 클릭 시 해당 태그 삭제 함수 호출
+
+//     tagElement.appendChild(removeTagElement); // 태그 요소에 제거 버튼 추가
+//     tagListElement.appendChild(tagElement); // 태그 리스트에 태그 요소 추가
 //   });
 // }
-//
+
 // // 태그 제거 함수
 // function removeTag(index) {
-//   tagsArray.splice(index, 1);
-//   updateTagList();
+//   tagsArray.splice(index, 1); // 해당 인덱스의 태그를 배열에서 제거
+//   updateTagList(); // 태그 리스트 업데이트
 // }
 
-// 모달 열기 함수
+// 게시물 작성 모달을 여는 함수
 function openModal() {
-  postModalElement.style.display = 'flex';
+  postModalElement.style.display = 'flex'; // 모달을 화면에 표시
 }
 
-// 모달 닫기 함수
+// 게시물 작성 모달을 닫는 함수
 function closeModal() {
-  postModalElement.style.display = 'none';
+  postModalElement.style.display = 'none'; // 모달을 화면에서 숨김
 }
 
 // 임시 저장 모달 열기 함수
@@ -88,11 +89,11 @@ function closeDraftModal() {
   draftModalElement.style.display = 'none';
 }
 
-// 이미지 미리보기 처리 함수
+// 이미지 미리보기 및 이미지 파일 처리 함수
 function previewImages(event) {
-  const files = event.target.files;
-  imagePreviewContainer.innerHTML = '';
-  imagesArray = [];
+  const files = event.target.files; // 사용자가 선택한 파일들
+  imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
+  imagesArray = []; // 이미지 배열 초기화
 
   if (files.length > 10) {
     alert('이미지는 최대 10장까지 업로드할 수 있습니다.');
@@ -102,17 +103,17 @@ function previewImages(event) {
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
-    const reader = new FileReader();
-    reader.onload = function (e) {
+    const reader = new FileReader(); // 파일을 읽기 위한 FileReader 객체 생성
+    reader.onload = function (e) { // 파일 읽기가 완료되면 실행
       imagesArray.push({
-        file: file,
-        url: e.target.result,
+        file: file, // 원본 파일 저장
+        url: e.target.result, // 파일의 Data URL 저장 (미리보기에 사용)
       });
-      if (i === 0) {
-        displayImage(e.target.result);
+      if (i === 0) { // 첫 번째 파일인 경우
+        displayImage(e.target.result); // 미리보기 화면에 표시
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(file); // 파일을 Data URL 형식으로 읽음
   }
 
   if (files.length > 0) {
@@ -126,11 +127,11 @@ function previewImages(event) {
 
 // 선택된 이미지를 화면에 표시하는 함수
 function displayImage(url) {
-  const img = document.createElement('img');
-  img.src = url;
-  img.classList.add('photo');
-  img.style.objectFit = 'cover';
-  imagePreviewContainer.appendChild(img);
+  const img = document.createElement('img'); // 이미지 요소 생성
+  img.src = url; // 이미지 소스 설정
+  img.classList.add('photo'); // 이미지에 클래스 추가 (스타일 적용을 위해)
+  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
+  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
 }
 
 // 글자 수 업데이트 함수
@@ -139,7 +140,7 @@ function updateCharCount() {
   charCountElement.textContent = `${content.length} / 2200`;
 }
 
-// 게시물 데이터 준비 함수//태그 추가햇음~~
+// 게시물 데이터 준비 함수
 function preparePostData(tempId, content, images, status) {
   return {
     tempId: tempId,
@@ -152,8 +153,9 @@ function preparePostData(tempId, content, images, status) {
 
 // 게시물 데이터를 서버로 전송하는 함수
 async function submitPostData(url, postRequest, images) {
-  const formData = new FormData();
+  const formData = new FormData(); // 서버로 전송할 데이터를 담을 FormData 객체 생성
   formData.append('post',
+      // 게시물 데이터를 JSON으로 변환하여 FormData에 추가
       new Blob([JSON.stringify(postRequest)], {type: 'application/json'}));
 
   if (images && images.length > 0) {
@@ -175,7 +177,7 @@ async function submitPostData(url, postRequest, images) {
 
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.indexOf('application/json') !== -1) {
-      const data = await response.json();
+      const data = await response.json(); // 응답을 JSON으로 파싱
       return data;
     } else {
       const text = await response.text();
@@ -202,11 +204,16 @@ function showComplete() {
   completeImage.onerror = function () {
     console.log('Error loading image');
   };
+
+  // 2초 후에 페이지 새로고침
+  setTimeout(() => {
+    window.location.reload();
+  }, 1000);
 }
 
 // 게시물을 임시 저장하는 함수
 async function saveAsTemp(event) {
-  event.preventDefault();
+  event.preventDefault(); // 기본 폼 제출 동작 방지
 
   const content = contentElement.value;
   if (!content) {
@@ -220,6 +227,10 @@ async function saveAsTemp(event) {
     await submitPostData('/api/posts/temp-reg', postRequest, imagesArray);
     alert('임시 저장되었습니다.');
     closeModal();
+    resetForm(); // 폼 초기화
+
+    // 임시 저장 완료 후 페이지 새로고침
+    window.location.reload();
   } catch (error) {
     console.error('임시 저장 실패:', error.message);
     alert(error.message);
@@ -248,12 +259,36 @@ async function submitPost(event) {
 
     setTimeout(() => {
       completeContainer.style.display = 'none';
-      window.location.href = `/posts/detail/${postId}`;
+      // window.location.href = `/posts/detail/${postId}`;
+      closeModal(); // 모달 창 닫기
+      resetForm(); // 폼 초기화
     }, 2000);
   } catch (error) {
     console.error('게시물 등록 실패:', error.message);
     alert(error.message);
   }
+}
+
+// 폼 데이터와 상태를 초기화하는 함수
+function resetForm() {
+  // 폼 필드 초기화
+  contentElement.value = '';
+  charCountElement.textContent = '0 / 2200';
+
+  // 이미지 미리보기 초기화
+  imagePreviewContainer.innerHTML = '';
+  imagesArray = [];
+  currentImageIndex = 0;
+
+  // 태그 초기화
+  tagsArray = [];
+  updateTagList();
+
+  // 기타 필요한 초기화
+  document.getElementById('images').value = ''; // 파일 입력 필드 초기화
+  dragDropText.style.display = 'block';
+  shareButton.style.display = 'block';
+  leftContent.classList.remove('fullscreen');
 }
 
 // 임시 저장된 글 목록 불러오기 함수
@@ -263,13 +298,13 @@ async function loadDraft() {
 
   try {
     const response = await fetch(`/api/posts/temp-posts/list`, {
-      credentials: 'include',
+      credentials: 'include', // 인증 정보를 포함
     });
 
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('text/html')) {
       console.error('세션이 만료되었거나 인증이 필요합니다.');
-      window.location.href = '/login';
+      window.location.href = '/login'; // 세션 만료 시 로그인 페이지로 리디렉션
       return;
     }
 
@@ -283,23 +318,23 @@ async function loadDraft() {
           const postElement = document.createElement('div');
           postElement.classList.add('temp-post');
 
-          const postContent = post.content.length > 40 ? post.content.substring(
-              0, 40) + '...' : post.content;
+          const postContent = post.content.length > 40
+              ? post.content.substring(0, 40) + '...' : post.content;
           const postDate = new Date(post.createdAt).toLocaleDateString();
 
           postElement.innerHTML = `
-            <div class="post-details">
-              <p class="post-content">${postContent}</p>
-              <span class="post-date">${postDate}</span>
-              <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
-            </div>
-          `;
+          <div class="post-details">
+            <p class="post-content">${postContent}</p>
+            <span class="post-date">${postDate}</span>
+            <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span>
+          </div>
+        `;
           postElement.onclick = () => continueDraft(post);
           tempPostsContainer.appendChild(postElement);
         });
       }
 
-      tempPostsContainer.style.display = 'flex';
+      tempPostsContainer.style.display = 'flex'; // 임시 저장된 글 리스트 표시
     } else {
       console.error('서버 응답이 예상치 않은 형식입니다:', contentType);
     }
@@ -314,7 +349,7 @@ async function loadDraft() {
 function continueDraft(post) {
   contentElement.value = post.content;
   updateCharCount();
-  currentDraftPostId = post.postId;
+  currentDraftPostId = post.postId; // 현재 작성 중인 게시물의 ID 설정
 
   imagePreviewContainer.innerHTML = '';
 
@@ -323,7 +358,7 @@ function continueDraft(post) {
     filename: image.filename,
   }));
 
-  displayImages();
+  displayImages(); // 이미지 미리보기 업데이트
 
   document.getElementById('images').disabled = true;
   shareButton.style.display = 'none';
@@ -351,7 +386,7 @@ function displayImages() {
 
 // 임시 저장된 글 삭제 함수
 async function deleteTempPost(postId, event) {
-  event.stopPropagation();
+  event.stopPropagation(); // 이벤트 전파 방지 (글 삭제 시 글 열림 방지)
 
   try {
     const response = await fetch(`/api/posts/temp-delete/${postId}`, {
