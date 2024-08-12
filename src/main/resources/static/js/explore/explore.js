@@ -13,11 +13,12 @@ async function getExplorePosts(page = 1) {
     const params = new URLSearchParams(currentUrl.search);
 
     let url = `/api/explore?page=${page}&perPage=${itemsPerPage}`;
-    if (params.has('tag')) {    // 특정 파라미터가 존재하는지 확인
+    if (params.has('tag')) {    // 태그 파라미터가 존재하는지 확인
 
       url += `&tag=${encodeURIComponent(params.get('tag'))}`;
     }
 
+    console.log("api 호출");
     const response = await fetch(
         url, {
           method: 'GET',
@@ -40,7 +41,7 @@ async function getExplorePosts(page = 1) {
 
     // return data.list;
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error while Getting posts:', error);
     return []; // 오류 발생 시 빈 배열 반환
   }
 }
@@ -123,10 +124,10 @@ function handleIntersect(entries) {
   });
 }
 
-function showSpinner() {
-  document.getElementById('loading-spinner').style.display = 'block';
-  console.log('showSpinner() 함수 실행');
-}
+// function showSpinner() {
+//   document.getElementById('loading-spinner').style.display = 'block';
+//   console.log('showSpinner() 함수 실행');
+// }
 
 function hideSpinner() {
   document.getElementById('loading-spinner').style.display = 'none';

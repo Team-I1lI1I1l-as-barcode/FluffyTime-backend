@@ -57,6 +57,7 @@ public class SecurityConfig {
                     "/image/**"
                 ).permitAll()
                 .anyRequest().authenticated()
+
             )
             .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer),
                 CustomLoginFilter.class)
