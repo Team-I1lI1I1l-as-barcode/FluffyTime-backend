@@ -11,8 +11,10 @@ async function loadPostData(postId) {
       console.error('서버 응답 상태:', response.status);
       throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
+    console.log('응답 ok!')
 
     const postData = await response.json();
+    console.log('콘솔 불러와주세요~');
     currentPostId = postId;
 
     // 게시물 내용 설정
@@ -20,6 +22,7 @@ async function loadPostData(postId) {
 
     // 이미지 URL 업데이트
     imageUrls = postData.data.imageUrls; // 이미지 URL 배열을 업데이트합니다.
+    console.log(imageUrls);
 
     // 이미지 컨테이너 초기화 및 이미지 추가
     updateImageContainer('imageContainer', imageUrls);
