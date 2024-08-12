@@ -1,12 +1,16 @@
 package com.fluffytime.search.controller.api;
 
-import com.fluffytime.search.dto.request.Request;
+import com.fluffytime.domain.Profile;
+import com.fluffytime.domain.User;
+import com.fluffytime.search.dto.request.SearchRequestDto;
+import com.fluffytime.search.service.SearchService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,47 +23,63 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/search")
 public class SearchRestController {
 
+    private final SearchService searchService;
+
     @PostMapping("/names")
     public ResponseEntity<Map<String, Object>> searchNames(
-        @RequestBody Request req) {
+        @RequestBody SearchRequestDto requestDto
+        /*,
+        @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+        @RequestParam(value = "perPage", required = false, defaultValue = "24") int perPage*/) {
+        log.info("반려동물 이름 기반 검색실행. 검색어: {}", requestDto);
 
-        System.out.println("request: " + req);
-        List<Map<String, String>> list = new ArrayList<>();
+        try {
+            List<Map<String, String>> list = new ArrayList<>(); // TODO responseDto로 변환??
 
-        //TODO need code that connects to db in real project
-        int end = 9;
-        if (!req.getQuery().isEmpty()) {
-            end = 5;
+            // db로부터 게시물 리스트 받아오기
+            List<Profile> profileList = searchService.findMatchingPetName(requestDto);
+
+//        // 페이징 처리
+//        int start = (page - 1) * perPage;
+//        int end = Math.min(start + perPage, userList.size());
+
+//        for (int i = start; i <= end; i++) {//TODO 무한 스크롤 페이징 처리
+            for (int i = 0; i <= 12; i++) {
+
+                if (i >= profileList.size()) {
+                    break;
+                }
+
+                Profile profile = profileList.get(i);
+
+                Map<String, String> item = new HashMap<>();
+                item.put("nickName", profile.getUser().getNickname());
+                item.put("petName", profile.getPetName());
+                item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 프로필사진으로 연결
+                list.add(item);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("list", list);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Error processing request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(errorResponse);//TODO 공통 양식처럼 익셉션 처리하기
         }
-
-        for (int i = 1; i <= end; i++) {
-            Map<String, String> item = new HashMap<>();
-            item.put("userId", String.valueOf(i));
-            item.put("petName", "Item " + i);
-            item.put("imageUrl", "https://via.placeholder.com/150");
-            list.add(item);
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("list", list);
-
-        return ResponseEntity.ok(response);
 
     }
 
     @PostMapping("/tags")
     public ResponseEntity<Map<String, Object>> searchTags(
-        @RequestBody Request req) {
+        @RequestBody SearchRequestDto requestDto) {
 
         List<Map<String, String>> list = new ArrayList<>();
 
-        //TODO need code that connects to db in real project
-        int end = 13;
-        if (!req.getQuery().isEmpty()) {
-            end = 7;
-        }
-
-        for (int i = 1; i <= end; i++) {
+        for (int i = 1; i <= 12; i++) {
             Map<String, String> item = new HashMap<>();
             item.put("tagId", String.valueOf(i));
             item.put("tagName", "Item " + i);
@@ -77,28 +97,53 @@ public class SearchRestController {
 
     @PostMapping("/accounts")
     public ResponseEntity<Map<String, Object>> searchAccounts(
-        @RequestBody Request req) {
+        @RequestBody SearchRequestDto requestDto) {
 
-        List<Map<String, String>> list = new ArrayList<>();
+        log.info("유저 닉네임 기반 검색실행. 검색어: {}", requestDto);
 
-        //TODO need code that connects to db in real project
-        int end = 7;
-        if (!req.getQuery().isEmpty()) {
-            end = 3;
+        try {
+            List<Map<String, String>> list = new ArrayList<>();// TODO responseDto로 변환??
+
+            // db로부터 게시물 리스트 받아오기
+            List<User> userList = searchService.findMatchingUsers(requestDto);
+
+//        // 페이징 처리
+//        int start = (page - 1) * perPage;
+//        int end = Math.min(start + perPage, userList.size());
+
+//        for (int i = start; i <= end; i++) {//TODO 무한 스크롤 페이징 처리
+            for (int i = 0; i <= 12; i++) {
+
+                if (i >= userList.size()) {
+                    break;
+                }
+
+                User user = userList.get(i);
+
+                Map<String, String> item = new HashMap<>();
+                item.put("nickName", user.getNickname());
+
+                Profile profile = user.getProfile();
+                if (profile != null && profile.getPetName() != null) {
+                    item.put("petName", profile.getPetName());
+                } else {
+                    item.put("petName", "없음");
+                }
+                item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 프로필사진으로 연결
+                list.add(item);
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("list", list);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Error processing request: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(errorResponse);//TODO 공통 양식처럼 익셉션 처리하기
         }
-
-        for (int i = 1; i <= end; i++) {
-            Map<String, String> item = new HashMap<>();
-            item.put("userId", String.valueOf(i));
-            item.put("petName", "Item " + i);
-            item.put("imageUrl", "https://via.placeholder.com/150");
-            list.add(item);
-        }
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("list", list);
-
-        return ResponseEntity.ok(response);
 
     }
 

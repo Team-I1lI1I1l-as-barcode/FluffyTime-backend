@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class Request {
+public class SearchRequestDto {
 
     private String query;
 

@@ -1,17 +1,26 @@
-let currentTab = 'name'; // 현재 선택된 탭을 나타내는 변수, 초기값은 'name'
+let currentTab = 'name';
+// 현재 선택된 탭, 초기값은 'name'
 
-// 탭을 선택할 때 호출되는 함수
+// 탭을 전환하려 클릭할 때 호출되는 함수
 async function selectTab(tab) {
-  currentTab = tab; // 선택된 탭을 업데이트
-  // 모든 탭 버튼에서 'active' 클래스를 제거
+  currentTab = tab;
+
+  // html의 모든 탭 버튼에서 'active' 클래스를 제거한 후, 현재 선택된 탭 버튼에 'active' 클래스를 추가
   document.querySelectorAll('.tabs button').forEach(button => {
     button.classList.remove('active');
   });
-  // 현재 선택된 탭 버튼에 'active' 클래스를 추가
   document.getElementById('tab-' + tab).classList.add('active');
-  // 검색 입력 필드를 비우고 리스트를 다시 업데이트
+
+  // 검색 입력 필드초기화
   document.getElementById('search-input').value = '';
-  await populateList(); // 비동기로 리스트를 업데이트
+
+  //엔터키로도 검색 가능
+  await document.getElementById('search-input').addEventListener('keypress',
+      e => {
+        if (e.key === 'Enter') {
+          populateList();
+        }
+      });
 }
 
 // 검색 결과를 가져오는 함수
@@ -26,6 +35,7 @@ async function getSearchResult(tab, query) {
     } else {
       url += 'accounts'; // 계정 검색
     }
+    // url += '?page=${page}&perPage=${itemsPerPage}';
 
     // 검색 쿼리를 포함한 JSON 객체 생성
     const jsonData = {
@@ -41,23 +51,31 @@ async function getSearchResult(tab, query) {
       body: JSON.stringify(jsonData) // 요청 본문에 쿼리 추가
     });
 
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error("Expected JSON response, but got something else");
+    }
+
     // 서버로부터 JSON 응답을 받음
     const data = await response.json();
 
     // 응답 상태가 OK가 아닌 경우, 오류 처리
     if (!response.ok) {
-      alert("request not handled");
-      throw new Error(data.message || "error");
+      alert("Request not handled: " + (data.message || "Unknown error"));
+      throw new Error(data.message || "Request failed");
     }
     return data.list; // 검색 결과 리스트 반환
+
   } catch (error) {
-    console.error(error); // 오류를 콘솔에 출력
+    console.error("Error during fetch:", error);
+    return [];
   }
 }
 
 // 리스트를 업데이트하는 함수
 async function populateList() {
-  // 검색 입력 필드의 값을 읽어와 소문자로 변환
+
+  // 검색어를 가져와 소문자로 변환
   const query = document.getElementById('search-input').value.toLowerCase();
 
   // 현재 탭과 검색 쿼리를 기반으로 검색 결과를 가져옴
@@ -85,7 +103,7 @@ async function populateList() {
 
       name.textContent = item.tagName; // 태그 이름 표시
     } else {
-      id.textContent = `ID: ${item.userId}`; // userId 표시
+      id.textContent = item.nickName; // 닉네임 표시
 
       name.textContent = item.petName; //  이름 표시
     }
@@ -101,4 +119,4 @@ async function populateList() {
 }
 
 // 페이지 로드 시 초기 리스트를 업데이트
-window.onload = populateList;
+// window.onload = populateList;
