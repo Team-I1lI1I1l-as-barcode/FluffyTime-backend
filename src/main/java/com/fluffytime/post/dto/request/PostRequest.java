@@ -14,4 +14,5 @@ public class PostRequest {
     private String content;
     private TempStatus tempStatus;
     private List<Long> tagId = new ArrayList<>();
+
 }

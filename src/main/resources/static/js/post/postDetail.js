@@ -9,7 +9,7 @@ async function loadPostData(postId) {
     const response = await fetch(`/api/posts/detail/${postId}`);
     if (!response.ok) {
       console.error('서버 응답 상태:', response.status);
-      throw new Error('Network response was not ok ' + response.statusText);
+      throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
 
     const postData = await response.json();

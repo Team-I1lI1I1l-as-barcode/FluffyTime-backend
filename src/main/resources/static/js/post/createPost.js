@@ -1,6 +1,7 @@
 let currentImageIndex = 0;
 let imagesArray = [];
 let currentDraftPostId = null;
+let tagsArray = [];
 
 const postModalElement = document.getElementById('postModal');
 const draftModalElement = document.getElementById('draftModal');
@@ -13,6 +14,58 @@ const nextButton = document.getElementById('nextButton');
 const charCountElement = document.getElementById('charCount');
 const contentElement = document.getElementById('content');
 const completeContainer = document.getElementById('complete-container');
+const tagsInputElement = document.getElementById('tagsInput');
+const tagListElement = document.getElementById('tagList');
+
+//태그~~
+// 태그 입력 필드에서 엔터를 눌렀을 때 태그 추가
+tagsInputElement.addEventListener('keypress', function (event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    addTag(tagsInputElement.value.trim());
+    tagsInputElement.value = '';
+  }
+});
+
+// 태그 추가 함수
+function addTag(tag) {
+  if (tag.length > 0 && tag.startsWith('#')) {
+    if (tagsArray.length >= 10) {
+      alert('최대 10개의 태그만 추가할 수 있습니다.');
+      return;
+    }
+    if (tagsArray.includes(tag)) {
+      alert('이미 추가된 태그입니다.');
+      return;
+    }
+    tagsArray.push(tag);
+    updateTagList();
+  } else {
+    alert('태그는 #으로 시작해야 합니다.');
+  }
+}
+
+// 태그 리스트 업데이트 함수
+function updateTagList() {
+  tagListElement.innerHTML = '';
+  tagsArray.forEach((tag, index) => {
+    const tagElement = document.createElement('span');
+    tagElement.classList.add('tag');
+    tagElement.innerText = tag;
+    const removeTagElement = document.createElement('span');
+    removeTagElement.innerText = '×';
+    removeTagElement.classList.add('remove-tag');
+    removeTagElement.onclick = () => removeTag(index);
+    tagElement.appendChild(removeTagElement);
+    tagListElement.appendChild(tagElement);
+  });
+}
+
+// 태그 제거 함수
+function removeTag(index) {
+  tagsArray.splice(index, 1);
+  updateTagList();
+}
 
 // 모달 열기 함수
 function openModal() {
@@ -86,13 +139,14 @@ function updateCharCount() {
   charCountElement.textContent = `${content.length} / 2200`;
 }
 
-// 게시물 데이터 준비 함수
+// 게시물 데이터 준비 함수//태그 추가햇음~~
 function preparePostData(tempId, content, images, status) {
   return {
     tempId: tempId,
     content: content,
     tempStatus: status,
     imageUrls: images.map(image => image.url),
+    tags: tagsArray // 태그 데이터 추가
   };
 }
 

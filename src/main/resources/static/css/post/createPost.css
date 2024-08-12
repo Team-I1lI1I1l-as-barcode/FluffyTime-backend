@@ -340,3 +340,28 @@ hr {
   margin-left: 10px;
   white-space: nowrap;
 }
+
+
+.tag-list {
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e0f7fa;
+  color: #007bff;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tag:hover {
+  background-color: #b2ebf2;
+}
+
+.tag .remove-tag {
+  margin-left: 8px;
+  cursor: pointer;
+}
