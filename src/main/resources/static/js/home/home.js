@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const postsContainer = document.getElementById('posts-container');
   const loading = document.getElementById('loading');
   let currentPage = 1;
-  const itemsPerPage = 24;
+  const itemsPerPage = 5;
   let isLoading = false;
 
   async function fetchPosts(page = 1) {
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function loadMorePosts() {
-    if (isLoading || !hasMorePosts) {
+    if (isLoading) {
       return;
     }
     isLoading = true;
@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(posts.length);
         console.log(currentPage);
       } else {
-        hasMorePosts = false;
         // 사용자에게 더 이상 게시물이 없음을 알리는 메시지 표시
         if (!document.querySelector('.no-more-posts-message')) {
           const noMorePostsMessage = document.createElement('div');

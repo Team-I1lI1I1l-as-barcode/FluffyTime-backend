@@ -16,23 +16,23 @@
     <ul>
       <li>
         <span class="material-symbols-rounded">home</span>
-        <a href="#">홈</a>
+        <a href="/">홈</a>
       </li>
       <li>
         <span class="material-symbols-rounded">search</span>
-        <a href="#">검색</a>
+        <a href="/search">검색</a>
       </li>
       <li>
         <span class="material-symbols-rounded">explore</span>
-        <a href="#">탐색 탭</a>
+        <a href="/explore">탐색 탭</a>
       </li>
       <li>
         <span class="material-symbols-rounded">add_box</span>
-        <a href="#">만들기</a>
+        <a href="/posts/reg">만들기</a>
       </li>
       <li>
-        <span class="material-symbols-rounded">person</span>
-        <a href="#">프로필</a>
+        <span class="material-symbols-rounded" >person</span>
+        <a href="#" id="mypageBtn">프로필</a>
       </li>
       <li>
         <span class="material-symbols-rounded">favorite</span>
@@ -50,7 +50,6 @@
         <div>
           <h1>게시글 목록</h1>
           <h1> 메인 홈페이지 입니다.</h1>
-          <button id="mypageBtn">마이페이지</button>
           <button id="userpageBtn">유저페이지</button>
         </div>
       </div>
@@ -59,8 +58,6 @@
   </main>
 </div>
 <script>
-
-  // 마이페이지
   document.getElementById("mypageBtn").addEventListener('click', event => {
     //window.location.href = "/mypage/test";
     fetch("/api/mypage/info", {
