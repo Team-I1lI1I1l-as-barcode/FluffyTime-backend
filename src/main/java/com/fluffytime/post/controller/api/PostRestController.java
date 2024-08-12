@@ -92,7 +92,7 @@ public class PostRestController {
     }
 
     // 게시물 상세 정보 조회하기
-    @GetMapping("/detail/{id}")
+    @GetMapping("/detail/{id}")//postId
     public ResponseEntity<?> getPost(@PathVariable Long id) {
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
         ApiResponse<PostResponse> postResponse = postService.getPostById(id);

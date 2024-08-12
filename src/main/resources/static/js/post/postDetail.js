@@ -1,4 +1,4 @@
-let currentPostId;
+let currentPostId; // 현재 게시물의 ID를 저장하는 변수
 let currentImageIndex = 0;
 let imageUrls = [];
 
@@ -6,6 +6,7 @@ let imageUrls = [];
 async function loadPostData(postId) {
   console.log(`게시물 데이터 로드 시작: ${postId}`);
   try {
+    // 서버에서 게시물 데이터를 불러옴
     const response = await fetch(`/api/posts/detail/${postId}`);
     if (!response.ok) {
       console.error('서버 응답 상태:', response.status);
@@ -19,7 +20,7 @@ async function loadPostData(postId) {
     document.getElementById('postContent').innerText = postData.data.content;
 
     // 이미지 URL 업데이트
-    imageUrls = postData.data.imageUrls; // 이미지 URL 배열을 업데이트합니다.
+    imageUrls = postData.data.imageUrls; // 이미지 URL 배열을 업데이트
 
     // 이미지 컨테이너 초기화 및 이미지 추가
     updateImageContainer('imageContainer', imageUrls);
@@ -35,26 +36,26 @@ async function loadPostData(postId) {
 // 이미지 컨테이너 업데이트 함수
 function updateImageContainer(containerId, urls) {
   const container = document.getElementById(containerId);
-  container.innerHTML = ''; // 컨테이너를 초기화합니다.
+  container.innerHTML = ''; // 컨테이너를 초기화
 
   urls.forEach((imageObj, index) => {
     const img = document.createElement('img');
-    img.src = imageObj.filepath; // 이미지 경로를 설정합니다.
+    img.src = imageObj.filepath; // 이미지 경로를 설정
     img.alt = `image ${index + 1}`;
     img.style.display = index === 0 ? 'block' : 'none'; // 첫 번째 이미지만 처음에 표시
     img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지만 처음에 표시
-    img.style.width = '100%'; // 이미지가 꽉 차도록 설정합니다.
-    img.style.height = '100%'; // 이미지가 꽉 차도록 설정합니다.
-    img.style.objectFit = 'cover'; // 이미지를 컨테이너에 맞게 자르도록 설정합니다.
+    img.style.width = '100%'; // 이미지가 꽉 차도록 설정
+    img.style.height = '100%'; // 이미지가 꽉 차도록 설정
+    img.style.objectFit = 'cover'; // 이미지를 컨테이너에 맞게 자르도록 설정
     img.onerror = () => {
       console.error('이미지 로드 실패:', imageObj.filepath);
       img.parentElement.removeChild(img); // 이미지 로드 실패 시 요소를 제거합니다.
     };
-    container.appendChild(img); // 이미지 엘리먼트를 컨테이너에 추가합니다.
+    container.appendChild(img); // 이미지 요소를 컨테이너에 추가합니다.
   });
 }
 
-// 활성화된 이미지 표시
+// 현재 인덱스에 해당하는 이미지를 표시하는 함수
 function showImage(index, containerId) {
   console.log(`이미지 표시: ${index}`);
   const images = document.querySelectorAll(`#${containerId} img`);
@@ -64,11 +65,12 @@ function showImage(index, containerId) {
   });
 }
 
-// 이전 이미지 표시
+// 이전 이미지를 표시하는 함수
 function prevImage(event) {
   event.preventDefault();
   console.log('이전 이미지 표시');
   if (imageUrls.length > 1) {
+    // 현재 인덱스가 0이면 마지막 이미지로, 아니면 이전 이미지로 이동
     currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
         : currentImageIndex - 1;
     showImage(currentImageIndex, 'imageContainer');
@@ -80,6 +82,7 @@ function nextImage(event) {
   event.preventDefault();
   console.log('다음 이미지 표시');
   if (imageUrls.length > 1) {
+    // 현재 인덱스가 마지막이면 첫 번째 이미지로, 아니면 다음 이미지로 이동
     currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
         : currentImageIndex + 1;
     showImage(currentImageIndex, 'imageContainer');
@@ -228,8 +231,16 @@ function toggleDropdownMenu() {
 // URL에서 postId를 추출하여 로드
 document.addEventListener('DOMContentLoaded', () => {
   console.log('페이지 로드 완료');
-  const urlParams = new URLSearchParams(window.location.search);
-  const postId = urlParams.get('postId');
+
+  // 현재 URL의 경로를 가져옴
+  const path = window.location.pathname;
+
+  // 경로를 '/'로 분리하여 배열로 만듬
+  const pathSegments = path.split('/');
+
+  // 배열의 마지막 요소가 postId
+  const postId = pathSegments[pathSegments.length - 1];
+
   if (postId) {
     console.log(`게시물 ID: ${postId}`);
     loadPostData(postId);
@@ -238,3 +249,4 @@ document.addEventListener('DOMContentLoaded', () => {
     console.error('URL에서 postId를 찾을 수 없습니다.');
   }
 });
+
