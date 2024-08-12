@@ -64,6 +64,15 @@ public class JwtTokenizer {
             .compact(); // JWT를 생성하고, 문자열 형태로 변환하여 반환
     }
 
+    /*
+     * 토큰에서 유저 메일 얻기
+     * */
+    public Long getUserIdFromToken(String token) {
+        // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
+        Claims claims = parseAccessToken(token);
+        return Long.valueOf((Integer) claims.get("userId"));
+    }
+
     // 액세스 토큰을 파싱하여 클레임 객체를 반환하는 메서드
     public Claims parseAccessToken(String accessToken) {
         return parseToken(accessToken, accessSecret);

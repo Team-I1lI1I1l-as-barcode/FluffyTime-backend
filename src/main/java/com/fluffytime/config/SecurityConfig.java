@@ -49,7 +49,6 @@ public class SecurityConfig {
                     "/logout",
                     "/join/**",
                     "/api/users/**",
-                    // "/api/posts/**",
 
                     "/static/**",
                     "/html/**",
