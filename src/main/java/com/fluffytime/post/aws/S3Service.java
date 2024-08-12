@@ -35,6 +35,7 @@ public class S3Service {
                 PutObjectRequest.builder()
                     .bucket(bucketName)
                     .key(fileName)
+                    .contentType(file.getContentType()) // url 클릭시 파일 다운로드가 아닌 미리보기로 설정
                     .build(),
                 software.amazon.awssdk.core.sync.RequestBody.fromBytes(file.getBytes())
             );

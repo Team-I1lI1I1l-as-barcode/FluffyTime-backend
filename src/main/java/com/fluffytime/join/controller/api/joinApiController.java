@@ -1,17 +1,19 @@
 package com.fluffytime.join.controller.api;
 
 import com.fluffytime.join.dto.request.JoinRequest;
-import com.fluffytime.join.dto.response.ApiResponse;
+import com.fluffytime.join.dto.response.CheckDuplicationResponse;
 import com.fluffytime.join.dto.response.JoinResponse;
-import com.fluffytime.join.dto.response.SendEmailResponse;
+import com.fluffytime.join.dto.response.SucceedSendEmailResponse;
 import com.fluffytime.join.dto.response.SucceedCertificationResponse;
 import com.fluffytime.join.service.CertificationService;
 import com.fluffytime.join.service.JoinService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,58 +32,59 @@ public class joinApiController {
     private final CertificationService certificationService;
 
     @PostMapping("/temp-join")
-    public ResponseEntity<ApiResponse<JoinResponse>> tempJoin(
+    public ResponseEntity<JoinResponse> tempJoin(
         @RequestBody @Valid JoinRequest joinUser
     ) {
-        return ResponseEntity.ok(joinService.tempJoin(joinUser));
+        return ResponseEntity.created(URI.create("/join/email-certificate/" + joinUser.getEmail()))
+            .body(joinService.tempJoin(joinUser));
     }
 
     @GetMapping("/join")
-    public ResponseEntity<ApiResponse<JoinResponse>> join(
+    public ResponseEntity<JoinResponse> join(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        return ResponseEntity.ok(joinService.join(email));
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.join(email));
     }
 
     @GetMapping("/check-email")
-    public ResponseEntity<ApiResponse<Void>> checkEmail(
+    public ResponseEntity<CheckDuplicationResponse> checkEmail(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        return ResponseEntity.ok(joinService.checkExistsEmail(email));
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.checkExistsEmail(email));
     }
 
     @GetMapping("/check-nickname")
-    public ResponseEntity<ApiResponse<Void>> checkNickname(
+    public ResponseEntity<CheckDuplicationResponse> checkNickname(
         @RequestParam(name = "nickname")
         @NotBlank
         String nickname
     ) {
-        return ResponseEntity.ok(joinService.checkExistsNickname(nickname));
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.checkExistsNickname(nickname));
     }
 
     @GetMapping("/email-certification/send")
-    public ResponseEntity<ApiResponse<SendEmailResponse>> sendCertification(
+    public ResponseEntity<SucceedSendEmailResponse> sendCertification(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        return ResponseEntity.ok(certificationService.sendCertificationMail(email));
+        return ResponseEntity.status(HttpStatus.OK).body(certificationService.sendCertificationMail(email));
     }
 
     @GetMapping("/email-certification")
-    public ResponseEntity<ApiResponse<SucceedCertificationResponse>> certificateEmail(
+    public ResponseEntity<SucceedCertificationResponse> certificateEmail(
         @RequestParam(name = "email")
         @NotBlank
         @Email
         String email
     ) {
-        return ResponseEntity.ok(certificationService.certificateEmail(email));
+        return ResponseEntity.status(HttpStatus.OK).body(certificationService.certificateEmail(email));
     }
 }

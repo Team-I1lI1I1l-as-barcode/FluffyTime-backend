@@ -35,7 +35,7 @@
       <div class="right-content">
         <div>
           <div class="profile">
-            <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정~~!-->
+            <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정-->
             <span>happy</span>
           </div>
           <textarea id="content" name="content" class="post-textarea" rows="10"
@@ -43,8 +43,13 @@
                     oninput="updateCharCount()"></textarea>
           <div class="char-count" id="charCount">0 / 2200</div>
           <hr>
-          <input type="text" id="tags" name="tags" class="post-textarea" placeholder="태그"
-                 maxlength="10">
+          <!--태그-->
+          <div class="tags-container">
+            <input type="text" id="tagsInput" name="tags" class="post-textarea"
+                   placeholder="태그 입력 후 엔터를 누르세요" maxlength="10">
+            <div id="tagList" class="tag-list"></div>
+          </div>
+
           <hr>
           <div class="toggle">
             <label for="hideLikes">이 게시물의 좋아요 수 및 조회수 숨기기</label>

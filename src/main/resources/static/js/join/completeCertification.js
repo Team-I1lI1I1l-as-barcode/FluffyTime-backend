@@ -1,5 +1,5 @@
 const succeedCertificationBtn = document.getElementById(
-    'succeedCertificationBtn');
+    'succeedBtn');
 
 // 현재 URL의 경로를 가져옵니다.
 const pathname = window.location.pathname;
