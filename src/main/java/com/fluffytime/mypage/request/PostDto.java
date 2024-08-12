@@ -14,6 +14,6 @@ import lombok.Setter;
 // 유저의 게시글 가져오는 DTO
 public class PostDto {
 
-    private String title;
+    private String imageUrl;
 
 }
