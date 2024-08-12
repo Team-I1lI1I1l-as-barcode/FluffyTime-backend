@@ -5,6 +5,8 @@ let currentTab = 'name';
 async function selectTab(tab) {
   currentTab = tab;
 
+  console.log('현재 탭: ' + tab);
+
   // html의 모든 탭 버튼에서 'active' 클래스를 제거한 후, 현재 선택된 탭 버튼에 'active' 클래스를 추가
   document.querySelectorAll('.tabs button').forEach(button => {
     button.classList.remove('active');
@@ -119,4 +121,4 @@ async function populateList() {
 }
 
 // 페이지 로드 시 초기 리스트를 업데이트
-// window.onload = populateList;
+window.onload = selectTab(currentTab);
