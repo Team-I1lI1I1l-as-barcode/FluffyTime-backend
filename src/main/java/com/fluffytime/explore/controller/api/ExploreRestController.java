@@ -1,6 +1,7 @@
 package com.fluffytime.explore.controller.api;
 
 import com.fluffytime.domain.Post;
+import com.fluffytime.domain.PostImages;
 import com.fluffytime.explore.service.ExploreService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,12 +62,20 @@ public class ExploreRestController {
             item.put("userId", post.getUser().getUserId().toString());
             item.put("content", post.getContent());
             item.put("createdAt", post.getCreatedAt().toString());
-//            item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 이미지 url로 수정 필요
-            //item.put("imageUrl", post.getImageUrls.~가장 첫번째 사진 url 불러오기
+            //가장 첫번째 사진 url 불러오기
+            String imageUrl = post.getPostImages()
+                .stream()
+                .findFirst()
+                .map(PostImages::getFilepath)
+                .orElse(null);
+
+            item.put("imageUrl", imageUrl);
+
             list.add(item);
         }
 
         Map<String, Object> response = new HashMap<>();
+
         response.put("list", list);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

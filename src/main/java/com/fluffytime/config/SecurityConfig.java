@@ -1,9 +1,9 @@
 package com.fluffytime.config;
 
 import com.fluffytime.login.jwt.dao.RefreshTokenDao;
-import com.fluffytime.login.jwt.filter.CustomLogoutFilter;
-import com.fluffytime.login.jwt.filter.CustomLoginFilter;
 import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
+import com.fluffytime.login.jwt.filter.CustomLoginFilter;
+import com.fluffytime.login.jwt.filter.CustomLogoutFilter;
 import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
 import java.util.List;
@@ -44,23 +44,26 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login",
-                    "/logout",
-                    "/join/**",
-                    "/api/users/**",
+                    .requestMatchers(
+                        "/login",
+                        "/logout",
+                        "/join/**",
+                        "/api/users/**",
+//                    "/error",
 
-                    "/static/**",
-                    "/html/**",
-                    "/js/**",
-                    "/css/**",
-                    "/image/**"
-                ).permitAll()
-                .anyRequest().authenticated()
+                        "/static/**",
+                        "/html/**",
+                        "/js/**",
+                        "/css/**",
+                        "/image/**"
+                    ).permitAll()
+                    .anyRequest().authenticated()
             )
-            .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer), CustomLoginFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer),
+                CustomLoginFilter.class)
             .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(new CustomLogoutFilter(jwtTokenizer,refreshTokenDao), LogoutFilter.class)
+            .addFilterBefore(new CustomLogoutFilter(jwtTokenizer, refreshTokenDao),
+                LogoutFilter.class)
             .formLogin(form -> form.disable())
             .sessionManagement(
                 sessionManagement -> sessionManagement.sessionCreationPolicy(
@@ -87,7 +90,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+        throws Exception {
         return configuration.getAuthenticationManager();
     }
 
