@@ -115,6 +115,12 @@ async function populateList() {
     li.appendChild(img);
     li.appendChild(details);
 
+    // 클릭 이벤트 리스너를 추가
+    li.addEventListener('click', () => {
+      // 원하는 페이지로 리다이렉트
+      window.location.href = `userpages/${id.textContent}`;
+    });
+
     resultsList.appendChild(li);
   });
 }
