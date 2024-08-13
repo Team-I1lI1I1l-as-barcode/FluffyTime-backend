@@ -98,7 +98,7 @@ public class MyPageService {
             List<PostDto> postsList = user.getPostList().stream()
                 // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
                 .map(post -> new PostDto(post.getPostId(),
-                    post.getPostImages().getFirst().getFilepath()))
+                    post.getPostImages().get(0).getFilepath()))
                 .collect(Collectors.toList());
 
             // 게시물 리스트가 비어있을때
@@ -109,7 +109,6 @@ public class MyPageService {
             MyPageInformationDto myPageInformationDto = MyPageInformationDto.builder()
                 .nickname(nickName)
                 .postsList(postsList)
-                .profile(false)
                 .build();
 
             Profile profile = user.getProfile(); //프로필 객체
@@ -119,10 +118,10 @@ public class MyPageService {
                 ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
                 String fileUrl; // 프로필 이미지 업로드 URL
                 if (profileImages == null) {
-                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필  이미지 미등록 상태");
+                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 미등록 상태");
                     fileUrl = null;
                 } else {
-                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 이미지 등록 상태");
+                    log.info("createProfileResponseDto 실행 >> 해당 유저는 프로필 등록 상태");
                     fileUrl = profileImages.getFilePath();
                 }
 
@@ -131,7 +130,6 @@ public class MyPageService {
                 myPageInformationDto.setPetAge(profile.getPetAge()); // 반려동물 나이
                 myPageInformationDto.setIntro(profile.getIntro()); //소개글
                 myPageInformationDto.setFileUrl(fileUrl);
-                myPageInformationDto.setProfile(true);
                 return myPageInformationDto;
             }
         } else {

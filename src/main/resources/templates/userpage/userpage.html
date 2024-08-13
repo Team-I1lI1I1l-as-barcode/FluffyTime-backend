@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko"  xmlns:th="http://www.thymeleaf.org/">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8"/>
   <title>유저페이지</title>
@@ -28,11 +28,11 @@
     <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
 
     <!-- 모달 오버레이 -->
-    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="userPage-modal-overlay" class="userPage-modal-overlay"></div>
 
     <!-- 모달 창 -->
-    <div id="modal" class="modal">
-      <div id="modal-content">
+    <div id="userPage-modal" class="userPage-modal">
+      <div id="userPage-modal-content">
         <a id="block_follow">유저 차단</a>
         <!--          <a id="block_follow_cancel">유저 차단 해제</a>-->
         <a id="block_cancel">취소</a>
@@ -86,9 +86,11 @@
   </section>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal" style="display: none;"></div>
+<div th:include="common/createModal :: createModal" class="modal" id="postModal"
+     style="display: none;"></div>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal" style="display: none;"></div>
+<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
+     style="display: none;"></div>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
 
