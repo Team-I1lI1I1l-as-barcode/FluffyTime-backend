@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Search with Tabs</title>
+  <link rel="stylesheet" href="../../css/search/search.css">
+</head>
+<body>
+<div class="container">
+
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="검색">
+    <!--    <button onclick="populateList()">Search</button>-->
+  </div>
+
+  <div class="tabs">
+    <button id="tab-name" class="active" onclick="selectTab('name')">Name</button>
+    <button id="tab-tag" onclick="selectTab('tag')">Tag</button>
+    <button id="tab-account" onclick="selectTab('account')">Account</button>
+  </div>
+
+  <div class="results">
+    <ul id="results-list"></ul>
+  </div>
+
+</div>
+
+<script src="../../js/search/search.js"></script>
+</body>
+</html>

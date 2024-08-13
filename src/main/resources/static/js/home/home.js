@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const postsContainer = document.getElementById('posts-container');
   const loading = document.getElementById('loading');
   let currentPage = 1;
-  const itemsPerPage = 24;
+  const itemsPerPage = 5;
   let isLoading = false;
 
   async function fetchPosts(page = 1) {
@@ -43,19 +43,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     posts.forEach(post => {
       const postElement = document.createElement('div');
-      postElement.classList.add('post');
+      postElement.classList.add('home-post');
 
       postElement.innerHTML = `
-        <div class="post-header">
+        <div class="home-post-header">
           <img src="${post.userImage
       || 'https://via.placeholder.com/40'}" alt="${post.userName || 'User'}">
           <strong>${post.userName || 'Anonymous'}</strong>
         </div>
-        <div class="post-content">
+        <div class="home-post-content">
           <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
           <p>${post.content || ''}</p>
         </div>
-        <div class="post-footer">
+        <div class="home-post-footer">
           ${post.comments && Array.isArray(post.comments)
           ? post.comments.map(comment => `<p>${comment}</p>`).join('')
           : '<p>No comments available.</p>'}
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function loadMorePosts() {
-    if (isLoading || !hasMorePosts) {
+    if (isLoading) {
       return;
     }
     isLoading = true;
@@ -80,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(posts.length);
         console.log(currentPage);
       } else {
-        hasMorePosts = false;
         // 사용자에게 더 이상 게시물이 없음을 알리는 메시지 표시
         if (!document.querySelector('.no-more-posts-message')) {
           const noMorePostsMessage = document.createElement('div');

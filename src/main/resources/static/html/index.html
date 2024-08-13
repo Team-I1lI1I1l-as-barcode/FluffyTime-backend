@@ -2,16 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>FluffyTime</title>
+
+  <title>홈페이지</title>
+  <link rel="stylesheet" href="/css/post/createPost.css">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/home/home.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-      href="https://fonts.googleapis.com/css2?family=Gasoek+One&family=Sansita:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&display=swap"
-      rel="stylesheet">
+  <script src="/js/post/createPost.js" defer></script>
 </head>
 <body>
 <div class="container">
@@ -20,23 +18,23 @@
     <ul>
       <li>
         <span class="material-symbols-rounded">home</span>
-        <a href="#">홈</a>
+        <a href="/">홈</a>
       </li>
       <li>
         <span class="material-symbols-rounded">search</span>
-        <a href="#">검색</a>
+        <a href="/search">검색</a>
       </li>
       <li>
         <span class="material-symbols-rounded">explore</span>
-        <a href="#">탐색 탭</a>
+        <a href="/explore">탐색 탭</a>
       </li>
       <li>
         <span class="material-symbols-rounded">add_box</span>
-        <a href="#">만들기</a>
+        <a href="javascript:void(0);" id="openModalBtn">만들기</a>
       </li>
       <li>
         <span class="material-symbols-rounded">person</span>
-        <a href="#">프로필</a>
+        <a href="#" id="mypageBtn">프로필</a>
       </li>
       <li>
         <span class="material-symbols-rounded">favorite</span>
@@ -50,11 +48,10 @@
   </aside>
   <main class="content-container">
     <div class="content">
-      <div id="posts-container" class="posts-container">
+      <div id="posts-container" class="home-post-container">
         <div>
           <h1>게시글 목록</h1>
           <h1> 메인 홈페이지 입니다.</h1>
-          <button id="mypageBtn">마이페이지</button>
           <button id="userpageBtn">유저페이지</button>
         </div>
       </div>
@@ -62,13 +59,137 @@
     </div>
   </main>
 </div>
+
+<div class="modal" id="postModal" style="display: none;">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">&times;</button> <!-- 모달 닫기 버튼 -->
+    <div class="post-header">새 게시물 만들기</div>
+    <form id="postForm" class="post-content" enctype="multipart/form-data" method="post">
+      <div class="post-left-content" id="leftContent">
+        <div id="imagePreviewContainer">
+          <img id="imagePreview" src="/image/post/photo.jpg">
+        </div>
+        <p id="dragDropText">사진과 동영상을 여기에 끌어다 놓으세요</p>
+        <input type="file" id="images" name="images" accept="image/*" multiple
+               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 파일 선택 입력 -->
+        <button type="button" class="share-button" id="shareButton"
+                onclick="document.getElementById('images').click()">이미지 선택
+        </button>
+        <button class="nav-button prev" id="prevButton" style="display: none;"
+                onclick="prevImage(event)">&#10094;
+        </button>
+        <button class="nav-button next" id="nextButton" style="display: none;"
+                onclick="nextImage(event)">&#10095;
+        </button>
+      </div>
+      <div class="post-right-content">
+        <div>
+          <div class="profile">
+            <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정-->
+            <span>happy</span>
+          </div>
+          <textarea id="content" name="content" class="post-textarea" rows="10"
+                    placeholder="내용을 입력하세요" maxlength="2200" required
+                    oninput="updateCharCount()"></textarea>
+          <div class="char-count" id="charCount">0 / 2200</div>
+          <hr>
+          <!--태그-->
+          <div class="tags-container">
+            <input type="text" id="tagsInput" name="tags" class="post-textarea"
+                   placeholder="#태그 입력 후 엔터를 누르세요" maxlength="10">
+            <div id="tagList" class="tag-list"></div>
+          </div>
+
+          <hr>
+          <div class="toggle">
+            <label for="hideLikes">이 게시물의 좋아요 수 및 조회수 숨기기</label>
+            <label class="switch">
+              <input type="checkbox" name="hideLikes" id="hideLikes">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <hr>
+          <div class="toggle">
+            <label for="disableComments">댓글 기능 해제</label>
+            <label class="switch">
+              <input type="checkbox" name="disableComments" id="disableComments">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <hr>
+        <div class="options">
+          <a href="javascript:void(0);" onclick="openDraftModal()">임시 저장 글 불러오기</a>
+          <a href="javascript:void(0);" onclick="saveAsTemp(event)">임시저장</a>
+          <a href="javascript:void(0);" onclick="submitPost(event)">공유하기</a>
+        </div>
+      </div>
+    </form>
+    <div class="complete" id="complete-container">
+      <img src="/image/post/complete.jpg">
+      <p>게시물 등록이 완료되었습니다!</p>
+    </div>
+  </div>
+</div>
+
+<!-- 임시 저장 모달 -->
+<div class="modal" id="draftModal" style="display: none;">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeDraftModal()">&times;</button>
+    <div class="header">임시 저장 글 목록</div>
+    <div id="tempPostsContainer"></div>
+  </div>
+</div>
+
+
 <script>
+  // 모달 열기 및 닫기 함수 정의
+  function openModal() {
+    document.getElementById("postModal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("postModal").style.display = "none";
+  }
+
+  // "만들기" 버튼에 이벤트 리스너 추가
+  document.getElementById("openModalBtn").addEventListener('click', function () {
+    openModal();
+  });
+
+  // 마이페이지
   document.getElementById("mypageBtn").addEventListener('click', event => {
-    window.location.href = "/mypage/test";
+    //window.location.href = "/mypage/test";
+    fetch("/api/mypage/info", {
+      method: "GET", // GET 요청
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(errorData => {
+          // 에러 메시지 포함하여 alert 호출
+          console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
+          alert('Error: ' + errorData.message);
+          window.location.href = "/";
+        });
+      }
+      return response.json();
+    })  // 서버에서 보낸 응답을 JSON 형식으로 변환
+    .then(data => {
+      window.location.href = `/mypage/${data.nickname}`;
+    })
+    .catch(error => {
+      console.log("서버 오류 발생:" + error);
+    });
   });
+
+  // 유저페이지
   document.getElementById("userpageBtn").addEventListener('click', event => {
-    window.location.href = "/mypage/test";
+    window.location.href = "/userpages/testuser2";
   });
+
 
 </script>
 <script src="/js/home/home.js"></script>

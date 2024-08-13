@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Sansita:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&display=swap');
+
 :root {
   --primary-color: #FFCC00;
   --text-color: #000000;
@@ -10,6 +12,25 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+input {
+  outline: none; /* 기본 포커스 아웃라인 제거 */
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit; /* 방문 후에도 색상 변화 없음 */
+  text-decoration: none; /* 방문 후에도 밑줄 제거 */
+}
+
+button {
+  all: unset;  /* 모든 기본 스타일을 제거 */
+  display: inline-block; /* 버튼을 인라인 블록으로 설정 */
+  cursor: pointer; /* 마우스 오버 시 포인터 커서 표시 */
 }
 
 body {
@@ -55,7 +76,7 @@ https://fonts.google.com/icons?icon.style=Rounded에서 'Inserting the icon'부�
 
 .sidebar h2 {
   margin-top: 0;
-  font-family: "Sansita", sans-serif;
+  font-family: "Sansita One", sans-serif;
   font-weight: 800;
   font-style: normal;
 }

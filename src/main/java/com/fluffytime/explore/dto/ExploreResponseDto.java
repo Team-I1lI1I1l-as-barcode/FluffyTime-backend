@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExploreResponseDto {
+    //사용 보류
 
     private Map<String, Object> data;
 

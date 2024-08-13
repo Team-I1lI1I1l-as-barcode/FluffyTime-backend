@@ -11,23 +11,25 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class EmailCertificationDao {
 
+    private static final String keyHeader = "email_certification:";
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     public void saveEmailCertificationTempUser(TempUser user) {
-        redisTemplate.opsForValue().set(user.getEmail(), user, Duration.ofSeconds(300));
+        redisTemplate.opsForValue().set(keyHeader + user.getEmail(), user, Duration.ofSeconds(300));
     }
 
     public Optional<TempUser> getTempUser(String email) {
-        TempUser tempUser = (TempUser) redisTemplate.opsForValue().get(email);
+        TempUser tempUser = (TempUser) redisTemplate.opsForValue().get(keyHeader + email);
         return Optional.ofNullable(tempUser);
     }
 
 
     public boolean hasKey(String email) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(email));
+        return Boolean.TRUE.equals(redisTemplate.hasKey(keyHeader + email));
     }
 
     public void removeTempUser(String email) {
-        redisTemplate.delete(email);
+        redisTemplate.delete(keyHeader + email);
     }
 }
