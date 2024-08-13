@@ -30,7 +30,7 @@
     <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
     <div id="profile_container">
       <!-- 이미지 미리보기 및 출력 영역 -->
-      <div id="imagePreview">
+      <div id="Profile-image-Preview">
         <span class="material-symbols-rounded">photo_camera</span>
         <img src="../../../image/profile/profile.png" id="img">
       </div>
@@ -74,9 +74,11 @@
   </section>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal" style="display: none;"></div>
+<div th:include="common/createModal :: createModal" class="modal" id="postModal"
+     style="display: none;"></div>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal" style="display: none;"></div>
+<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
+     style="display: none;"></div>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
 </body>

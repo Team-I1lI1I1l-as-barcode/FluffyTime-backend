@@ -97,8 +97,13 @@ public class MyPageService {
             // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
                 // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
-                .map(post -> new PostDto(post.getPostId(),
-                    post.getPostImages().get(0).getFilepath()))
+                .map(post -> {
+                    String thumbnailPath = post.getPostImages().isEmpty() ?
+                        null : // 이미지가 없으면 null 사용
+                        post.getPostImages().get(0).getFilepath();
+
+                    return new PostDto(post.getPostId(), thumbnailPath);
+                })
                 .collect(Collectors.toList());
 
             // 게시물 리스트가 비어있을때
@@ -113,6 +118,7 @@ public class MyPageService {
 
             Profile profile = user.getProfile(); //프로필 객체
             if (profile == null) {
+                myPageInformationDto.setProfile(false);
                 return myPageInformationDto;
             } else {
                 ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
@@ -130,6 +136,7 @@ public class MyPageService {
                 myPageInformationDto.setPetAge(profile.getPetAge()); // 반려동물 나이
                 myPageInformationDto.setIntro(profile.getIntro()); //소개글
                 myPageInformationDto.setFileUrl(fileUrl);
+                myPageInformationDto.setProfile(true);
                 return myPageInformationDto;
             }
         } else {

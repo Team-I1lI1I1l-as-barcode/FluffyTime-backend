@@ -50,7 +50,7 @@
 }
 
 /* 이미지 미리보기 및 출력 영역의 스타일 설정 */
-#imagePreview {
+#Profile-image-Preview {
   width: 60px;
   height: 60px;
   overflow: hidden;
@@ -64,7 +64,7 @@
 }
 
 /* 이미지 스타일 설정 */
-#imagePreview img {
+#Profile-image-Preview img {
   width: 100%;
   height: 100%;
   object-fit: cover; /* 이미지 비율을 유지하면서 잘림을 방지 */

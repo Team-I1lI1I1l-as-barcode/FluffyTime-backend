@@ -19,7 +19,7 @@
 }
 
 /* 프로필 이미지 영역 */
-#imagePreview {
+#Profile-image-Preview {
   position: relative; /* 아이콘을 절대 위치로 배치하기 위해 추가 */
   display: flex;
   justify-content: center;
@@ -34,7 +34,7 @@
 
 
 /* 프로필 이미지 */
-#imagePreview img {
+#Profile-image-Preview img {
   height: 100%;
   width: 100%;
   object-fit: cover;
@@ -43,7 +43,7 @@
 
 
 /* 이미지 위의 아이콘 */
-#imagePreview .material-symbols-rounded {
+#Profile-image-Preview .material-symbols-rounded {
   position: absolute; /* 아이콘을 절대 위치로 배치 */
   font-size: 3rem; /* 아이콘 크기 조정 */
   color: black; /* 아이콘 색상 (필요에 따라 조정) */
@@ -212,7 +212,7 @@
 }
 
 /* 모달 오버레이 스타일 */
-#modal-overlay {
+#userPage-modal-overlay {
   display: none; /* 기본적으로 숨김 */
   position: fixed;
   top: 0;
@@ -225,7 +225,7 @@
 }
 
 /* 모달 창 스타일 */
-#modal {
+#userPage-modal {
   display: none; /* 기본적으로 숨김 */
   position: fixed;
   top: 50%;
@@ -244,7 +244,7 @@
 }
 
 /* 모달을 활성화했을 때 스타일 */
-#modal.show {
+#userPage-modal.show {
   display: block;
   opacity: 1;
   transform: translate(-50%, -50%); /* 중앙 정렬로 이동 */
@@ -252,7 +252,7 @@
 
 
 /* 모달 콘텐츠 스타일 (내부) */
-#modal-content {
+#userPage-modal-content {
   text-align: center; /* 내용 중앙 정렬 */
 }
 
