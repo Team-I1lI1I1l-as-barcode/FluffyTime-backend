@@ -28,7 +28,7 @@ a:visited {
 }
 
 button {
-  all: unset;  /* 모든 기본 스타일을 제거 */
+  all: unset; /* 모든 기본 스타일을 제거 */
   display: inline-block; /* 버튼을 인라인 블록으로 설정 */
   cursor: pointer; /* 마우스 오버 시 포인터 커서 표시 */
 }
@@ -87,7 +87,13 @@ https://fonts.google.com/icons?icon.style=Rounded에서 'Inserting the icon'부�
 }
 
 .sidebar ul li {
+  display: flex;
+  align-items: center;
   margin: 1.5rem 0;
+}
+
+.sidebar ul li .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
 li {
@@ -99,8 +105,9 @@ li {
   color: var(--text-color);
   text-decoration: none;
   font-weight: bold;
-  margin-left: 10px;
-  margin-top: 0.2rem;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.04rem;
 }
 
 .sidebar ul li a:hover {
@@ -112,14 +119,23 @@ li {
   bottom: 0; /* 사이드바 하단에 위치 */
   width: 100%;
   margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.more-menu .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
 .more-menu a {
   color: var(--text-color);
   text-decoration: none;
   font-weight: bold;
-  margin-left: 10px;
-  margin-top: 0.2rem;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.07rem;
 }
 
 .more-menu a:hover {
