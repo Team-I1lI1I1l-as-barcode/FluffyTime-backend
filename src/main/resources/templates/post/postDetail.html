@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>게시물 상세보기</title>
   <link rel="stylesheet" href="/css/post/postDetail.css">
-  <script src="/js/post/postDetail.js" defer></script>
-  <script src="/js/comment/comment.js"></script>
+  <script th:src="@{/js/post/postDetail.js}" defer></script>
+  <script th:src="@{/js/comment/comment.js}"></script>
 </head>
 <body>
 <div class="modal" id="postModal">

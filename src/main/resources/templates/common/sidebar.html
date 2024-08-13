@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>sidebar</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+</head>
+<body>
+<aside class="sidebar" th:fragment="sidebar">
+  <h2>FluffyTime</h2>
+<!--  <nav>-->
+    <ul>
+      <li>
+        <span class="material-symbols-rounded">home</span>
+        <a href="/">홈</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">search</span>
+        <a href="/search">검색</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">explore</span>
+        <a href="/explore">탐색 탭</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">add_box</span>
+        <a href="javascript:void(0);" id="openModalBtn">만들기</a>
+      </li>
+      <li>
+        <span class="material-symbols-rounded">person</span>
+        <a id="mypageBtn">프로필</a>
+      </li>
+<!--      <li>
+        <span class="material-symbols-rounded">favorite</span>
+        <a href="#">알림</a>
+      </li>-->
+    </ul>
+<!--  </nav>-->
+  <div class="more-menu">
+    <span class="material-symbols-rounded">menu</span>
+    <a href="#">더보기</a>
+  </div>
+</aside>
+</body>
+</html>

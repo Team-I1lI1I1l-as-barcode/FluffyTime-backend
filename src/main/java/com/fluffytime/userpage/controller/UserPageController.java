@@ -14,6 +14,6 @@ public class UserPageController {
     @GetMapping("/userpages/{nickname}")
     public String userPage(@PathVariable(name = "nickname") String nickname) {
         log.info("유저페이지 접근");
-        return "/html/userpage/userpage.html";
+        return "userpage/userpage";
     }
 }

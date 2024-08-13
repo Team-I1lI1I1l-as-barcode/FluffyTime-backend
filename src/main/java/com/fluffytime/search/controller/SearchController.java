@@ -10,7 +10,7 @@ public class SearchController {
 
     @GetMapping("/search")
     public String searchPage() {
-        return "/html/search/search.html";
+        return "search/search";
     }
 
 }
