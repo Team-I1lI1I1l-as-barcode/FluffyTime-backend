@@ -86,8 +86,8 @@
       <div class="post-right-content">
         <div>
           <div class="profile">
-            <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정-->
-            <span>happy</span>
+            <img id="profileImage" src="" alt="사용자의 프로필 이미지">
+            <span id="nicknameDisplay"></span>
           </div>
           <textarea id="content" name="content" class="post-textarea" rows="10"
                     placeholder="내용을 입력하세요" maxlength="2200" required
@@ -144,15 +144,6 @@
 
 
 <script>
-  // 모달 열기 및 닫기 함수 정의
-  function openModal() {
-    document.getElementById("postModal").style.display = "flex";
-  }
-
-  function closeModal() {
-    document.getElementById("postModal").style.display = "none";
-  }
-
   // "만들기" 버튼에 이벤트 리스너 추가
   document.getElementById("openModalBtn").addEventListener('click', function () {
     openModal();
