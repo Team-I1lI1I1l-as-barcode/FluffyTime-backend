@@ -19,7 +19,7 @@
 }
 
 /* 프로필 이미지 영역 */
-#imagePreview {
+#Profile-image-Preview {
   position: relative; /* 아이콘을 절대 위치로 배치하기 위해 추가 */
   display: flex;
   justify-content: center;
@@ -34,23 +34,24 @@
 
 
 /* 프로필 이미지 */
-#imagePreview img {
+#Profile-image-Preview img {
   height: 100%;
   width: 100%;
   object-fit: cover;
   border-radius: 50%;
   cursor: pointer;
+  z-index: 0; /* 이미지 위에 표시되도록 설정 */
   filter: blur(2px); /* 밝기를 20% 올리고 2px 블러 처리 */
 }
 
 
 /* 이미지 위의 아이콘 */
-#imagePreview .material-symbols-rounded {
+#Profile-image-Preview .material-symbols-rounded {
   position: absolute; /* 아이콘을 절대 위치로 배치 */
   font-size: 3rem; /* 아이콘 크기 조정 */
   color: black; /* 아이콘 색상 (필요에 따라 조정) */
-  z-index: 1; /* 이미지 위에 표시되도록 설정 */
   cursor: pointer;
+  z-index: 1; /* 이미지 위에 표시되도록 설정 */
 }
 
 /* 사용자 정보 컨테이너 */

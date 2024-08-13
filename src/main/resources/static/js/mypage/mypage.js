@@ -9,7 +9,7 @@ const pet_sex = getElement("pet_sex"); // 반려동물 성별
 const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
-const imagePreview = getElement('imagePreview'); // 프로필 이미지 영역
+const ProfileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 const postCreate = getElement("post_create"); // 게시물 추가 + 기호
@@ -162,13 +162,11 @@ function initialize() {
   fetchMyPage("/api/mypage/info", "GET", handleProfileData); // 마이페이지 정보 불러오기
 
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림
-  imagePreview.addEventListener('click', event => {
+  ProfileImagePreview.addEventListener('click', event => {
     event.preventDefault();
     // 프로필 미 생성시 마이페이지에서 프로필 사진 클릭하여 사진 변경하지 못하도록 막기
     if (!hasProfile) {
-      alert("프로필 없어요! ");
       fetchMyPage("/api/mypage/profiles/reg", "POST", handleCreateProfile);
-
     }
     // 프로필이 존재할시 프로필 이미지 등록
     document.getElementById("images").click();
