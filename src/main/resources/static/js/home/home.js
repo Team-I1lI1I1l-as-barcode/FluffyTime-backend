@@ -47,9 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       postElement.innerHTML = `
         <div class="home-post-header">
-          <img src="${post.userImage
-      || 'https://via.placeholder.com/40'}" alt="${post.userName || 'User'}">
-          <strong>${post.userName || 'Anonymous'}</strong>
+          <img src="${post.profileImageUrl}" alt="${post.nickname}">
+          <strong>${post.nickname || 'Anonymous'}</strong>
         </div>
         <div class="home-post-content">
           <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
