@@ -4,46 +4,15 @@
   <meta charset="UTF-8">
   <title>Search with Tabs</title>
   <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="../../css/search/search.css">
+  <link rel="stylesheet" href="/css/post/createPost.css">
+  <link rel="stylesheet" href="/css/search/search.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/post/createPost.js}" defer></script>
 </head>
 <body>
-<div>
   <div class="container">
-    <aside class="sidebar">
-      <h2>FluffyTime</h2>
-      <ul>
-        <li>
-          <span class="material-symbols-rounded">home</span>
-          <a href="/">홈</a>
-        </li>
-        <li>
-          <span class="material-symbols-rounded">search</span>
-          <a href="/search">검색</a>
-        </li>
-        <li>
-          <span class="material-symbols-rounded">explore</span>
-          <a href="/explore">탐색 탭</a>
-        </li>
-        <li>
-          <span class="material-symbols-rounded">add_box</span>
-          <a href="javascript:void(0);" id="openModalBtn">만들기</a>
-        </li>
-        <li>
-          <span class="material-symbols-rounded">person</span>
-          <a href="#" id="mypageBtn">프로필</a>
-        </li>
-        <li>
-          <span class="material-symbols-rounded">favorite</span>
-          <a href="#">알림</a>
-        </li>
-      </ul>
-      <div class="more-menu">
-        <span class="material-symbols-rounded">menu</span>
-        <a href="#">더보기</a>
-      </div>
-    </aside>
+    <aside class="sidebar" th:include="common/sidebar :: sidebar"></aside>
     <main class="content-container">
       <div class="search-container">
 
@@ -63,10 +32,14 @@
         </div>
       </div>
     </main>
-
   </div>
-</div>
 
-<script th:src="@{/js/search/search.js}"></script>
+  <div th:include="common/createModal :: createModal" class="modal" id="postModal" style="display: none;"></div>
+<!-- 임시 저장 모달 -->
+  <div th:include="common/tempModal :: tempModal" class="modal" id="draftModal" style="display: none;"></div>
+
+
+  <script th:src="@{/js/search/search.js}"></script>
+  <script th:src="@{/js/mypage/mypageNav.js}"></script>
 </body>
 </html>
