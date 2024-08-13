@@ -13,12 +13,13 @@ const imagePreview = getElement('imagePreview'); // 프로필 이미지 영역
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 const postCreate = getElement("post_create"); // 게시물 추가 + 기호
+let hasProfile; // 프로필 존재 여부
 
 // api  요청  함수
-function fetchMyPage(url, func) {
+function fetchMyPage(url, method, func) {
   console.log("fetchMyPage 실행");
   fetch(url, {
-    method: "GET", // GET 요청
+    method: method, // GET 요청
     headers: {
       'Content-Type': 'application/json'
 
@@ -76,6 +77,7 @@ function handleProfileData(data) {
   // 성공적인 응답 시
   console.log("fetchMyPage 응답 Success");
   nickName.innerText = data.nickname;
+  hasProfile = data.profile;
   if (data.postsList === null) {
     posts_count.innerText = 0;
   } else {
@@ -87,7 +89,7 @@ function handleProfileData(data) {
   } else {
     pet_sex.innerText = data.petSex;
   }
-  if (data.petAge === null) {
+  if (data.petAge === null || data.petAge === 0) {
     pet_age.innerText = " ";
   } else {
     pet_age.innerText = data.petAge + "살";
@@ -97,7 +99,12 @@ function handleProfileData(data) {
     img.src = data.fileUrl;
   }
   intro.innerText = data.intro;
-  renderPosts(data.postsList);
+  // 해당 유저의 게시글이 있을시 렌더링 처리
+  if (data.postsList !== null) {
+    renderPosts(data.postsList);
+  } else { // 게시글이 없을시 관련 문구 출력
+    getElement('no_post').style.display = 'flex';
+  }
 }
 
 // 프로필 편집 페이지로 이동하는 함수
@@ -109,34 +116,38 @@ function myPageEdit(data) {
 function renderPosts(posts) {
   console.log("renderPosts 실행");
   const postListElement = document.querySelector('#post_list');
-  if (posts !== null) {
-    // 기존 자식 요소들을 하나씩 제거
-    while (postListElement.firstChild) {
-      postListElement.removeChild(postListElement.firstChild);
-    }
 
-    posts.forEach(post => {
-      const img = document.createElement('img'); // <img> 요소 생성
-      img.src = post.imageUrl; // 이미지 URL 설정
-      img.alt = post.postId;
+  posts.forEach(post => {
+    const img = document.createElement('img'); // <img> 요소 생성
+    img.src = post.imageUrl; // 이미지 URL 설정
+    img.alt = post.postId;
 
-      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
-      img.addEventListener('click', event => {
-        console.log(img.alt + "게시물 클릭 ");
-        window.location.href = `/posts/detail/${img.alt}`;
-      });
-
-      postListElement.appendChild(img); // <img>를 섹션에 추가
+    // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+    img.addEventListener('click', event => {
+      console.log(img.alt + "게시물 클릭 ");
+      window.location.href = `/posts/detail/${img.alt}`;
     });
-  }
+
+    postListElement.appendChild(img); // <img>를 섹션에 추가
+  });
 }
 
 // 프로필 편집 버튼 설정 함수
 function setupProfileEditButton() {
   console.log("setupProfileEditButton 실행");
   getElement("profile_edit_button").addEventListener('click', () => {
-    fetchMyPage("/api/mypage/info", myPageEdit); // 프로필 편집 url 설정
+    fetchMyPage("/api/mypage/info", "GET", myPageEdit); // 프로필 편집 url 설정
   });
+}
+
+// 프로필 등록 API 후처리 함수
+function handleCreateProfile(data) {
+  if (!data.result) {
+    console.log("프로필 등록이 실패되었습니다.");
+    window.location.href = "/";
+  } else {
+    console.log("프로필 등록되었습니다.");
+  }
 }
 
 // 초기화 함수
@@ -148,13 +159,20 @@ function initialize() {
 
   setupProfileEditButton();
 
-  fetchMyPage("/api/mypage/info", handleProfileData); // 마이페이지 정보 불러오기
+  fetchMyPage("/api/mypage/info", "GET", handleProfileData); // 마이페이지 정보 불러오기
 
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림
   imagePreview.addEventListener('click', event => {
     event.preventDefault();
-    // 프로필 파일이 없을 시 사진 파일 선택창 열기
+    // 프로필 미 생성시 마이페이지에서 프로필 사진 클릭하여 사진 변경하지 못하도록 막기
+    if (!hasProfile) {
+      alert("프로필 없어요! ");
+      fetchMyPage("/api/mypage/profiles/reg", "POST", handleCreateProfile);
+
+    }
+    // 프로필이 존재할시 프로필 이미지 등록
     document.getElementById("images").click();
+
   });
 
   // 초기화 - 프로필 사진 등록
@@ -175,11 +193,11 @@ function initialize() {
     }
   });
 
-  // 초기화 - 게시물이 없을때 + 버튼을 누를시 게시글 생성으로 페이지로 이동
-  postCreate.addEventListener('click', (event) => {
-    event.preventDefault();
-    window.location.href = "/posts/reg";
-  });
+  // // 초기화 - 게시물이 없을때 + 버튼을 누를시 게시글 생성으로 페이지로 이동
+  // postCreate.addEventListener('click', (event) => {
+  //   event.preventDefault();
+  //   window.location.href = "/posts/reg";
+  // });
 
 }
 
