@@ -78,7 +78,7 @@ async function populateGrid() {
 
       // 이미지 클릭 이벤트 리스너 추가
       img.addEventListener('click', () => {
-        openPopup(item.imageUrl);
+        window.location.href = `posts/detail/${item.postId}`;
       });
 
       gridContainer.appendChild(img);
