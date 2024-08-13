@@ -33,7 +33,7 @@
         <a href="javascript:void(0);" id="openModalBtn">만들기</a>
       </li>
       <li>
-        <span class="material-symbols-rounded" >person</span>
+        <span class="material-symbols-rounded">person</span>
         <a href="#" id="mypageBtn">프로필</a>
       </li>
       <li>
@@ -48,7 +48,7 @@
   </aside>
   <main class="content-container">
     <div class="content">
-      <div id="posts-container" class="posts-container">
+      <div id="posts-container" class="home-post-container">
         <div>
           <h1>게시글 목록</h1>
           <h1> 메인 홈페이지 입니다.</h1>
@@ -63,9 +63,9 @@
 <div class="modal" id="postModal" style="display: none;">
   <div class="modal-content">
     <button class="close-btn" onclick="closeModal()">&times;</button> <!-- 모달 닫기 버튼 -->
-    <div class="header">새 게시물 만들기</div>
-    <form id="postForm" class="content" enctype="multipart/form-data" method="post">
-      <div class="left-content" id="leftContent">
+    <div class="post-header">새 게시물 만들기</div>
+    <form id="postForm" class="post-content" enctype="multipart/form-data" method="post">
+      <div class="post-left-content" id="leftContent">
         <div id="imagePreviewContainer">
           <img id="imagePreview" src="/image/post/photo.jpg">
         </div>
@@ -82,7 +82,7 @@
                 onclick="nextImage(event)">&#10095;
         </button>
       </div>
-      <div class="right-content">
+      <div class="post-right-content">
         <div>
           <div class="profile">
             <img src="/image/post/profile-placeholder.jpg" alt="프로필 이미지"><!--수정-->
