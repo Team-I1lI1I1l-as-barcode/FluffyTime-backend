@@ -4,15 +4,29 @@ let postId;
 document.addEventListener('DOMContentLoaded', async () => {
   // 현재 URL의 경로를 가져옵니다.
   const path = window.location.pathname;
-
   // 경로를 '/'로 분리하여 배열로 만듭니다.
   const pathSegments = path.split('/');
-
   // 배열의 마지막 요소가 postId입니다.
   postId = pathSegments[pathSegments.length - 1];
-
   await fetchComments(postId); // 페이지 로드 시 postId 2번의 댓글 목록을 가져옴
 });
+
+// 프로필 이미지를 가져오는 함수
+async function fetchProfileImage(userId) {
+  try {
+    const response = await fetch('/api/mypage/profiles/info');
+    if (!response.ok) {
+      console.error('프로필 이미지 가져오기 실패!', response.status);
+      return '/image/profile/profile.png'; // 기본 이미지 URL
+    }
+    const profileData = await response.json();
+    console.log(profileData);
+    return profileData.fileUrl || '/image/profile/profile.png'; // 프로필 이미지가 없으면 기본 이미지 사용
+  } catch (error) {
+    console.error('프로필 이미지 가져오는 중 예외 발생!', error);
+    return '/image/profile/profile.png'; // 예외 발생 시 기본 이미지 사용
+  }
+}
 
 //댓글 조회
 async function fetchComments() {
@@ -24,15 +38,22 @@ async function fetchComments() {
   const comments = await response.json();
   const commentList = document.getElementById('comment-list');
   commentList.innerHTML = ''; // 기존 댓글 목록 초기화
-  comments.forEach(comment => {
-    // 프로필 이미지
-    const profileImg = document.createElement('img');
-    profileImg.src = comment.profileImgUrl || 'https://via.placeholder.com/40'; // 프로필 이미지 URL, 없으면 기본 이미지
-    profileImg.className = 'profile-img';
+  for (const comment of comments) {
 
     // 댓글 내용
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'comment';
+    commentDiv.dataset.id = comment.commentId;
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'comment-content';
+
+    // 프로필 이미지
+    const profileImgUrl = await fetchProfileImage(comment.userId); // 프로필 이미지 가져오기
+
+    const profileImg = document.createElement('img');
+    profileImg.src = profileImgUrl;
+    profileImg.className = 'profile-img';
 
     const nicknameSpan = document.createElement('span');
     nicknameSpan.className = 'nickname';
@@ -42,15 +63,14 @@ async function fetchComments() {
     contentSpan.className = 'text';
     contentSpan.textContent = comment.content;
 
-    const commentDiv = document.createElement('div');
-    commentDiv.className = 'comment';
-    commentDiv.dataset.id = comment.commentId;
-
     contentDiv.appendChild(nicknameSpan);
     contentDiv.appendChild(contentSpan);
 
-    commentDiv.appendChild(profileImg);
-    commentDiv.appendChild(contentDiv);
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'buttons';
 
     // 댓글 수정 및 삭제 버튼
     if (comment.author) {
@@ -62,27 +82,34 @@ async function fetchComments() {
       deleteButton.textContent = '삭제';
       deleteButton.onclick = () => deleteComment(comment.commentId);
 
-      commentDiv.appendChild(editButton);
-      commentDiv.appendChild(deleteButton);
+      const editDeleteDiv = document.createElement('div');
+      editDeleteDiv.className = 'edit-delete-buttons';
+      editDeleteDiv.appendChild(editButton);
+      editDeleteDiv.appendChild(deleteButton);
+
+      buttonContainer.appendChild(editDeleteDiv);
+      commentDiv.appendChild(editDeleteDiv);
     }
 
     // 답글 버튼
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글';
     replyButton.onclick = () => toggleReplyInput(comment.commentId);
+    buttonsDiv.appendChild(replyButton);
+    commentDiv.appendChild(replyButton);
+
+    commentDiv.appendChild(profileImg);
+    commentDiv.appendChild(contentDiv);
+    commentDiv.appendChild(buttonsDiv);
 
     // 답글 목록 추가
     const repliesDiv = document.createElement('div');
     repliesDiv.className = 'replies';
-
-    // 답글 조회 및 추가
     fetchReplies(comment.commentId, repliesDiv);
 
-    commentDiv.appendChild(replyButton);
     commentDiv.appendChild(repliesDiv);
-
     commentList.appendChild(commentDiv);
-  });
+  }
 }
 
 // 답글 입력 칸 토글
@@ -124,15 +151,17 @@ async function fetchReplies(commentId, replyDiv) {
     return;
   }
   const replies = await response.json();
-  replies.forEach(reply => {
+  for (const reply of replies) {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
     replyElement.dataset.id = reply.replyId;
     replyElement.textContent = `${reply.nickname} ${reply.content}`;
 
     // 프로필 이미지
+    const profileImgUrl = await fetchProfileImage(reply.userId); // 프로필 이미지 가져오기
+
     const profileImg = document.createElement('img');
-    profileImg.src = reply.profileImgUrl || 'https://via.placeholder.com/40'; // 프로필 이미지 URL, 없으면 기본 이미지
+    profileImg.src = profileImgUrl;
     profileImg.className = 'profile-img';
 
     if (reply.author) {
@@ -148,8 +177,9 @@ async function fetchReplies(commentId, replyDiv) {
       replyElement.appendChild(deleteButton);
     }
 
+    replyDiv.appendChild(profileImg);
     replyDiv.appendChild(replyElement);
-  });
+  }
 }
 
 // 답글 등록
