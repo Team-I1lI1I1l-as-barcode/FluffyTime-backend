@@ -147,10 +147,10 @@ public class PostService {
                 .orElseThrow(NotFoundUser::new);
 
         } catch (IllegalArgumentException e) {
-            log.error("Invalid token: {}", accessToken, e);
+            log.error("유효하지 않은 토큰입니다", accessToken, e);
             throw new BadCredentialsException("유효하지 않은 토큰입니다.", e);
         } catch (Exception e) {
-            log.error("An error occurred while processing the token: {}", accessToken, e);
+            log.error("토큰 처리 중 오류가 발생했습니다. : {}", accessToken, e);
             throw new BadCredentialsException("토큰 처리 중 오류가 발생했습니다.", e);
         }
     }

@@ -3,7 +3,7 @@ body {
   font-family: Arial, sans-serif;
 }
 
-.container {
+.search-container {
   width: 80%;
   margin: auto;
   padding-top: 20px;
@@ -16,9 +16,10 @@ body {
 }
 
 .search-bar input[type="text"] {
-  width: 70%;
+  width: 100%;
   padding: 10px;
   font-size: 16px;
+  border-radius: 5px;
 }
 
 .tabs {
@@ -30,15 +31,17 @@ body {
 .tabs button {
   flex: 1;
   padding: 10px;
-  font-size: 16px;
+  font-size: 10px;
+  text-align: center;
   cursor: pointer;
-  border: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   background-color: #f9f9f9;
 }
 
 .tabs button.active {
-  background-color: #007BFF;
-  color: white;
+  background-color: #ccc;
+  color: black;
+  border-bottom: 2px solid black;
 }
 
 .results {

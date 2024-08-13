@@ -55,7 +55,12 @@ public class SearchRestController {
                 Map<String, String> item = new HashMap<>();
                 item.put("nickName", profile.getUser().getNickname());
                 item.put("petName", profile.getPetName());
-                item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 프로필사진으로 연결
+                String imageUrl = "https://via.placeholder.com/140";
+                if (profile.getProfileImages() != null) {
+                    imageUrl = profile.getProfileImages().getFilePath();
+                }
+                item.put("imageUrl", imageUrl);
+
                 list.add(item);
             }
 
@@ -129,7 +134,12 @@ public class SearchRestController {
                 } else {
                     item.put("petName", "없음");
                 }
-                item.put("imageUrl", "https://via.placeholder.com/150");//TODO 실제 프로필사진으로 연결
+
+                String imageUrl = "https://via.placeholder.com/130";
+                if (profile != null && profile.getProfileImages() != null) {
+                    imageUrl = profile.getProfileImages().getFilePath();
+                }
+                item.put("imageUrl", imageUrl);
                 list.add(item);
             }
 
