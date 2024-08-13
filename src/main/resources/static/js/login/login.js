@@ -1,6 +1,10 @@
 const loginBtnElement = document.getElementById('loginBtn');
+const emailErrorElement = document.querySelector('.email-error');
+const passwordErrorElement = document.querySelector('.password-error');
 
 loginBtnElement.addEventListener('click', loginProcess);
+
+const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
 
 async function loginProcess(event) {
   event.preventDefault();
@@ -8,6 +12,32 @@ async function loginProcess(event) {
 
   const email = formElement.email.value;
   const password = formElement.password.value;
+
+  let errorCount = 0;
+
+  // 이메일 형식 검사
+  if (!emailPattern.test(email)) {
+    emailErrorElement.innerText = "올바른 이메일 형식이 아닙니다.";
+    emailErrorElement.classList.remove('hidden');
+    errorCount++;
+  } else {
+    emailErrorElement.innerText = "";
+    emailErrorElement.classList.add('hidden');
+  }
+
+  // passsword 빈값 검사
+  if (!password) {
+    passwordErrorElement.innerText = "비밀번호를 입력해주세요.";
+    passwordErrorElement.classList.remove('hidden');
+    errorCount++;
+  } else {
+    passwordErrorElement.innerText = "";
+    passwordErrorElement.classList.add('hidden');
+  }
+
+  if(errorCount>0) {
+    return;
+  }
 
   if (!formElement.checkValidity()) {
     formElement.reportValidity(); // 브라우저의 기본 검증 메시지 표시
@@ -29,13 +59,21 @@ async function loginProcess(event) {
           },
           body: JSON.stringify(jsonData)
         });
-    const data = await response.json();
+
+    const res = await response.json();
 
     if (!response.ok) {
+      if(res.code === "JWTE-007") {
+        emailErrorElement.innerText = "아이디, 비밀번호를 확인해주세요."
+        emailErrorElement.classList.remove('hidden')
+        return
+      }
       alert("로그인 에러")
-      throw new Error(data.message || "error");
+      return;
     }
-    window.location.href = '/'; // 원하는 URL로 변경
+    console.log("로그인 성공")
+    window.location.href = '/';
+
   } catch (error) {
     console.error(error);
   }

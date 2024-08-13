@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>Search with Tabs</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="../../css/search/search.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+</head>
+<body>
+<div>
+  <div class="container">
+    <aside class="sidebar">
+      <h2>FluffyTime</h2>
+      <ul>
+        <li>
+          <span class="material-symbols-rounded">home</span>
+          <a href="/">홈</a>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">search</span>
+          <a href="/search">검색</a>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">explore</span>
+          <a href="/explore">탐색 탭</a>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">add_box</span>
+          <a href="javascript:void(0);" id="openModalBtn">만들기</a>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">person</span>
+          <a href="#" id="mypageBtn">프로필</a>
+        </li>
+        <li>
+          <span class="material-symbols-rounded">favorite</span>
+          <a href="#">알림</a>
+        </li>
+      </ul>
+      <div class="more-menu">
+        <span class="material-symbols-rounded">menu</span>
+        <a href="#">더보기</a>
+      </div>
+    </aside>
+    <main class="content-container">
+      <div class="search-container">
+
+        <div class="search-bar">
+          <input type="text" id="search-input" placeholder="검색">
+          <!--    <button onclick="populateList()">Search</button>-->
+        </div>
+
+        <div class="tabs">
+          <button id="tab-name" class="active" onclick="selectTab('name')">이름</button>
+          <button id="tab-tag" onclick="selectTab('tag')">태그</button>
+          <button id="tab-account" onclick="selectTab('account')">계정</button>
+        </div>
+
+        <div class="results">
+          <ul id="results-list"></ul>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<script th:src="@{/js/search/search.js}"></script>
+</body>
+</html>

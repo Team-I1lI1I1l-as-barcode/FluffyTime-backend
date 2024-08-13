@@ -1,14 +1,3 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f4f4;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
-
 .modal, .draft-modal {
   display: none;
   position: fixed;
@@ -33,7 +22,7 @@ body {
   overflow: hidden;
 }
 
-.header {
+.post-header {
   text-align: center;
   padding: 15px;
   border-bottom: 1px solid #ccc;
@@ -41,34 +30,31 @@ body {
   font-weight: bold;
 }
 
-.content {
+.post-content {
   display: flex;
   flex: 1;
 }
 
-.left-content {
+.post-left-content {
   flex: 3.5;
-  border-right: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 0; /* 패딩 제거 */
   position: relative;
+  height: 100%; /* 높이를 100%로 설정 */
 }
 
-.left-content img {
-  max-width: 100%;
-  max-height: 100%;
-  margin-bottom: 20px;
+.post-left-content img {
+  width: 100%; /* 너비를 100%로 설정 */
+  height: 100%; /* 높이를 100%로 설정 */
+  object-fit: cover; /* 이미지를 컨테이너에 꽉 차게 */
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  object-fit: cover; /* 이미지를 꽉 차게 */
 }
 
-.left-content.fullscreen img {
+.post-left-content.fullscreen img {
   position: absolute;
   top: 0;
   left: 0;
@@ -77,15 +63,15 @@ body {
   object-fit: cover;
 }
 
-.left-content input {
+.post-left-content input {
   display: none;
 }
 
-.left-content label {
+.post-left-content label {
   cursor: pointer;
 }
 
-.left-content .nav-button {
+.post-left-content .nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -103,11 +89,11 @@ body {
   align-items: center;
 }
 
-.left-content .prev {
+.post-left-content .prev {
   left: 10px;
 }
 
-.left-content .next {
+.post-left-content .next {
   right: 10px;
 }
 
@@ -125,12 +111,14 @@ body {
   border-radius: 4px;
 }
 
-.right-content {
+.post-right-content {
   flex: 1.5;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid #ccc;
+  border-left: 1px solid #ccc; /* 왼쪽 테두리 선 */
+  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
+  box-sizing: border-box; /* padding과 border를 포함한 높이 설정 */
 }
 
 .profile {
@@ -146,7 +134,7 @@ body {
   margin-right: 10px;
 }
 
-.right-content textarea {
+.post-right-content textarea {
   resize: none;
   width: calc(100% - 20px);
   margin-bottom: 10px;
@@ -155,7 +143,7 @@ body {
   border: none;
 }
 
-.right-content input[type="text"] {
+.post-right-content input[type="text"] {
   width: calc(100% - 20px);
   margin-bottom: 10px;
   padding: 10px;
@@ -339,4 +327,29 @@ hr {
 .post-date {
   margin-left: 10px;
   white-space: nowrap;
+}
+
+
+.tag-list {
+  margin-top: 10px;
+}
+
+.tag {
+  display: inline-block;
+  background-color: #e0f7fa;
+  color: #007bff;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tag:hover {
+  background-color: #b2ebf2;
+}
+
+.tag .remove-tag {
+  margin-left: 8px;
+  cursor: pointer;
 }

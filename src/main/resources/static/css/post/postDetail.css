@@ -107,7 +107,8 @@ body {
 .content {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0 1 auto;
+  display: block;
   padding: 20px;
 }
 
