@@ -98,3 +98,14 @@ input:focus {
   border-color: var(--primary-color);
 }
 
+.error {
+  margin: 5px 0;
+  text-align: start;
+  width: 100%;
+  font-size: 12px;
+  color: red;
+}
+
+.hidden {
+  display: none;
+}

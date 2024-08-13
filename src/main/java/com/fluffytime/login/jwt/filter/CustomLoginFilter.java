@@ -93,7 +93,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
-        response.sendRedirect("/");
 
         JwtResponseProvider.setResponse(response, JwtErrorCode.SUCCESS);
         log.info("로그인에 성공하였습니다.");
