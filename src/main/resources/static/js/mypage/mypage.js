@@ -169,7 +169,7 @@ function initialize() {
       fetchMyPage("/api/mypage/profiles/reg", "POST", handleCreateProfile);
     }
     // 프로필이 존재할시 프로필 이미지 등록
-    document.getElementById("images").click();
+    document.getElementById("mypage-images").click();
 
   });
 
