@@ -87,8 +87,13 @@ public class UserPageService {
             // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
                 // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
-                .map(post -> new PostDto(post.getPostId(),
-                    post.getPostImages().getFirst().getFilepath()))
+                .map(post -> {
+                    String thumbnailPath = post.getPostImages().isEmpty() ?
+                        null : // 이미지가 없으면 null 사용
+                        post.getPostImages().get(0).getFilepath();
+
+                    return new PostDto(post.getPostId(), thumbnailPath);
+                })
                 .collect(Collectors.toList());
 
             // 게시물 리스트가 비어있을때

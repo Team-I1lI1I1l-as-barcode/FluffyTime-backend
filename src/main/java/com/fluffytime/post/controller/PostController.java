@@ -16,6 +16,6 @@ public class PostController {
     public String postDetailView(@PathVariable(name = "id") Long id, Model model) {
         model.addAttribute("postId", id); // 모델에 게시물 ID 추가
 
-        return "/html/post/postDetail.html";
+        return "post/postDetail";
     }
 }

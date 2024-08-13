@@ -14,9 +14,9 @@ public class MyPageController {
 
     private final MyPageService myPageService;
 
-    @GetMapping("/")
+    @GetMapping()
     public String home() {
-        return "/html/main.html";
+        return "main";
     }
 
     // 마이페이지
@@ -27,7 +27,7 @@ public class MyPageController {
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);
 
         if (isAuthorized) {
-            return "/html/mypage/mypage.html";
+            return "mypage/mypage";
         } else {
             return "redirect:/mypage/" + user.getNickname();
         }
@@ -41,7 +41,7 @@ public class MyPageController {
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);
 
         if (isAuthorized) {
-            return "/html/mypage/profiles/profile.html";
+            return "mypage/profiles/profile";
         } else {
             return "redirect:/mypage/profile/edit/" + user.getNickname();
         }

@@ -10,6 +10,6 @@ public class ExploreController {
 
     @GetMapping("/explore")
     public String explorePage() {
-        return "/html/explore/explore.html";
+        return "explore/explore";
     }
 }

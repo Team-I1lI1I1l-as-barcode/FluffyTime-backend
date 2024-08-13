@@ -37,24 +37,21 @@
 
 .post-left-content {
   flex: 3.5;
-  border-right: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 0; /* 패딩 제거 */
   position: relative;
+  height: 100%; /* 높이를 100%로 설정 */
 }
 
 .post-left-content img {
-  max-width: 100%;
-  max-height: 100%;
-  margin-bottom: 20px;
+  width: 100%; /* 너비를 100%로 설정 */
+  height: 100%; /* 높이를 100%로 설정 */
+  object-fit: cover; /* 이미지를 컨테이너에 꽉 차게 */
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  object-fit: cover; /* 이미지를 꽉 차게 */
 }
 
 .post-left-content.fullscreen img {
@@ -119,7 +116,9 @@
   padding: 20px;
   display: flex;
   flex-direction: column;
-  border-left: 1px solid #ccc;
+  border-left: 1px solid #ccc; /* 왼쪽 테두리 선 */
+  height: 100%; /* 높이를 부모 컨테이너에 맞추도록 수정 */
+  box-sizing: border-box; /* padding과 border를 포함한 높이 설정 */
 }
 
 .profile {

@@ -14,59 +14,39 @@ const nextButton = document.getElementById('nextButton');
 const charCountElement = document.getElementById('charCount'); // 글자 수 카운터
 const contentElement = document.getElementById('content');
 const completeContainer = document.getElementById('complete-container');
-const tagsInputElement = document.getElementById('tagsInput');
-const tagListElement = document.getElementById('tagList');
+const imgElement = document.getElementById('profileImage');
+const nicknameElement = document.getElementById('nicknameDisplay');
 
-// // 태그 입력 필드에서 엔터를 눌렀을 때 태그 추가
-// tagsInputElement.addEventListener('keypress', function (event) {
-//   if (event.key === 'Enter') {
-//     event.preventDefault(); // 기본 엔터 동작(줄바꿈) 방지
-//     addTag(tagsInputElement.value.trim()); // 태그 추가 함수 호출 (공백 제거)
-//     tagsInputElement.value = '';
-//   }
-// });
+//프로필 fileUrl & nickname 가져
+fetch('/api/mypage/profiles/info', {
+  method: 'GET',
+  credentials: 'include', // 쿠키를 포함해서 요청 보냄
+})
+.then(response => response.json())
+.then(data => {
+  const profileImageUrl = data.fileUrl;
+  const nickname = data.nickname;
 
-// // 태그 추가 함수
-// function addTag(tag) {
-//   if (tag.length > 0 && tag.startsWith('#')) {
-//     if (tagsArray.length >= 10) {
-//       alert('최대 10개의 태그만 추가할 수 있습니다.');
-//       return;
-//     }
-//     if (tagsArray.includes(tag)) { // 이미 동일한 태그가 존재하는 경우
-//       alert('이미 추가된 태그입니다.');
-//       return;
-//     }
-//     tagsArray.push(tag); // 태그 배열에 추가
-//     updateTagList(); // 태그 리스트 업데이트
-//   } else {
-//     alert('태그는 #으로 시작해야 합니다.');
-//   }
-// }
+  if (profileImageUrl) {
+    // 프로필 이미지가 있는 경우
+    imgElement.src = profileImageUrl;
+  } else {
+    // 프로필 이미지가 없는 경우 기본 이미지로 설정
+    imgElement.src = '/image/profile/profile.png';
+  }
 
-// // 태그 리스트를 화면에 업데이트하는 함수
-// function updateTagList() {
-//   tagListElement.innerHTML = ''; // 기존 태그 리스트를 초기화
-//   tagsArray.forEach((tag, index) => { // 모든 태그에 대해
-//     const tagElement = document.createElement('span'); // 새로운 태그 요소 생성
-//     tagElement.classList.add('tag'); // 태그 클래스 추가
-//     tagElement.innerText = tag; // 태그 텍스트 설정
-
-//     const removeTagElement = document.createElement('span'); // 제거 버튼 요소 생성
-//     removeTagElement.innerText = '×'; // 제거 버튼 텍스트 설정
-//     removeTagElement.classList.add('remove-tag'); // 제거 버튼 클래스 추가
-//     removeTagElement.onclick = () => removeTag(index); // 제거 버튼 클릭 시 해당 태그 삭제 함수 호출
-
-//     tagElement.appendChild(removeTagElement); // 태그 요소에 제거 버튼 추가
-//     tagListElement.appendChild(tagElement); // 태그 리스트에 태그 요소 추가
-//   });
-// }
-
-// // 태그 제거 함수
-// function removeTag(index) {
-//   tagsArray.splice(index, 1); // 해당 인덱스의 태그를 배열에서 제거
-//   updateTagList(); // 태그 리스트 업데이트
-// }
+  if (nickname) {
+    nicknameElement.textContent = nickname;
+  } else {
+    nicknameElement.textContent = '닉네임 없음';
+  }
+})
+.catch(error => {
+  console.error('Error:', error);
+  // 에러 발생 시 기본 이미지 설정 및 닉네임 오류 표시
+  document.getElementById('profileImage').src = '/image/profile/profile.png';
+  document.getElementById('nicknameDisplay').textContent = '오류 발생';
+});
 
 // 게시물 작성 모달을 여는 함수
 function openModal() {
@@ -193,16 +173,12 @@ async function submitPostData(url, postRequest, images) {
 
 // 게시물 등록 완료 화면 표시 함수
 function showComplete() {
-  console.log('게시물 등록 완료 화면 표시');
-  document.querySelector('.content').style.display = 'none';
   completeContainer.style.display = 'block';
 
   const completeImage = completeContainer.querySelector('img');
   completeImage.onload = function () {
-    console.log('Image successfully loaded');
   };
   completeImage.onerror = function () {
-    console.log('Error loading image');
   };
 
   // 2초 후에 페이지 새로고침
@@ -259,7 +235,6 @@ async function submitPost(event) {
 
     setTimeout(() => {
       completeContainer.style.display = 'none';
-      // window.location.href = `/posts/detail/${postId}`;
       closeModal(); // 모달 창 닫기
       resetForm(); // 폼 초기화
     }, 2000);
@@ -303,7 +278,6 @@ async function loadDraft() {
 
     const contentType = response.headers.get('content-type');
     if (contentType && contentType.includes('text/html')) {
-      console.error('세션이 만료되었거나 인증이 필요합니다.');
       window.location.href = '/login'; // 세션 만료 시 로그인 페이지로 리디렉션
       return;
     }
@@ -403,7 +377,6 @@ async function deleteTempPost(postId, event) {
       postElement.remove();
     } else {
       const errorData = await response.json();
-      console.error('임시 저장 글 삭제 실패:', errorData.message || postId);
       alert('임시 저장 글 삭제에 실패했습니다.');
     }
   } catch (error) {
@@ -431,3 +404,8 @@ function nextImage(event) {
     displayImages();
   }
 }
+
+// "만들기" 버튼에 이벤트 리스너 추가
+document.getElementById("openModalBtn").addEventListener('click', function () {
+  openModal();
+});

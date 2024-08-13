@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
   <title>Explore</title>
@@ -8,7 +8,6 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 </head>
 <body>
 <div>
@@ -67,23 +66,6 @@
 
 
 </div>
-
-<script>
-  // // 모달 열기 및 닫기 함수 정의
-  // function openModal() {
-  //   document.getElementById("postModal").style.display = "flex";
-  // }
-  //
-  // function closeModal() {
-  //   document.getElementById("postModal").style.display = "none";
-  // }
-  //
-  // // "만들기" 버튼에 이벤트 리스너 추가
-  // document.getElementById("openModalBtn").addEventListener('click', function () {
-  //   openModal();
-  // });
-
-</script>
-<script src="../../js/explore/explore.js"></script>
+<script th:src="@{/js/explore/explore.js}"></script>
 </body>
 </html>
