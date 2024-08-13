@@ -93,6 +93,8 @@ body {
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
+  overflow-x: hidden; /* 가로 스크롤 숨기기 */
+  overflow-y: auto; /* 세로 스크롤은 자동으로 표시되도록 */
 }
 
 .header {
