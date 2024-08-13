@@ -14,8 +14,8 @@ const more = getElement('more'); // ``` 버튼
 // 모달 관련 요소
 const blockFollow = getElement('block_follow'); // 유저 차단
 // const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단 해제
-const modal = document.getElementById('modal');
-const overlay = document.getElementById('modal-overlay');
+const userPageModal = document.getElementById('userPage-modal');
+const userPageOverlay = document.getElementById('userPage-modal-overlay');
 const closeModalButtons = document.querySelectorAll('#block_cancel');
 
 // const follower_count = getElement("follower_count"); // 팔로워 수
@@ -115,15 +115,15 @@ function initialize() {
   more.addEventListener('click', event => {
     event.preventDefault();
     // 모달 창 열기
-    overlay.style.display = 'block';
-    modal.classList.add('show');
+    userPageOverlay.style.display = 'block';
+    userPageModal.classList.add('show');
   });
 // 모달 닫기
   closeModalButtons.forEach(button => {
     button.addEventListener('click', (event) => {
       event.preventDefault();
-      modal.classList.remove('show');
-      overlay.style.display = 'none';
+      userPageModal.classList.remove('show');
+      userPageOverlay.style.display = 'none';
     });
   });
 }

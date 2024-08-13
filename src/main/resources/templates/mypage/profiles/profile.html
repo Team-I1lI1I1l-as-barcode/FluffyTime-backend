@@ -44,11 +44,11 @@
 
     <form id="profile_edit_form" method=post>
       <!-- 모달 오버레이 -->
-      <div id="modal-overlay" class="modal-overlay"></div>
+      <div id="profile-modal-overlay" class="profile-modal-overlay"></div>
 
       <!-- 모달 창 -->
-      <div id="modal" class="modal">
-        <div class="modal-content">
+      <div id="profile-modal" class="profile-modal">
+        <div class="profile-modal-content">
           <p id="modal_title">프로필 사진 바꾸기</p>
           <a id="profile_image_upload">사진 업로드</a>
           <a id="profile_image_delete">현재 사진 삭제</a>
@@ -110,9 +110,11 @@
   </div>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal" style="display: none;"></div>
+<div th:include="common/createModal :: createModal" class="modal" id="postModal"
+     style="display: none;"></div>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal" style="display: none;"></div>
+<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
+     style="display: none;"></div>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
 </body>
