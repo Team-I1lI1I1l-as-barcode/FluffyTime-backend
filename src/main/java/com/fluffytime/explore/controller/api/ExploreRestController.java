@@ -2,6 +2,7 @@ package com.fluffytime.explore.controller.api;
 
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
+import com.fluffytime.domain.Profile;
 import com.fluffytime.explore.service.ExploreService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ public class ExploreRestController {
             Map<String, String> item = new HashMap<>();
             item.put("postId", post.getPostId().toString());
             item.put("userId", post.getUser().getUserId().toString());
+            item.put("nickname", post.getUser().getNickname());
             item.put("content", post.getContent());
             item.put("createdAt", post.getCreatedAt().toString());
             //가장 첫번째 사진 url 불러오기
@@ -70,6 +72,16 @@ public class ExploreRestController {
                 .orElse(null);
 
             item.put("imageUrl", imageUrl);
+
+            String profileImageUrl = "https://via.placeholder.com/40";
+//            위에 프로필 사진 없는 경우 기본 이미지 넣기
+
+            Profile profile = post.getUser().getProfile();
+            if (profile != null && profile.getProfileImages() != null) {
+                profileImageUrl = profile.getProfileImages().getFilePath();
+            }
+
+            item.put("profileImageUrl", profileImageUrl);
 
             list.add(item);
         }

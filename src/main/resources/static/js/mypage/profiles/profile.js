@@ -19,8 +19,8 @@ const img = getElement('img'); // 이미지 미리보기
 // 모달 관련 요소
 const profileImageUpload = getElement('profile_image_upload'); // 사진 업로드 a태그
 const profileImageDelete = getElement('profile_image_delete'); // 현재 사진 삭제 a태그
-const modal = document.getElementById('modal');
-const overlay = document.getElementById('modal-overlay');
+const profileModal = document.getElementById('profile-modal');
+const profileOverlay = document.getElementById('profile-modal-overlay');
 const closeModalButtons = document.querySelectorAll('#profile_image_cancel');
 
 let originalIntroValue = ""; // intro 필드의 원래 값
@@ -257,7 +257,7 @@ function createRequestDto(nickname) {
 function withdrawAccount(data) {
   if (data.result === true) {
     alert("회원 탈퇴가 완료되었습니다.");
-    window.location.href = "/";
+    window.location.href = "/login";
   } else {
     alert("회원 탈퇴가 실패되었습니다. 다시 시도해주세요.");
     window.location.href = "/";
@@ -326,15 +326,15 @@ function initialize() {
     event.preventDefault();
     const img = getElement('img');
     // 모달 창 열기
-    modal.classList.add('show');
-    overlay.style.display = 'block';
+    profileModal.classList.add('show');
+    profileOverlay.style.display = 'block';
   });
 // 모달 닫기
   closeModalButtons.forEach(button => {
     button.addEventListener('click', (event) => {
       event.preventDefault();
-      modal.classList.remove('show');
-      overlay.style.display = 'none';
+      profileModal.classList.remove('show');
+      profileOverlay.style.display = 'none';
     });
   });
   // 초기화 - 프로필 사진 등록

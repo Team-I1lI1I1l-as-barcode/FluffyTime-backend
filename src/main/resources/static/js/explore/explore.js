@@ -135,28 +135,6 @@ function hideSpinner() {
 
 }
 
-// 팝업을 열고 이미지를 표시하는 함수
-function openPopup(imageUrl) {
-  const popup = document.getElementById('popup');
-  const popupImage = document.getElementById('popup-image');
-  popupImage.src = imageUrl;
-  popup.style.display = 'flex';
-}
-
-// 팝업을 닫는 함수
-function closePopup() {
-  const popup = document.getElementById('popup');
-  popup.style.display = 'none';
-}
-
-// 팝업 닫기 버튼에 이벤트 리스너 추가
-document.getElementById('popup-close').addEventListener('click', closePopup);
-document.getElementById('popup').addEventListener('click', (event) => {
-  if (event.target.id === 'popup') {
-    closePopup();
-  }
-});
-
 // 사이드바 마이페이지 코드
 document.getElementById("mypageBtn").addEventListener('click', event => {
   //window.location.href = "/mypage/test";
