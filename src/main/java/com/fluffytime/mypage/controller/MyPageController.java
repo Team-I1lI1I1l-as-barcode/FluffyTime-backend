@@ -8,7 +8,7 @@ public class MyPageController {
 
     @GetMapping("/")
     public String home() {
-        return "/html/index.html";
+        return "/html/main.html";
     }
 
     // 마이페이지

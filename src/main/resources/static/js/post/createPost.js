@@ -170,7 +170,7 @@ async function submitPost(event) {
     document.getElementById('complete-container').style.display = 'block';
     setTimeout(() => {
       document.getElementById('complete-container').style.display = 'none';
-      window.location.href = `/html/post/postDetail.html?postId=${postId}`; // 게시물 상세 페이지로 이동
+      window.location.href = `../../../templates/post/postDetail.html?postId=${postId}`; // 게시물 상세 페이지로 이동
     }, 3000); // 3초 후에 완료 메시지를 숨기고 상세 페이지로 이동
   }).catch(error => {
     alert(error.message);
