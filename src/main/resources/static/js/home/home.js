@@ -43,19 +43,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     posts.forEach(post => {
       const postElement = document.createElement('div');
-      postElement.classList.add('post');
+      postElement.classList.add('home-post');
 
       postElement.innerHTML = `
-        <div class="post-header">
+        <div class="home-post-header">
           <img src="${post.userImage
       || 'https://via.placeholder.com/40'}" alt="${post.userName || 'User'}">
           <strong>${post.userName || 'Anonymous'}</strong>
         </div>
-        <div class="post-content">
+        <div class="home-post-content">
           <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
           <p>${post.content || ''}</p>
         </div>
-        <div class="post-footer">
+        <div class="home-post-footer">
           ${post.comments && Array.isArray(post.comments)
           ? post.comments.map(comment => `<p>${comment}</p>`).join('')
           : '<p>No comments available.</p>'}
