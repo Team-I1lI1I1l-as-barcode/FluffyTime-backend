@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
   <title>가입하기</title>
@@ -38,6 +38,6 @@
     <button type="submit" id="joinBtn" class="btn submit">회원가입</button>
   </form>
 </div>
-<script src="/js/join/join.js"></script>
+<script th:src="@{/js/join/join.js}"></script>
 </body>
 </html>

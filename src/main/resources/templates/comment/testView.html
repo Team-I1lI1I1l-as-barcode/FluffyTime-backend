@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
   <title>댓글 테스트용 화면</title>
@@ -15,6 +15,6 @@
   <div id="status-message"></div>
   <div id="comment-list"></div>
 </div>
-<script src="/js/comment/comment.js"></script>
+<script th:src="@{/js/comment/comment.js}"></script>
 </body>
 </html>

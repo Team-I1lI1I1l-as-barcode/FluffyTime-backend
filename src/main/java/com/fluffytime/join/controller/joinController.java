@@ -12,26 +12,26 @@ public class joinController {
 
     @GetMapping
     public String joinPage() {
-        return "/html/join/join.html";
+        return "join/join";
     }
 
     @GetMapping("/email-certificate/{email}")
     public String emailCertificatePage() {
-        return "/html/join/EmailCertificationStay.html";
+        return "join/EmailCertificationStay";
     }
 
     @GetMapping("/email-certificate/result/{email}")
     public String emailCertificateResultPage() {
-        return "/html/join/EmailCertificationResult.html";
+        return "join/EmailCertificationResult";
     }
 
     @GetMapping("/success")
     public String joinSuccessPage() {
-        return "/html/join/joinSuccess.html";
+        return "join/joinSuccess";
     }
 
     @GetMapping("/fail")
     public String joinFailPage() {
-        return "/html/join/joinFail.html";
+        return "join/joinFail";
     }
 }

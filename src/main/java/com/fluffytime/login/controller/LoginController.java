@@ -10,12 +10,12 @@ public class LoginController {
 
     @GetMapping("/login")
     public String loginPage() {
-        return "/html/login/login.html";
+        return "login/login";
     }
 
     @GetMapping("/admin")
     public String adminPage() {
-        return "/html/admin/admin.html";
+        return "admin/admin";
     }
 
 }

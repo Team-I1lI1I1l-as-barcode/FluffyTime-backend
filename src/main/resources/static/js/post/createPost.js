@@ -431,3 +431,8 @@ function nextImage(event) {
     displayImages();
   }
 }
+
+// "만들기" 버튼에 이벤트 리스너 추가
+document.getElementById("openModalBtn").addEventListener('click', function () {
+  openModal();
+});

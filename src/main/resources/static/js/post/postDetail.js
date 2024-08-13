@@ -222,6 +222,7 @@ function openModal() {
 function closeModal() {
   console.log('모달 닫기');
   document.getElementById('postModal').style.display = 'none';
+  window.history.back();
 }
 
 // 드롭다운 메뉴 토글
