@@ -338,26 +338,27 @@ function initialize() {
     });
   });
   // 초기화 - 프로필 사진 등록
-  document.getElementById("images").addEventListener('change', event => {
-    event.preventDefault();
-    // 기본 이미지일 경우 이미지 등록 api 요청
-    if (img.src === "../../../image/profile/profile.png") {
-      console.log("프로필 사진 등록 api 요청")
-      fetchProfileImage('POST',
-          `/api/mypage/profiles/images/reg?nickname=${encodeURIComponent(
-              nickname)}`);
-    } else { // 아닐 경우 이미지 업데이트 api 요청
-      console.log("프로필 사진 업데이트 api 요청")
-      fetchProfileImage('PATCH',
-          `/api/mypage/profiles/images/edit?nickname=${encodeURIComponent(
-              nickname)}`);
-    }
-  });
+  document.getElementById("profile-images").addEventListener('change',
+      event => {
+        event.preventDefault();
+        // 기본 이미지일 경우 이미지 등록 api 요청
+        if (img.src === "../../../image/profile/profile.png") {
+          console.log("프로필 사진 등록 api 요청")
+          fetchProfileImage('POST',
+              `/api/mypage/profiles/images/reg?nickname=${encodeURIComponent(
+                  nickname)}`);
+        } else { // 아닐 경우 이미지 업데이트 api 요청
+          console.log("프로필 사진 업데이트 api 요청")
+          fetchProfileImage('PATCH',
+              `/api/mypage/profiles/images/edit?nickname=${encodeURIComponent(
+                  nickname)}`);
+        }
+      });
 
   // 초기화 - 프로필 사진 업데이트
   profileImageUpload.addEventListener('click', (event) => {
     event.preventDefault();
-    document.getElementById("images").click();
+    document.getElementById("profile-images").click();
   });
   // 초기화 - 프로필 사진 삭제
   profileImageDelete.addEventListener('click', (event) => {
