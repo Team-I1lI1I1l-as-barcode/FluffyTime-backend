@@ -64,43 +64,43 @@ function handleUserData(data) {
   } else {
     pet_sex.innerText = data.petSex;
   }
-  if (data.petAge === 0) {
+  if (data.petAge === null || data.petAge === 0) {
     pet_age.innerText = " ";
   } else {
-    pet_age.innerText = data.petAge;
+    pet_age.innerText = data.petAge + "살";
   }
   if (data.fileUrl !== null) {
     console.log("등록된 프로필 사진을 불러옵니다.");
     img.src = data.fileUrl;
   }
   intro.innerText = data.intro;
-  renderPosts(data.postsList);
+
+  // 해당 유저의 게시글이 있을시 렌더링 처리
+  if (data.postsList !== null) {
+    renderPosts(data.postsList);
+  } else { // 게시글이 없을시 관련 문구 출력
+    getElement('no_post').style.display = 'flex';
+  }
 }
 
 // 게시물 목록을 렌더링하는 함수
 function renderPosts(posts) {
   console.log("renderPosts 실행");
   const postListElement = document.querySelector('#post_list');
-  if (posts !== null) {
-    // 기존 자식 요소들을 하나씩 제거
-    while (postListElement.firstChild) {
-      postListElement.removeChild(postListElement.firstChild);
-    }
 
-    posts.forEach(post => {
-      const img = document.createElement('img'); // <img> 요소 생성
-      img.src = post.imageUrl; // 이미지 URL 설정
-      img.alt = post.postId;
+  posts.forEach(post => {
+    const img = document.createElement('img'); // <img> 요소 생성
+    img.src = post.imageUrl; // 이미지 URL 설정
+    img.alt = post.postId;
 
-      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
-      img.addEventListener('click', event => {
-        console.log(img.alt + "게시물 클릭 ");
-        window.location.href = `/posts/detail/${img.alt}`;
-      });
-
-      postListElement.appendChild(img); // <img>를 섹션에 추가
+    // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+    img.addEventListener('click', event => {
+      console.log(img.alt + "게시물 클릭 ");
+      window.location.href = `/posts/detail/${img.alt}`;
     });
-  }
+
+    postListElement.appendChild(img); // <img>를 섹션에 추가
+  });
 }
 
 // 초기화 함수

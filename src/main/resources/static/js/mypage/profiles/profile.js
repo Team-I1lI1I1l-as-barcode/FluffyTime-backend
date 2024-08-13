@@ -257,7 +257,7 @@ function createRequestDto(nickname) {
 function withdrawAccount(data) {
   if (data.result === true) {
     alert("회원 탈퇴가 완료되었습니다.");
-    window.location.href = "/";
+    window.location.href = "/login";
   } else {
     alert("회원 탈퇴가 실패되었습니다. 다시 시도해주세요.");
     window.location.href = "/";
