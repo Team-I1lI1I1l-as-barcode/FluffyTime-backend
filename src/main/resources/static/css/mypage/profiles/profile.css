@@ -330,7 +330,7 @@ select {
 }
 
 /* 모달 창 스타일 */
-.modal {
+#modal {
   display: none; /* 기본적으로 숨김 */
   position: fixed;
   top: 50%;
@@ -349,14 +349,14 @@ select {
 }
 
 /* 모달을 활성화했을 때 스타일 */
-.modal.show {
+#modal.show {
   display: block;
   opacity: 1;
   transform: translate(-50%, -50%); /* 중앙 정렬로 이동 */
 }
 
 /* 모달 콘텐츠 스타일 (내부) */
-.modal-content {
+#modal .modal-content {
   text-align: center; /* 내용 중앙 정렬 */
 }
 
