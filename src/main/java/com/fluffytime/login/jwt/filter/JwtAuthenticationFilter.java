@@ -3,6 +3,8 @@ package com.fluffytime.login.jwt.filter;
 import static com.fluffytime.login.jwt.util.JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT;
 
 import com.fluffytime.login.jwt.dao.RefreshTokenDao;
+import com.fluffytime.login.jwt.exception.JwtErrorCode;
+import com.fluffytime.login.jwt.util.JwtResponseProvider;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.login.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
@@ -43,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         log.info("accessToken = {}", accessToken);
         log.info("refreshToken = {}", refreshToken);
-
 
         if (StringUtils.hasText(refreshToken) && !StringUtils.hasText(accessToken)) {
             // 리프레쉬 토큰 검증
