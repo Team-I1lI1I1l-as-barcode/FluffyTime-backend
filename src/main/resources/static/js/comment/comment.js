@@ -19,20 +19,40 @@ async function fetchComments() {
   const response = await fetch(`/api/comments/post/${postId}`);
   if (!response.ok) {
     console.error('댓글 목록 가져오기 실패!', response.status);
-    return;
+    return [];
   }
   const comments = await response.json();
   const commentList = document.getElementById('comment-list');
   commentList.innerHTML = ''; // 기존 댓글 목록 초기화
   comments.forEach(comment => {
+    // 프로필 이미지
+    const profileImg = document.createElement('img');
+    profileImg.src = comment.profileImgUrl || 'https://via.placeholder.com/40'; // 프로필 이미지 URL, 없으면 기본 이미지
+    profileImg.className = 'profile-img';
+
+    // 댓글 내용
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'comment-content';
+
+    const nicknameSpan = document.createElement('span');
+    nicknameSpan.className = 'nickname';
+    nicknameSpan.textContent = comment.nickname;
+
+    const contentSpan = document.createElement('span');
+    contentSpan.className = 'text';
+    contentSpan.textContent = comment.content;
+
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.dataset.id = comment.commentId;
 
-    const contentDiv = document.createElement('div');
-    contentDiv.className = 'comment-content';
-    commentDiv.textContent = `${comment.commentId} ${comment.nickname}: ${comment.content}`;
+    contentDiv.appendChild(nicknameSpan);
+    contentDiv.appendChild(contentSpan);
 
+    commentDiv.appendChild(profileImg);
+    commentDiv.appendChild(contentDiv);
+
+    // 댓글 수정 및 삭제 버튼
     if (comment.author) {
       const editButton = document.createElement('button');
       editButton.textContent = '수정';
@@ -40,12 +60,13 @@ async function fetchComments() {
 
       const deleteButton = document.createElement('button');
       deleteButton.textContent = '삭제';
-      deleteButton.onclick = () => deleteComment(comment.commentId, postId);
+      deleteButton.onclick = () => deleteComment(comment.commentId);
 
       commentDiv.appendChild(editButton);
       commentDiv.appendChild(deleteButton);
     }
 
+    // 답글 버튼
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글';
     replyButton.onclick = () => toggleReplyInput(comment.commentId);
@@ -57,7 +78,6 @@ async function fetchComments() {
     // 답글 조회 및 추가
     fetchReplies(comment.commentId, repliesDiv);
 
-    commentDiv.appendChild(contentDiv);
     commentDiv.appendChild(replyButton);
     commentDiv.appendChild(repliesDiv);
 
@@ -82,7 +102,7 @@ function toggleReplyInput(commentId) {
 
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글 달기';
-    replyButton.onclick = () => postReply(commentId, replyTextarea.value, 2); // postId를 적절히 설정
+    replyButton.onclick = () => postReply(commentId, replyTextarea.value);
 
     replyDiv.appendChild(replyTextarea);
     replyDiv.appendChild(replyButton);
@@ -90,6 +110,9 @@ function toggleReplyInput(commentId) {
     const commentDiv = document.querySelector(
         `.comment[data-id='${commentId}']`);
     commentDiv.appendChild(replyDiv);
+
+    // 스크롤을 하단으로 이동
+    commentDiv.scrollIntoView({behavior: 'smooth', block: 'end'});
   }
 }
 
@@ -105,7 +128,12 @@ async function fetchReplies(commentId, replyDiv) {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
     replyElement.dataset.id = reply.replyId;
-    replyElement.textContent = `${reply.replyId} ${reply.nickname}: ${reply.content}`;
+    replyElement.textContent = `${reply.nickname} ${reply.content}`;
+
+    // 프로필 이미지
+    const profileImg = document.createElement('img');
+    profileImg.src = reply.profileImgUrl || 'https://via.placeholder.com/40'; // 프로필 이미지 URL, 없으면 기본 이미지
+    profileImg.className = 'profile-img';
 
     if (reply.author) {
       const editButton = document.createElement('button');

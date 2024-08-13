@@ -11,12 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class PostController {
 
 
-//    // 새 게시물 등록하기 화면
-//    @GetMapping("/reg")
-//    public String postRegView() {
-//        return "/html/post/createPost.html";
-//    }
-
     // 게시물 상세보기 화면
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable(name = "id") Long id, Model model) {

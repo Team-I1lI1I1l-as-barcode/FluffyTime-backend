@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>게시물 상세보기</title>
+  <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/post/postDetail.css">
-  <script src="/js/post/postDetail.js" defer></script>
-  <script src="/js/comment/comment.js"></script>
+  <link rel="stylesheet" href="/css/comment/comment.css">
 </head>
 <body>
 <div class="modal" id="postModal">
@@ -29,11 +29,11 @@
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
       <div id="postContent" class="content"></div><!-- 게시물 내용 컨테이너 -->
-      <div>
+      <div id="comment-list" class="comment-list"></div> <!-- 댓글 목록 -->
+      <div class="comment-form">
         <textarea id="comment-content" placeholder="댓글 내용 적기" required></textarea>
         <button id="commentButton">댓글 달기</button> <!--postId에 댓글 달기-->
       </div>
-      <div id="comment-list"></div>
     </div>
   </div>
 </div>
@@ -73,4 +73,6 @@
   </div>
 </div>
 </body>
+<script src="/js/post/postDetail.js" defer></script>
+<script src="/js/comment/comment.js"></script>
 </html>
