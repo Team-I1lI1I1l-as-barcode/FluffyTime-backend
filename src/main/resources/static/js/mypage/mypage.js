@@ -164,6 +164,7 @@ function initialize() {
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림
   ProfileImagePreview.addEventListener('click', event => {
     event.preventDefault();
+
     // 프로필 미 생성시 마이페이지에서 프로필 사진 클릭하여 사진 변경하지 못하도록 막기
     if (!hasProfile) {
       fetchMyPage("/api/mypage/profiles/reg", "POST", handleCreateProfile);
@@ -174,7 +175,7 @@ function initialize() {
   });
 
   // 초기화 - 프로필 사진 등록
-  document.getElementById("images").addEventListener('change', event => {
+  document.getElementById("mypage-images").addEventListener('change', event => {
     event.preventDefault();
 
     // 기본 이미지일 경우 이미지 등록 api 요청
