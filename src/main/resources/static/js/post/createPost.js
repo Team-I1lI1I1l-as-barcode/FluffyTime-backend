@@ -1,7 +1,6 @@
 let currentImageIndex = 0;
 let imagesArray = [];
 let currentDraftPostId = null;
-let tagsArray = [];
 
 const postModalElement = document.getElementById('postModal');
 const draftModalElement = document.getElementById('draftModal');
@@ -17,35 +16,27 @@ const completeContainer = document.getElementById('complete-container');
 const imgElement = document.getElementById('profileImage');
 const nicknameElement = document.getElementById('nicknameDisplay');
 
-//프로필 fileUrl & nickname 가져
+//프로필
 fetch('/api/mypage/profiles/info', {
   method: 'GET',
-  credentials: 'include', // 쿠키를 포함해서 요청 보냄
+  credentials: 'include',
 })
 .then(response => response.json())
 .then(data => {
   const profileImageUrl = data.fileUrl;
   const nickname = data.nickname;
 
-  if (profileImageUrl) {
-    // 프로필 이미지가 있는 경우
-    imgElement.src = profileImageUrl;
-  } else {
-    // 프로필 이미지가 없는 경우 기본 이미지로 설정
-    imgElement.src = '/image/profile/profile.png';
-  }
-
   if (nickname) {
     nicknameElement.textContent = nickname;
   } else {
     nicknameElement.textContent = '닉네임 없음';
   }
-})
-.catch(error => {
-  console.error('Error:', error);
-  // 에러 발생 시 기본 이미지 설정 및 닉네임 오류 표시
-  document.getElementById('profileImage').src = '/image/profile/profile.png';
-  document.getElementById('nicknameDisplay').textContent = '오류 발생';
+
+  if (profileImageUrl) {
+    imgElement.src = profileImageUrl;
+  } else {
+    imgElement.src = '/image/profile/profile.png';
+  }
 });
 
 // 게시물 작성 모달을 여는 함수
@@ -126,8 +117,7 @@ function preparePostData(tempId, content, images, status) {
     tempId: tempId,
     content: content,
     tempStatus: status,
-    imageUrls: images.map(image => image.url),
-    tags: tagsArray // 태그 데이터 추가
+    imageUrls: images.map(image => image.url)
   };
 }
 
@@ -231,17 +221,28 @@ async function submitPost(event) {
         imagesArray);
     const postId = data.data.postId || data.data;
 
+    // 게시물 작성 부분 숨기기
+    document.querySelector('.post-right-content').style.display = 'none';
+
+    // 등록한 이미지 숨기기
+    document.querySelector('.post-left-content').style.display = 'none';
+
+    // 완료 이미지 표시
     showComplete(); // 게시물 등록 완료 화면 표시
 
+    // 2초 후에 페이지 새로고침
     setTimeout(() => {
-      completeContainer.style.display = 'none';
-      closeModal(); // 모달 창 닫기
-      resetForm(); // 폼 초기화
+      window.location.reload();
     }, 2000);
   } catch (error) {
     console.error('게시물 등록 실패:', error.message);
     alert(error.message);
   }
+}
+
+// 게시물 등록 완료 화면 표시 함수
+function showComplete() {
+  completeContainer.style.display = 'block';
 }
 
 // 폼 데이터와 상태를 초기화하는 함수
@@ -254,10 +255,6 @@ function resetForm() {
   imagePreviewContainer.innerHTML = '';
   imagesArray = [];
   currentImageIndex = 0;
-
-  // 태그 초기화
-  tagsArray = [];
-  updateTagList();
 
   // 기타 필요한 초기화
   document.getElementById('images').value = ''; // 파일 입력 필드 초기화

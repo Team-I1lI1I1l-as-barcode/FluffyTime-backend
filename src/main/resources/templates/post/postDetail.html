@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>게시물 상세보기</title>
   <link rel="stylesheet" href="/css/post/postDetail.css">
-  <link rel="stylesheet" href="/css/comment/comment.css">
   <script th:src="@{/js/post/postDetail.js}" defer></script>
   <script th:src="@{/js/comment/comment.js}"></script>
 </head>
@@ -26,7 +25,10 @@
     </div>
     <div class="right-content">
       <div class="header">
-        닉네임~~~
+        <div class="profile">
+          <img id="profileImage" src="" alt="사용자의 프로필 이미지">
+          <span id="nicknameDisplay"></span>
+        </div>
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
       <div id="postContent" class="content"></div><!-- 게시물 내용 컨테이너 -->

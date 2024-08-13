@@ -1,6 +1,31 @@
 let currentPostId; // 현재 게시물의 ID를 저장하는 변수
 let currentImageIndex = 0;
 let imageUrls = [];
+const imgElement = document.getElementById('profileImage');
+const nicknameElement = document.getElementById('nicknameDisplay');
+
+//프로필
+fetch('/api/mypage/profiles/info', {
+  method: 'GET',
+  credentials: 'include',
+})
+.then(response => response.json())
+.then(data => {
+  const profileImageUrl = data.fileUrl;
+  const nickname = data.nickname;
+
+  if (nickname) {
+    nicknameElement.textContent = nickname;
+  } else {
+    nicknameElement.textContent = '닉네임 없음';
+  }
+
+  if (profileImageUrl) {
+    imgElement.src = profileImageUrl;
+  } else {
+    imgElement.src = '/image/profile/profile.png';
+  }
+});
 
 // 게시물 데이터 로드
 async function loadPostData(postId) {
