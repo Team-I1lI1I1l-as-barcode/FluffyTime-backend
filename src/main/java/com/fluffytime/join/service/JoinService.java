@@ -3,6 +3,7 @@ package com.fluffytime.join.service;
 import static com.fluffytime.domain.RoleName.ROLE_USER;
 
 import com.fluffytime.common.exception.global.NotFoundRoleName;
+import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.Role;
 import com.fluffytime.domain.User;
 import com.fluffytime.domain.UserRole;
@@ -15,6 +16,7 @@ import com.fluffytime.join.exception.AlreadyExistsEmail;
 import com.fluffytime.join.exception.AlreadyExistsNickname;
 import com.fluffytime.join.exception.InvalidTempUser;
 import com.fluffytime.join.exception.NotFoundTempUser;
+import com.fluffytime.mypage.response.RequestResultDto;
 import com.fluffytime.repository.RoleRepository;
 import com.fluffytime.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -72,6 +74,11 @@ public class JoinService {
             .build();
 
         user.getUserRoles().add(userRole);
+
+        Profile basicProfile = new Profile("none", Long.valueOf(0), "none");
+
+        basicProfile.setUser(user);
+        user.setProfile(basicProfile);
 
         userRepository.save(user);
 
