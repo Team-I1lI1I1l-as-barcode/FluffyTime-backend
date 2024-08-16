@@ -156,6 +156,15 @@
   line-height: normal; /* 텍스트의 수직 정렬을 조정 */
 }
 
+/* 비활성화된 버튼 스타일 */
+#check_username_Btn:disabled {
+  background-color: #ccc; /* 비활성화 상태의 배경색 (회색) */
+  color: #666; /* 비활성화 상태의 텍스트 색상 (회색) */
+  cursor: not-allowed; /* 비활성화 상태의 커서 변경 */
+  opacity: 0.6; /* 비활성화 상태의 투명도 */
+}
+
+
 #check_username_Btn:hover {
   background-color: #ffa000;
 }

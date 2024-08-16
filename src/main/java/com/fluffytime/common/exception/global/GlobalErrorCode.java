@@ -13,7 +13,6 @@ public enum GlobalErrorCode implements ErrorCode {
     NOT_FOUND_POST(HttpStatus.NOT_FOUND, "GE-002", "게시글을 찾을 수 없습니다"),
     NOT_FOUND_COMMENT(HttpStatus.NOT_FOUND, "GE-003", "댓글을 찾을 수 없습니다"),
     NOT_FOUND_REPLY(HttpStatus.NOT_FOUND, "GE-004", "답글을 찾을 수 없습니다"),
-    NOT_FOUND_PROFILE(HttpStatus.NOT_FOUND, "GE-005", "프로필을 찾을 수 없습니다"),
     NOT_FOUND_TAG(HttpStatus.NOT_FOUND, "GE-006", "태그를 찾을 수 없습니다"),
     NOT_EDIT_PERMISSION(HttpStatus.FORBIDDEN, "GE-007", "편집 권한이 없습니다"),
     NOT_ACCESS_PERMISSION(HttpStatus.FORBIDDEN, "GE-008", "접근 권한이 없습니다"),

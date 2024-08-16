@@ -15,6 +15,6 @@ import lombok.Setter;
 public class PostDto {
 
     private Long postId; // 게시글 id
-    private String imageUrl; // s3i 이미지 저장 url
+    private String fileUrl; // s3i 이미지 저장 url
 
 }

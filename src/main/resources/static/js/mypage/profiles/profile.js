@@ -28,18 +28,9 @@ let originalPetNameValue = ""; // pet_name 필드의 원래 값
 
 // 반려동물 나이 옵션 설정 함수
 function setPetAgeOptions(maxAge) {
-  const noneOption = document.createElement("option");
-  noneOption.value = "0";
-  noneOption.text = "==선택==";
-  noneOption.selected = true;
-  petAge.add(noneOption);
-
-  for (let i = 1; i <= maxAge; i++) {
-    const option = document.createElement("option");
-    option.value = i;
-    option.text = `${i} 살`;
-    petAge.add(option);
-  }
+  petAge.innerHTML = '<option value="0" selected>==선택==</option>' +
+      Array.from({length: maxAge},
+          (_, i) => `<option value="${i + 1}">${i + 1} 살</option>`).join('');
 }
 
 // 반려동물 이름 존재 여부에 따라 성별/나이/카테고리 선택 활성화
@@ -47,6 +38,25 @@ function petOptionsStatus(status) {
   petSex.disabled = !status;
   petAge.disabled = !status;
   petCategory.disabled = !status;
+}
+
+//  유저명 변경시 중복 버튼 활성화
+username.addEventListener('keyup', () => {
+  checkUsernameBtn.disabled = false;
+});
+
+// 프로필 수정 요청 DTO 구성
+function createRequestDto(nickname) {
+  return {
+    nickname: nickname,
+    username: username.value,
+    intro: intro.value,
+    petName: petName.value,
+    petSex: petSex.value,
+    petAge: petAge.value,
+    petCategory: petCategory.value,
+    publicStatus: publicStatus.checked ? "1" : "0"
+  };
 }
 
 // API 요청 함수 (요청 헤더가 X)
@@ -96,7 +106,7 @@ function fetchProfileJson(method, callback, url, dto) {
   .catch(error => console.error("서버 오류 발생: " + error));
 }
 
-// 사진 등록/수정 api 요청 함수
+// 프로필 사진 등록/수정 api 요청 함수
 function fetchProfileImage(method, url) {
   const profileForm = document.getElementById('profileImageForm');
   const formData = new FormData(profileForm);
@@ -116,11 +126,11 @@ function fetchProfileImage(method, url) {
   })
   .then(data => {
     if (data.result) {
-      alert("사진이 정상적으로 등록되었습니다.");
-      img.src = data.fileUrl; // img의 src 속성을 서버에서 반환된 URL로 업데이트
+      console.log("프로필 사진 등록 성공");
+      img.src = data.fileUrl;
       window.location.reload(); // 새로 고침
     } else {
-      alert("사진 등록에 실패하였습니다.");
+      alert("프로필 사진 등록에 실패");
     }
   })
   .catch(error => console.error("서버 오류 발생: " + error));
@@ -137,6 +147,7 @@ function handleProfileData(data) {
   petAge.value = data.petAge;
   petCategory.value = data.petCategory;
   publicStatus.checked = data.publicStatus === "1";
+
   if (data.fileUrl !== null) {
     console.log("등록된 프로필 사진을 불러옵니다.");
     img.src = data.fileUrl;
@@ -157,13 +168,8 @@ function handleProfileData(data) {
 
 // intro 입력시 제출 버튼 활성화 여부 검토
 intro.addEventListener('input', () => {
-  const introValue = intro.value.trim();
   // intro 필드 값이 원래 값과 다르면 제출 버튼 활성화
-  if (introValue !== originalIntroValue) {
-    submitBtn.disabled = false; // 제출 버튼 활성화
-  } else {
-    submitBtn.disabled = true; // 제출 버튼 비활성화
-  }
+  submitBtn.disabled = (intro.value.trim() === originalIntroValue);
 });
 
 // 반려동물 이름 입력시 관련 옵션 활성화/비활성화 + 제출 버튼 활성화
@@ -191,33 +197,11 @@ function activateSubmitButton() {
   submitBtn.disabled = false; // 제출 버튼 활성화
 }
 
-// 반려동물 성별 선택시 제출 버튼 상태 변경
-pet_sex.addEventListener('change', activateSubmitButton);
+// 이벤트를 처리할 요소들을 배열에 저장
+const elements = [pet_sex, pet_age, petCategory, publicStatus];
 
-// 반려동물 나이 선택시 제출 버튼 상태 변경
-pet_age.addEventListener('change', activateSubmitButton);
-
-// 카테고리 선택시 제출 버튼 상태 변경
-petCategory.addEventListener('change', activateSubmitButton);
-
-// 계정 활성화 비활성화 선택시 제출 버튼 상태 변경
-publicStatus.addEventListener('change', activateSubmitButton);
-
-// 프로필 등록 함수
-function createProfile(nickname) {
-  fetchProfile("POST", handleCreateProfile, "/api/mypage/profiles/reg");
-  window.location.href = `/mypage/profile/edit/${nickname}`;
-}
-
-// 프로필 등록 API 후처리 함수
-function handleCreateProfile(data) {
-  if (!data.result) {
-    alert("프로필 등록이 실패되었습니다.");
-    window.location.href = "/";
-  } else {
-    alert("프로필 등록되었습니다.");
-  }
-}
+// 반려동물 성별, 나이, 카테고리, 계정 활성화 여부 변경시 제출 버튼 활성화
+elements.forEach(el => el.addEventListener('change', activateSubmitButton));
 
 // 프로필 데이터 수정 함수
 function saveProfileData(data, nickname) {
@@ -239,20 +223,6 @@ function checkUsername(data) {
   }
 }
 
-// 프로필 수정 요청 DTO 구성
-function createRequestDto(nickname) {
-  return {
-    nickname: nickname,
-    username: username.value,
-    intro: intro.value,
-    petName: petName.value,
-    petSex: petSex.value,
-    petAge: petAge.value,
-    petCategory: petCategory.value,
-    publicStatus: publicStatus.checked ? "1" : "0"
-  };
-}
-
 // 회원 탈퇴 함수
 function withdrawAccount(data) {
   if (data.result === true) {
@@ -260,7 +230,7 @@ function withdrawAccount(data) {
     window.location.href = "/login";
   } else {
     alert("회원 탈퇴가 실패되었습니다. 다시 시도해주세요.");
-    window.location.href = "/";
+    window.location.reload();
   }
 }
 
@@ -270,28 +240,26 @@ function deleteImage(data) {
     console.log("프로필 이미지가 삭제되었습니다.")
     window.location.reload();
   } else {
-    console.log("프로필 이미지가 실패하였습니다.")
+    alert("프로필 이미지 삭제를 실패하였습니다. 다시 시도 해주세요.")
     window.location.reload();
   }
 }
 
 // 초기화 함수
 function initialize() {
+  const nickname = window.location.pathname.split('/').pop();
+
   // 반려동물 나이 옵션 설정
   setPetAgeOptions(100);
+
   // 닉네임 중복확인 버튼 초기 비활성화
   checkUsernameBtn.disabled = true;
+
   // 제출하기 버튼 초기 비활성화
   submitBtn.disabled = true;
-  const nickname = window.location.pathname.split('/').pop();
-  const profileForm = document.getElementById('profileImageForm');
+
   // 초기화 - 프로필 정보 불러오기
   fetchProfile("GET", handleProfileData, "/api/mypage/profiles/info");
-
-  // 초기화 - 유저명 변경시 중복 버튼 활성화
-  username.addEventListener('keyup', () => {
-    checkUsernameBtn.disabled = false;
-  });
 
   // 초기화 - 중복 버튼 클릭시 api 요청
   checkUsernameBtn.addEventListener('click', event => {
@@ -360,6 +328,7 @@ function initialize() {
     event.preventDefault();
     document.getElementById("profile-images").click();
   });
+
   // 초기화 - 프로필 사진 삭제
   profileImageDelete.addEventListener('click', (event) => {
     event.preventDefault();

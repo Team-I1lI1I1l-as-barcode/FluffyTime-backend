@@ -23,12 +23,16 @@ public class MyPageController {
     @GetMapping("/mypage/{nickname}")
     public String myPage(@PathVariable(name = "nickname") String nickname,
         HttpServletRequest httpServletRequest) {
+        // 로그인한 유저 찾기
         User user = myPageService.findByAccessToken(httpServletRequest);
+        // 로그인한 유저와 마이페이지의 유저와 동일인인지 체크
         Boolean isAuthorized = myPageService.isUserAuthorized(user.getNickname(), nickname);
 
         if (isAuthorized) {
+            // 동일인일시 마이페이지로 이동
             return "mypage/mypage";
         } else {
+            // 다른 마이페이지 접근시 본인 마이페이지로 이동
             return "redirect:/mypage/" + user.getNickname();
         }
     }
