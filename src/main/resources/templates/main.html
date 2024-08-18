@@ -8,12 +8,13 @@
   <link rel="stylesheet" href="/css/home/home.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/post/createPost.js}" defer></script>
 
 </head>
 <body>
 <div class="container">
-  <aside class="sidebar" th:include="common/sidebar :: sidebar"></aside>
+  <aside class="sidebar" th:insert="~{common/sidebar :: sidebar}"></aside>
   <main class="content-container">
     <div class="content">
       <div id="posts-container" class="home-post-container">
@@ -23,9 +24,9 @@
   </main>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal" style="display: none;"></div>
+<div th:insert="~{common/createModal :: createModal}" class="modal" id="postModal" style="display: none;"></div>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal" style="display: none;"></div>
+<div th:insert="~{common/tempModal :: tempModal}" class="modal" id="draftModal" style="display: none;"></div>
 
 <script th:src="@{/js/home/home.js}"></script>
 <script th:src="@{/js/mypage/mypageNav.js}"></script>

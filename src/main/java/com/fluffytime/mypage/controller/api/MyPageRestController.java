@@ -2,7 +2,7 @@ package com.fluffytime.mypage.controller.api;
 
 
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
 import com.fluffytime.mypage.response.ImageResultDto;

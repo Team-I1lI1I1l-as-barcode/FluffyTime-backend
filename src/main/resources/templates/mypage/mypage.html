@@ -14,7 +14,7 @@
 </head>
 <body>
 <div class="container">
-  <aside class="sidebar" th:include="common/sidebar :: sidebar"></aside>
+  <aside class="sidebar" th:insert="~{common/sidebar :: sidebar}"></aside>
 </div>
 
 <div id="mypage_container">
@@ -74,10 +74,10 @@
   </section>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal"
+<div th:insert="~{common/createModal :: createModal}" class="modal" id="postModal"
      style="display: none;"></div>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
+<div th:insert="~{common/tempModal :: tempModal}" class="modal" id="draftModal"
      style="display: none;"></div>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>

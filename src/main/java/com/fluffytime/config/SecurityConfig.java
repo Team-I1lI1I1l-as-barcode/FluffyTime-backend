@@ -1,24 +1,18 @@
 package com.fluffytime.config;
 
-import com.fluffytime.login.jwt.dao.RefreshTokenDao;
-import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
-import com.fluffytime.login.jwt.filter.CustomLoginFilter;
-import com.fluffytime.login.jwt.filter.CustomLogoutFilter;
-import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.exception.CustomAuthenticationEntryPoint;
+import com.fluffytime.auth.jwt.filter.JwtAuthenticationFilter;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -28,42 +22,31 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtTokenizer jwtTokenizer;
-    private final RefreshTokenDao refreshTokenDao;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CustomLoginFilter loginFilter = new CustomLoginFilter(
-            authenticationManager(authenticationConfiguration),
-            jwtTokenizer,
-            refreshTokenDao
-        );
-        loginFilter.setFilterProcessesUrl("/api/users/login");
-
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/login",
-                    "/logout",
+//                    "/logout",
                     "/join/**",
                     "/api/users/**",
+                    "/api/auth/**",
                     "/error",
                     "/static/**",
-                    "/html/**",
                     "/js/**",
                     "/css/**",
                     "/image/**"
+
                 ).permitAll()
                 .anyRequest().authenticated()
 
             )
-            .addFilterBefore(new JwtAuthenticationFilter(refreshTokenDao, jwtTokenizer),
-                CustomLoginFilter.class)
-            .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(new CustomLogoutFilter(jwtTokenizer, refreshTokenDao),
-                LogoutFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
+                UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())
             .sessionManagement(
                 sessionManagement -> sessionManagement.sessionCreationPolicy(
@@ -88,13 +71,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
-        throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

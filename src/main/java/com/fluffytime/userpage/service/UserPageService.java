@@ -3,7 +3,7 @@ package com.fluffytime.userpage.service;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.request.PostDto;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.repository.PostRepository;

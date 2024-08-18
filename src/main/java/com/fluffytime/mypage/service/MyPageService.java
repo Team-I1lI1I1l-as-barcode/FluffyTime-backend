@@ -1,11 +1,11 @@
 package com.fluffytime.mypage.service;
 
-import com.fluffytime.common.exception.global.NotFoundProfile;
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.common.exception.global.ProfileNotFound;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.exception.NoProfileImage;
 import com.fluffytime.mypage.exception.NotFoundMyPage;
 import com.fluffytime.mypage.request.PostDto;
@@ -160,7 +160,7 @@ public class MyPageService {
             // 사용자는 있으나, 프로필이 없는 경우 기본 뼈대 프로필 생성 (회원가입 후 프로필을 수정하지 않은 경우에 해당)
             if (profile == null) {
                 log.info("해당 사용자 프로필 없음");
-                throw new NotFoundProfile();
+                throw new ProfileNotFound();
             }
             ProfileImages profileImages = profile.getProfileImages(); // 프로필 이미지 객체
             String petName = profile.getPetName(); // 반려동물 이름
@@ -191,7 +191,7 @@ public class MyPageService {
 
         } else {
             log.info("createProfileResponseDto 실행 >> 해당 유저가 존재하지 않아  NOT_FOUND_USER 예외 발생");
-            throw new NotFoundUser();
+            throw new UserNotFound();
         }
     }
 
@@ -311,7 +311,7 @@ public class MyPageService {
         if (user == null) {
             log.info("uploadProfileImage 실행 >> 해당 유저가 없습니다. ");
             imageResultDto.setResult(false);
-            throw new NotFoundUser();
+            throw new UserNotFound();
         }
         Profile profile = user.getProfile();
         if (profile.getProfileImages() == null) {

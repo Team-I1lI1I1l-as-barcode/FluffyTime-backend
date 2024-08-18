@@ -1,14 +1,14 @@
 package com.fluffytime.post.service;
 
-import com.fluffytime.common.exception.global.NotFoundPost;
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.common.exception.global.PostNotFound;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
 import com.fluffytime.domain.Tag;
 import com.fluffytime.domain.TagPost;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.request.PostRequest;
 import com.fluffytime.post.dto.response.ApiResponse;
@@ -144,7 +144,7 @@ public class PostService {
         try {
             Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
             return userRepository.findById(userId)
-                .orElseThrow(NotFoundUser::new);
+                .orElseThrow(UserNotFound::new);
 
         } catch (IllegalArgumentException e) {
             log.error("유효하지 않은 토큰입니다", accessToken, e);
@@ -186,7 +186,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public ApiResponse<PostResponse> getPostById(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // PostResponse로 변환
         PostResponse postResponse = new PostResponse(
@@ -217,7 +217,7 @@ public class PostService {
     public ApiResponse<PostResponse> updatePost(Long id, PostRequest postRequest,
         MultipartFile[] files) {
         Post existingPost = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         if (postRequest.getContent() != null && postRequest.getContent().length() > 2200) {
             throw new ContentLengthExceeded();
@@ -269,7 +269,7 @@ public class PostService {
     @Transactional
     public ApiResponse<Void> deletePost(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // 게시물과 연관된 태그 삭제
         tagPostRepository.deleteByPost(post);
@@ -282,7 +282,7 @@ public class PostService {
     @Transactional
     public ApiResponse<Void> deleteTempPost(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         if (post.getTempStatus() == TempStatus.TEMP) {
             // 게시물과 연관된 태그 삭제
