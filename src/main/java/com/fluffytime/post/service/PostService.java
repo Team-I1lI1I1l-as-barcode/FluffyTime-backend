@@ -4,8 +4,6 @@ import com.fluffytime.common.exception.global.NotFoundPost;
 import com.fluffytime.common.exception.global.NotFoundUser;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
-import com.fluffytime.domain.Tag;
-import com.fluffytime.domain.TagPost;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
@@ -22,8 +20,6 @@ import com.fluffytime.post.exception.TooManyFiles;
 import com.fluffytime.post.exception.UnsupportedFileFormat;
 import com.fluffytime.repository.PostImagesRepository;
 import com.fluffytime.repository.PostRepository;
-import com.fluffytime.repository.TagPostRepository;
-import com.fluffytime.repository.TagRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +29,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,8 +41,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostImagesRepository postImagesRepository;
-    private final TagRepository tagRepository;
-    private final TagPostRepository tagPostRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
 
@@ -73,27 +66,11 @@ public class PostService {
 
         postRepository.save(post);
 
-        // 태그 등록
-        registerTags(postRequest.getTagId(), post);
-
         if (files != null && files.length > 0) {
             savePostImages(files, post);
         }
 
         return ApiResponse.response(PostResponseCode.CREATE_POST_SUCCESS, post.getPostId());
-    }
-
-    // 태그 등록 로직
-    private void registerTags(List<Long> tagIds, Post post) {
-        for (Long tagId : tagIds) {
-            Tag tag = tagRepository.findById(tagId)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 태그 ID입니다."));
-
-            TagPost tagPost = new TagPost();
-            tagPost.setPost(post);
-            tagPost.setTag(tag);
-            tagPostRepository.save(tagPost);
-        }
     }
 
     // 이미지 파일 저장 로직
@@ -147,11 +124,11 @@ public class PostService {
                 .orElseThrow(NotFoundUser::new);
 
         } catch (IllegalArgumentException e) {
-            log.error("유효하지 않은 토큰입니다", accessToken, e);
-            throw new BadCredentialsException("유효하지 않은 토큰입니다.", e);
+            log.error("유효하지 않은 토큰입니다: {}", accessToken, e);
+            throw new NotFoundUser();
         } catch (Exception e) {
-            log.error("토큰 처리 중 오류가 발생했습니다. : {}", accessToken, e);
-            throw new BadCredentialsException("토큰 처리 중 오류가 발생했습니다.", e);
+            log.error("토큰 처리 중 오류가 발생했습니다: {}", accessToken, e);
+            throw new NotFoundUser();
         }
     }
 
@@ -171,9 +148,6 @@ public class PostService {
             .build();
 
         postRepository.save(post);
-
-        // 태그 등록
-        registerTags(postRequest.getTagId(), post);
 
         if (files != null && files.length > 0) {
             savePostImages(files, post);
@@ -203,10 +177,7 @@ public class PostService {
             )).collect(Collectors.toList()),
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
-            post.getTagPosts().stream()
-                .map(tagPost -> tagPost.getTag().getName())
-                .collect(Collectors.toList())
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
         );
 
         return ApiResponse.response(PostResponseCode.GET_POST_SUCCESS, postResponse);
@@ -215,17 +186,22 @@ public class PostService {
     // 게시글 수정하기
     @Transactional
     public ApiResponse<PostResponse> updatePost(Long id, PostRequest postRequest,
-        MultipartFile[] files) {
+        MultipartFile[] files, HttpServletRequest request) {
+        // 토큰을 통해 사용자 정보 추출
+        User user = findUserByAccessToken(request);
+
         Post existingPost = postRepository.findById(id)
             .orElseThrow(NotFoundPost::new);
+
+        // 게시물 소유자인지 확인
+        if (!existingPost.getUser().equals(user)) {
+            throw new NotFoundUser(); // 권한이 없으면 NotFoundUser 예외 발생
+        }
 
         if (postRequest.getContent() != null && postRequest.getContent().length() > 2200) {
             throw new ContentLengthExceeded();
         }
         existingPost.setContent(postRequest.getContent());
-
-        // 기존 태그 삭제 후 새로운 태그 등록
-        updateTags(postRequest.getTagId(), existingPost);
 
         if (files != null && files.length > 0) {
             savePostImages(files, existingPost);
@@ -248,31 +224,25 @@ public class PostService {
             )).collect(Collectors.toList()),
             existingPost.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             existingPost.getUpdatedAt() != null ? existingPost.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
-            existingPost.getTagPosts().stream()
-                .map(tagPost -> tagPost.getTag().getName())
-                .collect(Collectors.toList())
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
         );
 
         return ApiResponse.response(PostResponseCode.UPDATE_POST_SUCCESS, postResponse);
     }
 
-    private void updateTags(List<Long> tagIds, Post post) {
-        // 기존 태그 삭제
-        tagPostRepository.deleteByPost(post);
-
-        // 새로운 태그 등록
-        registerTags(tagIds, post);
-    }
-
     // 게시글 삭제하기
     @Transactional
-    public ApiResponse<Void> deletePost(Long id) {
+    public ApiResponse<Void> deletePost(Long id, HttpServletRequest request) {
+        // 토큰을 통해 사용자 정보 추출
+        User user = findUserByAccessToken(request);
+
         Post post = postRepository.findById(id)
             .orElseThrow(NotFoundPost::new);
 
-        // 게시물과 연관된 태그 삭제
-        tagPostRepository.deleteByPost(post);
+        // 게시물 소유자인지 확인
+        if (!post.getUser().equals(user)) {
+            throw new NotFoundUser(); // 권한이 없으면 NotFoundUser 예외 발생
+        }
 
         postRepository.deleteById(id);
         return ApiResponse.response(PostResponseCode.DELETE_POST_SUCCESS);
@@ -285,9 +255,6 @@ public class PostService {
             .orElseThrow(NotFoundPost::new);
 
         if (post.getTempStatus() == TempStatus.TEMP) {
-            // 게시물과 연관된 태그 삭제
-            tagPostRepository.deleteByPost(post);
-
             postRepository.deleteById(id);
             log.info("게시물 ID {}가 성공적으로 삭제되었습니다.", id);
             return ApiResponse.response(PostResponseCode.DELETE_TEMP_POST_SUCCESS);
@@ -317,10 +284,7 @@ public class PostService {
             )).collect(Collectors.toList()),
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
-            post.getTagPosts().stream()
-                .map(tagPost -> tagPost.getTag().getName())
-                .collect(Collectors.toList())
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null
         )).collect(Collectors.toList());
 
         return ApiResponse.response(PostResponseCode.GET_TEMP_POSTS_SUCCESS, tempPostResponses);
@@ -328,6 +292,10 @@ public class PostService {
 
     // 파일 검증 로직
     private void validateFiles(MultipartFile[] files) {
+        if (files == null) {
+            return; // null이면 파일 검증을 할 필요가 없습니다.
+        }
+
         if (files.length > 10) {
             throw new TooManyFiles();
         }
