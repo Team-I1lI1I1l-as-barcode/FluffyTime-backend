@@ -5,7 +5,7 @@ import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
 import com.fluffytime.login.jwt.util.JwtTokenizer;
-import com.fluffytime.mypage.request.PostDto;
+import com.fluffytime.mypage.response.PostDto;
 import com.fluffytime.mypage.service.MyPageService;
 import com.fluffytime.repository.UserRepository;
 import com.fluffytime.userpage.exception.NotFoundUserPage;

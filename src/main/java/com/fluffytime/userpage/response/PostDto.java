@@ -1,4 +1,4 @@
-package com.fluffytime.userpage.request;
+package com.fluffytime.userpage.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

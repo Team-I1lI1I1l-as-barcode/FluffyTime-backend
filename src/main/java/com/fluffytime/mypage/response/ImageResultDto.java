@@ -11,6 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ImageResultDto {
 
-    private Boolean result; // 중복 결과 여부
+    private Boolean result; // 요청 결과 여부
     private String fileUrl; // 이미지 URL을 저장할 필드
 }
