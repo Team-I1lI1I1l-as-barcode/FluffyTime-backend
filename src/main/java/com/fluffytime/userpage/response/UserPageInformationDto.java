@@ -1,6 +1,6 @@
 package com.fluffytime.userpage.response;
 
-import com.fluffytime.mypage.request.PostDto;
+import com.fluffytime.mypage.response.PostDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

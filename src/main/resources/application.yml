@@ -36,8 +36,8 @@ spring:
       timeout: 5000
 
 # spring security 로깅 설정
-logging:
-  level.org.springframework.security: TRACE
+#logging:
+#  level.org.springframework.security: TRACE
 
 jwt:
   secretKey: ${JWT_SECRET_KEY}
