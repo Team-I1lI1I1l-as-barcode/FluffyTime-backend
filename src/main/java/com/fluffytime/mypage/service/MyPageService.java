@@ -1,11 +1,11 @@
 package com.fluffytime.mypage.service;
 
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.exception.NoProfileImage;
 import com.fluffytime.mypage.exception.NotFoundMyPage;
 import com.fluffytime.mypage.request.ProfileDto;
@@ -161,7 +161,7 @@ public class MyPageService {
 
         } else {
             log.info("createProfileResponseDto 실행 >> 해당 유저가 존재하지 않아  NOT_FOUND_USER 예외 발생");
-            throw new NotFoundUser();
+            throw new UserNotFound();
         }
     }
 
@@ -250,7 +250,7 @@ public class MyPageService {
         if (user == null) {
             log.info("uploadProfileImage 실행 >> 해당 유저가 없습니다. ");
             imageResultDto.setResult(false);
-            throw new NotFoundUser();
+            throw new UserNotFound();
         }
 
         Profile profile = user.getProfile();

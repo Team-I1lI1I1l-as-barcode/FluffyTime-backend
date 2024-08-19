@@ -1,62 +1,46 @@
-const tokenManager = {
-  accessToken: getCookie('accessToken'),
-  refreshToken: getCookie('refreshToken'),
+// refresh token으로 access token 재발급 요청 보내기
+async function refreshAccessToken() {
+  console.log("Refreshing Access Token");
+  const response = await fetch('/api/auth/refreshToken', {
+    method:'POST'
+  })
 
-  async validateAndRefreshToken() {
-    if (!this.accessToken && this.refreshToken) {
-      await handleTokenRefresh();
+  if(!response.ok) {
+    console.log("Failed to refresh Access Token")
+    // window.location.href="/login"
+    return;
+  }
+
+  console.log("Access Token refreshed successfully")
+  localStorage.setItem('lastRefreshTime', new Date().getTime());
+}
+
+// access token 만료 시간 이전 주기적 갱신 시도
+async function initTokenRefresh() {
+  console.log("initTokenRefresh");
+  const lastRefreshTime = localStorage.getItem("lastRefreshTime");
+  const currentTime = new Date().getTime();
+  const timeElapsed = currentTime - lastRefreshTime;
+
+  // 마지막 갱신 후 25분이 지났다면 즉시 갱신
+  if(timeElapsed >= 50 * 60 * 1000) {
+    console.log("즉시갱신")
+     await refreshAccessToken();
+  }
+
+  // 주기적으로 AccessToken 갱신
+  setInterval(() => {
+    const lastRefreshTime = localStorage.getItem("lastRefreshTime");
+    const currentTime = new Date().getTime();
+    const timeElapsed = currentTime - lastRefreshTime;
+
+    // 25분이 지난 경우에만 갱신
+    if(timeElapsed >= 50 * 60 * 1000) {
+       refreshAccessToken();
     }
-  }
-};
-
-
-// API 요청을 보낼 때 사용하는 함수
-async function fetchWithAuth(url, options = {}) {
-  if(checkTokens()) {
-    return await fetch(url, options);
-  }
-  // accessToken이 만료된 경우, 재발급 요청을 보내는 함수 호출
-  await handleTokenRefresh();
-    // 이후 다시 원래 요청을 보냄
-    if(getCookie("accessToken") !== null) {
-    return fetch(url, options);
-  }
+  }, 60 * 1000); // 매 1분마다 체크
 }
 
-// accessToken 재발급 함수
-async function handleTokenRefresh() {
-  try {
-    const response = await fetch('/api/users/reissue', {
-      method: 'POST',
-      credentials: 'include', // 쿠키를 포함하여 요청
-    });
-
-    if(!response.ok) {
-      throw new Error('Failed RefreshToken Validation')
-    }
-  } catch (error) {
-    console.error('Failed to refresh token:', error);
-    // 실패한 경우, 사용자에게 알리고 로그인 페이지로 리다이렉트
-    alert('세션이 만료되었습니다. 다시 로그인 해주세요.');
-    window.location.href = '/login';
-  }
-}
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
-  return null;
-}
-
-function checkTokens() {
-  const accessToken = getCookie('accessToken');
-
-  if (accessToken) {
-    console.log('Access Token exists:', accessToken);
-    return true;
-  } else {
-    console.log('Access Token does not exist.');
-    return false;
-  }
-}
+// 페이지 로드 시 초기화
+console.log('Script loaded');
+window.addEventListener("load", initTokenRefresh);

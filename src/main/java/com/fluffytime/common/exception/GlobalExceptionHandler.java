@@ -1,6 +1,7 @@
 package com.fluffytime.common.exception;
 
 
+import com.fluffytime.common.exception.auth.AuthException;
 import com.fluffytime.common.exception.business.FluffyException;
 import com.fluffytime.common.exception.global.GlobalErrorCode;
 import com.fluffytime.common.exception.global.GlobalException;
@@ -41,10 +42,10 @@ public class GlobalExceptionHandler {
         return createErrorResponseEntity(e.getErrorCode());
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException e) {
-        log.error("BadCredentialsException = {}", e.getMessage());
-        return createErrorResponseEntity(GlobalErrorCode.NOT_ACCESS_PERMISSION);
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<ErrorResponse> handleBadCredentialsException(AuthException e) {
+        log.error("AuthException = {}", e.getMessage());
+        return createErrorResponseEntity(e.getErrorCode());
     }
 
 

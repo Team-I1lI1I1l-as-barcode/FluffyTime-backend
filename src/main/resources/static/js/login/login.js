@@ -60,18 +60,13 @@ async function loginProcess(event) {
           body: JSON.stringify(jsonData)
         });
 
-    const res = await response.json();
-
     if (!response.ok) {
-      if(res.code === "JWTE-007") {
-        emailErrorElement.innerText = "아이디, 비밀번호를 확인해주세요."
-        emailErrorElement.classList.remove('hidden')
-        return
-      }
-      alert("로그인 에러")
+      emailErrorElement.innerText = "아이디, 비밀번호를 확인해주세요."
+      emailErrorElement.classList.remove('hidden')
       return;
     }
     console.log("로그인 성공")
+    localStorage.setItem('lastRefreshTime', new Date().getTime());
     window.location.href = '/';
 
   } catch (error) {
