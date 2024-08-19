@@ -14,6 +14,35 @@ body {
   margin: 0;
 }
 
+.comment-form {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
+  padding: 10px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+#comment-content {
+  flex-grow: 1;
+  margin-right: 10px; /* 버튼과의 간격 */
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+#commentButton {
+  padding: 5px 10px; /* padding을 조정하여 글씨가 세로로 나오지 않게 함 */
+  white-space: nowrap; /* 버튼의 텍스트가 강제로 한 줄에 나오도록 설정 */
+  height: 100%; /* 버튼의 높이를 textarea와 맞추기 위해 추가 */
+  line-height: 1;
+  box-sizing: border-box;
+}
+
 /* 댓글 스타일 */
 .comment {
   display: flex;
@@ -23,6 +52,15 @@ body {
   border-radius: 10px;
   background-color: #fff; /* 배경색 흰색 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 효과 */
+}
+
+.profile-content {
+  display: flex;
+}
+
+.nickname-content {
+  display: flex;
+  flex-direction: column;
 }
 
 .default-content {
@@ -69,6 +107,13 @@ body {
   color: var(--primary-color);
 }
 
+.edit-delete-buttons {
+  width: 160px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 3.2rem;
+}
+
 .comment .buttons button {
   background: none;
   border: none;
@@ -88,6 +133,7 @@ body {
 
 .reply {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
   margin-bottom: 10px;
 }
@@ -143,6 +189,13 @@ body {
 
 .reply-section button:hover {
   background-color: var(--hover-color);
+}
+
+.edit-delete-buttons-reply {
+  width: 106px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 2.5rem;
 }
 
 /* 댓글/답글 수정 칸 */
