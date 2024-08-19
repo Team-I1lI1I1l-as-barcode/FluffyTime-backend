@@ -1,13 +1,13 @@
 ---
-name: "\U0001F41EBUG"
+name: "\U0001F41BBUG"
 about: BUG 발생 시 작성해주세요.
 title: ''
-labels: bug
+labels: ''
 assignees: ''
 
 ---
 
-### Issue: 🐞BUG
+### Issue: 🐛BUG
 Bug 내용을 작성해주세요.
 
 ### Description
