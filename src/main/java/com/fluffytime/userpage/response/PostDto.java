@@ -1,4 +1,4 @@
-package com.fluffytime.mypage.request;
+package com.fluffytime.userpage.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import lombok.Setter;
 // 유저의 게시글 가져오는 DTO
 public class PostDto {
 
-    private Long postId; // 게시글 id
-    private String imageUrl; // s3i 이미지 저장 url
+    private String title;
 
 }
+
