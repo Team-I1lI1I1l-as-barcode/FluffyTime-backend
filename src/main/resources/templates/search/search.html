@@ -13,7 +13,7 @@
 </head>
 <body>
   <div class="container">
-    <aside class="sidebar" th:insert="~{common/sidebar :: sidebar}"></aside>
+    <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
     <main class="content-container">
       <div class="search-container">
 
@@ -35,9 +35,9 @@
     </main>
   </div>
 
-  <div th:insert="~{common/createModal :: createModal}" class="modal" id="postModal" style="display: none;"></div>
-<!-- 임시 저장 모달 -->
-  <div th:insert="~{common/tempModal :: tempModal}" class="modal" id="draftModal" style="display: none;"></div>
+  <th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+  <!-- 임시 저장 모달 -->
+  <th:block th:replace="~{common/tempModal :: tempModal}" ></th:block>
 
 
   <script th:src="@{/js/search/search.js}"></script>

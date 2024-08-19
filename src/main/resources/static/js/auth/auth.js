@@ -22,7 +22,7 @@ async function initTokenRefresh() {
   const currentTime = new Date().getTime();
   const timeElapsed = currentTime - lastRefreshTime;
 
-  // 마지막 갱신 후 25분이 지났다면 즉시 갱신
+  // 마지막 갱신 후 50분이 지났다면 즉시 갱신
   if(timeElapsed >= 50 * 60 * 1000) {
     console.log("즉시갱신")
      await refreshAccessToken();
@@ -34,7 +34,7 @@ async function initTokenRefresh() {
     const currentTime = new Date().getTime();
     const timeElapsed = currentTime - lastRefreshTime;
 
-    // 25분이 지난 경우에만 갱신
+    // 50분이 지난 경우에만 갱신
     if(timeElapsed >= 50 * 60 * 1000) {
        refreshAccessToken();
     }
