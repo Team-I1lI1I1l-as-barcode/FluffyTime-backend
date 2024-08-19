@@ -4,6 +4,7 @@ import com.fluffytime.domain.Comment;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private List<ReplyResponseDto> replyList;
     private boolean isAuthor; //현재 사용자 = 작성자??
+    private String profileImageurl; //프로필 이미지
 
     public CommentResponseDto(Comment comment, Long currentUserId) {
         this.commentId = comment.getCommentId();
@@ -34,5 +36,8 @@ public class CommentResponseDto {
             .map(reply -> new ReplyResponseDto(reply, currentUserId))
             .collect(Collectors.toList());
         this.isAuthor = this.userId.equals(currentUserId);
+        this.profileImageurl = Optional.ofNullable(comment.getUser().getProfile())
+            .map(profile -> profile.getProfileImages().getFilePath())
+            .orElse("/image/profile/profile.png");
     }
 }
