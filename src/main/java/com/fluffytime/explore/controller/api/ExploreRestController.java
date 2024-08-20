@@ -3,6 +3,7 @@ package com.fluffytime.explore.controller.api;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
 import com.fluffytime.domain.Profile;
+import com.fluffytime.domain.TempStatus;
 import com.fluffytime.explore.service.ExploreService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,6 +59,11 @@ public class ExploreRestController {
             }
 
             Post post = posts.get(i);
+            if (post.getTempStatus() == TempStatus.TEMP) {
+                log.info("임시저장글 숨김!");
+                continue;
+            }
+
             Map<String, String> item = new HashMap<>();
             item.put("postId", post.getPostId().toString());
             item.put("userId", post.getUser().getUserId().toString());
