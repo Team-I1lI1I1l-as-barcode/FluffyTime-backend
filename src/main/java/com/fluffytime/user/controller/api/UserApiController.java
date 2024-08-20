@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,9 +60,20 @@ public class UserApiController {
 
     // 로그인
     @PostMapping("login")
-    public ResponseEntity<Void> login(@RequestBody @Valid LoginUser loginUser, HttpServletResponse response) {
+    public ResponseEntity<Void> login(
+        @RequestBody @Valid LoginUser loginUser,
+        @RequestParam(defaultValue = "/") String redirectURL,
+        HttpServletResponse response
+    ) {
         loginService.loginProcess(response,loginUser);
-        return ResponseEntity.status(HttpStatus.OK).build();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.LOCATION, redirectURL);
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .headers(headers)
+            .build();
     }
 
     // 로그아웃

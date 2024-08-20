@@ -44,15 +44,37 @@ async function loginProcess(event) {
     return;
   }
 
+
   // 폼 데이터를 JSON으로 변환
   const jsonData = {
     email: email,
     password: password
   };
 
+  // 현재 화면 URL을 가져옵니다.
+  const currentUrl = window.location.href;
+
+  // URL 객체를 생성합니다.
+  const url = new URL(currentUrl);
+
+  // URLSearchParams 객체를 사용하여 쿼리 파라미터를 추출합니다.
+  const queryParams = new URLSearchParams(url.search);
+
+  // 'redirectURL' 쿼리 파라미터 추출
+  const redirectURL = queryParams.get('redirectURL');
+
+  let loginApiUri;
+
+  // target API URI
+  if (redirectURL) {
+    loginApiUri = `/api/users/login?redirectURL=${redirectURL}`;
+  } else {
+    loginApiUri = '/api/users/login';
+  }
+
   try {
     const response = await fetch(
-        '/api/users/login', {
+        loginApiUri, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -67,7 +89,7 @@ async function loginProcess(event) {
     }
     console.log("로그인 성공")
     localStorage.setItem('lastRefreshTime', new Date().getTime());
-    window.location.href = '/';
+    window.location.href = response.headers.get("Location"); // 원하는 URL로 변경;
 
   } catch (error) {
     console.error(error);
