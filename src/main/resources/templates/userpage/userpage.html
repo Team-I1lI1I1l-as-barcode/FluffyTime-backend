@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <title>유저페이지</title>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/userpage/userpage.js}" defer></script>
   <link rel="stylesheet" href="/css/userpage/userpage.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
@@ -13,7 +14,7 @@
 </head>
 <body>
 <div class="container">
-  <aside class="sidebar" th:include="common/sidebar :: sidebar"></aside>
+  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
 </div>
 <div id="userpage_container">
   <header id="user_information_container">
@@ -86,11 +87,10 @@
   </section>
 </div>
 
-<div th:include="common/createModal :: createModal" class="modal" id="postModal"
-     style="display: none;"></div>
+
+<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
 <!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
-     style="display: none;"></div>
+<th:block th:replace="~{common/tempModal :: tempModal}" ></th:block>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
 

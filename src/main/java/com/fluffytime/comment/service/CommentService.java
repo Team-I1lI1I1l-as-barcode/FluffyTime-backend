@@ -2,13 +2,13 @@ package com.fluffytime.comment.service;
 
 import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.comment.dto.CommentResponseDto;
-import com.fluffytime.common.exception.global.NotFoundComment;
-import com.fluffytime.common.exception.global.NotFoundPost;
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.common.exception.global.CommentNotFound;
+import com.fluffytime.common.exception.global.PostNotFound;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.repository.CommentRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
@@ -35,9 +35,9 @@ public class CommentService {
     //댓글 저장
     public void createComment(CommentRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(NotFoundUser::new);
+            .orElseThrow(UserNotFound::new);
         Post post = postRepository.findById(requestDto.getPostId())
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         Comment comment = Comment.builder()
             .content(requestDto.getContent())
@@ -58,7 +58,7 @@ public class CommentService {
     //댓글 수정
     public void updateComment(Long commentId, String content) {
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
+            .orElseThrow(CommentNotFound::new);
 
         comment.setContent(content);
         commentRepository.save(comment);
@@ -67,7 +67,7 @@ public class CommentService {
     //댓글 삭제
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
+            .orElseThrow(CommentNotFound::new);
         commentRepository.delete(comment);
     }
 
@@ -89,7 +89,7 @@ public class CommentService {
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
-        User user = findUserById(userId).orElseThrow(NotFoundUser::new);
+        User user = findUserById(userId).orElseThrow(UserNotFound::new);
         return user;
     }
 
@@ -102,7 +102,7 @@ public class CommentService {
     //댓글 ID로 댓글 조회하기
     public CommentResponseDto getCommentByCommentId(Long commentId, Long currentUserId) {
         Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(NotFoundComment::new);
+            .orElseThrow(CommentNotFound::new);
         return new CommentResponseDto(comment, currentUserId);
     }
 }

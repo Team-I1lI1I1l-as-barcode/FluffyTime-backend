@@ -2,6 +2,7 @@ package com.fluffytime.reply.dto;
 
 import com.fluffytime.domain.Reply;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ public class ReplyResponseDto {
     private String nickname;
     private LocalDateTime createdAt;
     private boolean isAuthor; //현재 사용자 = 작성자??
+    private String profileImageurl;
 
     public ReplyResponseDto(Reply reply, Long currentUserId) {
         this.replyId = reply.getReplyId();
@@ -27,5 +29,8 @@ public class ReplyResponseDto {
         this.nickname = reply.getUser().getNickname();
         this.createdAt = reply.getCreatedAt();
         this.isAuthor = this.userId.equals(currentUserId);
+        this.profileImageurl = Optional.ofNullable(reply.getUser().getProfile())
+            .map(profile -> profile.getProfileImages().getFilePath())
+            .orElse("/image/profile/profile.png");
     }
 }

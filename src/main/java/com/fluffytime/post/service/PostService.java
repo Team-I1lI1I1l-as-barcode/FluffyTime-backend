@@ -1,12 +1,12 @@
 package com.fluffytime.post.service;
 
-import com.fluffytime.common.exception.global.NotFoundPost;
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.common.exception.global.PostNotFound;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.request.PostRequest;
 import com.fluffytime.post.dto.response.ApiResponse;
@@ -138,7 +138,7 @@ public class PostService {
         try {
             Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
             return userRepository.findById(userId)
-                .orElseThrow(NotFoundUser::new);
+                .orElseThrow(UserNotFound::new);
 
         } catch (IllegalArgumentException e) {
             log.error("유효하지 않은 토큰입니다: {}", accessToken, e);
@@ -179,7 +179,7 @@ public class PostService {
     public ApiResponse<PostResponse> getPostById(Long id) {
         // 게시글을 조회하고, 없으면 예외를 발생시킴
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // Post 엔티티를 PostResponse로 변환함
         PostResponse postResponse = new PostResponse(
@@ -210,7 +210,7 @@ public class PostService {
         User user = findUserByAccessToken(request);
 
         Post existingPost = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // 게시물 소유자인지 확인
         if (!existingPost.getUser().equals(user)) {
@@ -260,7 +260,7 @@ public class PostService {
         User user = findUserByAccessToken(request);
 
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // 게시물 소유자인지 확인
         if (!post.getUser().equals(user)) {
@@ -275,7 +275,7 @@ public class PostService {
     @Transactional
     public ApiResponse<Void> deleteTempPost(Long id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(NotFoundPost::new);
+            .orElseThrow(PostNotFound::new);
 
         // 임시 저장된 상태인 경우에만 삭제함
         if (post.getTempStatus() == TempStatus.TEMP) {
