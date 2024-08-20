@@ -78,6 +78,11 @@ async function populateList() {
 
   // 검색어를 가져와 소문자로 변환
   const query = document.getElementById('search-input').value.toLowerCase();
+  console.log("검색어: " + query);
+  if (query === "") {
+    alert("검색어를 입력해주세요.");
+    return;
+  }
 
   // 현재 탭과 검색 쿼리를 기반으로 검색 결과를 가져옴
   const list = await getSearchResult(currentTab, query);
@@ -124,34 +129,6 @@ async function populateList() {
     resultsList.appendChild(li);
   });
 }
-
-// 사이드바 마이페이지 코드
-document.getElementById("mypageBtn").addEventListener('click', event => {
-  //window.location.href = "/mypage/test";
-  fetch("/api/mypage/info", {
-    method: "GET", // GET 요청
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.json().then(errorData => {
-        // 에러 메시지 포함하여 alert 호출
-        console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
-        alert('Error: ' + errorData.message);
-        window.location.href = "/";
-      });
-    }
-    return response.json();
-  })  // 서버에서 보낸 응답을 JSON 형식으로 변환
-  .then(data => {
-    window.location.href = `/mypage/${data.nickname}`;
-  })
-  .catch(error => {
-    console.log("서버 오류 발생:" + error);
-  });
-});
 
 // 페이지 로드 시 초기 리스트를 업데이트
 window.onload = selectTab(currentTab);
