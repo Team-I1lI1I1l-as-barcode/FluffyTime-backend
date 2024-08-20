@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/posts")
 public class PostController {
 
-
     // 게시물 상세보기 화면
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable(name = "id") Long id, Model model) {

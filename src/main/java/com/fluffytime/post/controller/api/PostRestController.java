@@ -26,11 +26,17 @@ public class PostRestController {
 
     private final PostService postService;
 
+    // 게시물 등록
     @PostMapping("/reg")
     public ResponseEntity<?> regPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files,
+        @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("게시물 등록 요청 받음: {}", postRequest);
+
+        if (postRequest.getTempId() != null) {
+            // 임시 저장된 글 최종 등록 시 이미지 추가/수정 불가
+            files = null;
+        }
 
         ApiResponse<Long> postIdResponse = postService.createPost(postRequest, files, request);
 
@@ -43,6 +49,7 @@ public class PostRestController {
             .body(postIdResponse);
     }
 
+    // 임시 게시물 등록
     @PostMapping("/temp-reg")
     public ResponseEntity<?> tempRegPost(@RequestPart("post") PostRequest postRequest,
         @RequestPart("images") MultipartFile[] files,
@@ -56,6 +63,7 @@ public class PostRestController {
             .body(postIdResponse);
     }
 
+    // 임시 게시물 삭제
     @PostMapping("/temp-delete/{id}")
     public ResponseEntity<?> deleteTempPost(@PathVariable(name = "id") Long id) {
         log.info("임시 게시물 삭제 요청 받음, ID: {}", id);
@@ -65,6 +73,7 @@ public class PostRestController {
             .body(response);
     }
 
+    // 임시 게시물 목록 조회
     @GetMapping("/temp-posts/list")
     public ResponseEntity<?> getTempPosts() {
         log.info("임시 게시물 목록 조회 요청 받음");
@@ -74,6 +83,7 @@ public class PostRestController {
             .body(tempPostsResponse);
     }
 
+    // 게시물 상세 정보 조회
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getPost(@PathVariable(name = "id") Long id) {
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
@@ -83,6 +93,7 @@ public class PostRestController {
             .body(postResponse);
     }
 
+    // 게시물 수정
     @PostMapping("/edit/{id}")
     public ResponseEntity<?> editPost(@PathVariable(name = "id") Long id,
         @RequestPart(value = "post") PostRequest postRequest,
@@ -96,6 +107,7 @@ public class PostRestController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedPostResponse);
     }
 
+    // 게시물 삭제
     @PostMapping("/delete/{id}")
     public ResponseEntity<?> deletePost(@PathVariable(name = "id") Long id,
         HttpServletRequest request) {

@@ -48,24 +48,38 @@ public class PostService {
     @Transactional
     public ApiResponse<Long> createPost(PostRequest postRequest, MultipartFile[] files,
         HttpServletRequest request) {
+        // 업로드된 파일들의 유효성을 검증함
         validateFiles(files);
 
-        // 토큰에서 사용자 ID 추출
         User user = findUserByAccessToken(request);
+        Post post;
 
-        if (postRequest.getTempStatus() == null) {
-            postRequest.setTempStatus(TempStatus.SAVE);
+        if (postRequest.getTempId() != null) {
+            // 임시 저장된 글을 가져옴
+            post = postRepository.findById(postRequest.getTempId())
+                .orElseThrow(NotFoundPost::new);
+
+            // 상태 검증
+            if (post.getTempStatus() != TempStatus.TEMP) {
+                throw new PostNotInTempStatus();  // 상태가 올바르지 않으면 예외 발생
+            }
+
+            // 상태를 최종 등록으로 업데이트
+            post.setTempStatus(TempStatus.SAVE);
+            post.setUpdatedAt(LocalDateTime.now());
+            post.setContent(postRequest.getContent());
+        } else {
+            // 새 게시물 생성
+            post = Post.builder()
+                .user(user)
+                .content(postRequest.getContent())
+                .createdAt(LocalDateTime.now())
+                .tempStatus(TempStatus.SAVE)  // 새로 생성되는 게시물은 최종 등록 상태로 설정
+                .build();
+            postRepository.save(post);
         }
 
-        Post post = Post.builder()
-            .user(user)
-            .content(postRequest.getContent())
-            .createdAt(LocalDateTime.now())
-            .tempStatus(postRequest.getTempStatus())
-            .build();
-
-        postRepository.save(post);
-
+        // 이미지 저장 로직
         if (files != null && files.length > 0) {
             savePostImages(files, post);
         }
@@ -73,13 +87,16 @@ public class PostService {
         return ApiResponse.response(PostResponseCode.CREATE_POST_SUCCESS, post.getPostId());
     }
 
+
     // 이미지 파일 저장 로직
     private void savePostImages(MultipartFile[] files, Post post) {
         for (MultipartFile file : files) {
             try {
+                // 이미지를 S3에 업로드하고 URL을 가져옴
                 String fileName = s3Service.uploadFile(file);
                 String fileUrl = s3Service.getFileUrl(fileName);
 
+                // PostImages 엔티티를 생성하여 데이터베이스에 저장함
                 PostImages postImage = PostImages.builder()
                     .filename(fileName)
                     .filepath(fileUrl)
@@ -140,6 +157,7 @@ public class PostService {
 
         User user = findUserByAccessToken(request);
 
+        // 임시 게시물을 생성함
         Post post = Post.builder()
             .user(user)
             .content(postRequest.getContent())
@@ -159,10 +177,11 @@ public class PostService {
     // 게시글 조회하기
     @Transactional(readOnly = true)
     public ApiResponse<PostResponse> getPostById(Long id) {
+        // 게시글을 조회하고, 없으면 예외를 발생시킴
         Post post = postRepository.findById(id)
             .orElseThrow(NotFoundPost::new);
 
-        // PostResponse로 변환
+        // Post 엔티티를 PostResponse로 변환함
         PostResponse postResponse = new PostResponse(
             post.getPostId(),
             post.getContent(),
@@ -198,11 +217,15 @@ public class PostService {
             throw new NotFoundUser(); // 권한이 없으면 NotFoundUser 예외 발생
         }
 
+        // 게시물 내용의 길이를 검증함
         if (postRequest.getContent() != null && postRequest.getContent().length() > 2200) {
             throw new ContentLengthExceeded();
         }
+
+        // 게시물 내용을 업데이트함
         existingPost.setContent(postRequest.getContent());
 
+        // 새로운 파일이 업로드된 경우 이미지를 저장함(일단은 안됨)
         if (files != null && files.length > 0) {
             savePostImages(files, existingPost);
         }
@@ -254,6 +277,7 @@ public class PostService {
         Post post = postRepository.findById(id)
             .orElseThrow(NotFoundPost::new);
 
+        // 임시 저장된 상태인 경우에만 삭제함
         if (post.getTempStatus() == TempStatus.TEMP) {
             postRepository.deleteById(id);
             log.info("게시물 ID {}가 성공적으로 삭제되었습니다.", id);
@@ -266,6 +290,7 @@ public class PostService {
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
     public ApiResponse<List<PostResponse>> getTempPosts() {
+        // 모든 게시글을 조회한 후, 임시 저장된 게시물만 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
             .collect(Collectors.toList());
