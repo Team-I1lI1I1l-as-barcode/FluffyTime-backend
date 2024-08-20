@@ -31,7 +31,6 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/login",
-//                    "/logout",
                     "/join/**",
                     "/api/users/**",
                     "/api/auth/**",
@@ -40,7 +39,6 @@ public class SecurityConfig {
                     "/js/**",
                     "/css/**",
                     "/image/**"
-
                 ).permitAll()
                 .anyRequest().authenticated()
 
@@ -54,8 +52,10 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .exceptionHandling(
-                exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
+            .exceptionHandling( exception ->
+                exception
+                    .authenticationEntryPoint(customAuthenticationEntryPoint)
+                    .accessDeniedPage("/error.html")
             )
         ;
 
