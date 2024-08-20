@@ -64,6 +64,11 @@ public class UserPageService {
         return findUserById(userId);
     }
 
+    // 접근한 사용자와 실제 권한을 가진 사용자가 동일한지 판단하는 메서드
+    public boolean isUserAuthorized(String accessNickname, String actuallyNickname) {
+        return accessNickname.equals(actuallyNickname);
+    }
+
 
     // 유저 페이지 정보 불러오기 응답 dto 구성
     @Transactional(readOnly = true)
@@ -100,6 +105,7 @@ public class UserPageService {
                 .petAge(profile.getPetAge()) // 반려동물 나이
                 .intro(profile.getIntro()) // 소개글
                 .fileUrl(myPageService.profileFileUrl(profile.getProfileImages())) // 프로필 파일 경로
+                .publicStatus(profile.getPublicStatus()) // 프로필 공개 여부
                 .build();
 
             return userPageInformationDto;

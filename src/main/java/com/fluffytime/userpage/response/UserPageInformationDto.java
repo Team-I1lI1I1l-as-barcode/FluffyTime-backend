@@ -25,11 +25,13 @@ public class UserPageInformationDto {
     private Long petAge;  // 애완동물 나이
     private String intro;    // 소개글
     private String fileUrl; // 프로필 사진 등록 URL
+    private String publicStatus; // 프로필 공개/비공개 여부
 
     @Builder
     public UserPageInformationDto(String nickname,
         List<PostDto> postsList,
-        String petName, String petSex, Long petAge, String intro, String fileUrl) {
+        String petName, String petSex, Long petAge, String intro, String fileUrl,
+        String publicStatus) {
         this.nickname = nickname;
         this.postsList = postsList;
         this.petName = petName;
@@ -37,5 +39,6 @@ public class UserPageInformationDto {
         this.petAge = petAge;
         this.intro = intro;
         this.fileUrl = fileUrl;
+        this.publicStatus = publicStatus;
     }
 }
