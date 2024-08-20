@@ -1,12 +1,12 @@
 package com.fluffytime.post.service;
 
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.PostNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.post.dto.request.PostRequest;
 import com.fluffytime.post.dto.response.ApiResponse;
@@ -57,7 +57,7 @@ public class PostService {
         if (postRequest.getTempId() != null) {
             // 임시 저장된 글을 가져옴
             post = postRepository.findById(postRequest.getTempId())
-                .orElseThrow(NotFoundPost::new);
+                .orElseThrow(PostNotFound::new);
 
             // 상태 검증
             if (post.getTempStatus() != TempStatus.TEMP) {
@@ -142,10 +142,10 @@ public class PostService {
 
         } catch (IllegalArgumentException e) {
             log.error("유효하지 않은 토큰입니다: {}", accessToken, e);
-            throw new NotFoundUser();
+            throw new UserNotFound();
         } catch (Exception e) {
             log.error("토큰 처리 중 오류가 발생했습니다: {}", accessToken, e);
-            throw new NotFoundUser();
+            throw new UserNotFound();
         }
     }
 
@@ -214,7 +214,7 @@ public class PostService {
 
         // 게시물 소유자인지 확인
         if (!existingPost.getUser().equals(user)) {
-            throw new NotFoundUser(); // 권한이 없으면 NotFoundUser 예외 발생
+            throw new UserNotFound(); // 권한이 없으면 NotFoundUser 예외 발생
         }
 
         // 게시물 내용의 길이를 검증함
@@ -264,7 +264,7 @@ public class PostService {
 
         // 게시물 소유자인지 확인
         if (!post.getUser().equals(user)) {
-            throw new NotFoundUser(); // 권한이 없으면 NotFoundUser 예외 발생
+            throw new UserNotFound(); // 권한이 없으면 NotFoundUser 예외 발생
         }
 
         postRepository.deleteById(id);
