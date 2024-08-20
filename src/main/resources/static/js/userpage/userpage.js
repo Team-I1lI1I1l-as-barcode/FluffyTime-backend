@@ -65,12 +65,20 @@ function handleUserData(data) {
     img.src = data.fileUrl;
   }
 
-  // 해당 유저의 게시글이 있을시 렌더링 처리
-  if (data.postsList !== null) {
-    renderPosts(data.postsList);
-  } else {
+  console.log("타입 확인 코드 !!!!!!!" + typeof data.publicStatus);
+  // 해당 유저의 계정이 공개 계정일때
+  if (data.publicStatus === "1") {
+    (data.postsList !== null) ? renderPosts(data.postsList) : getElement(
+        'no_post').style.display = 'flex';
+
+  } else { // 해당 유저의 계정이 비공개 계정일때
+    // 추후 팔로우 관계일시에는 게시물이 보이게 변경할 예정
+    // if (data.postsList !== null) {
+    //   renderPosts(data.postsList);
+    // } else {
     // 게시글이 없을시 문구 출력
-    getElement('no_post').style.display = 'flex';
+    getElement('private_account').style.display = 'flex';
+    // }
   }
 }
 

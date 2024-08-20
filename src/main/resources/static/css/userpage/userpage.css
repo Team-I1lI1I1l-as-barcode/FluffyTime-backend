@@ -196,6 +196,25 @@
   font-size: 40px;
 }
 
+/*비공개 계정 */
+#private_account {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  gap: 1rem;
+}
+
+#lock {
+  font-size: 5rem;
+}
+
+#lock_comment1, #lock_comment1 {
+  font-size: 40px;
+}
 
 /* 게시글 이미지 */
 .posts img {
