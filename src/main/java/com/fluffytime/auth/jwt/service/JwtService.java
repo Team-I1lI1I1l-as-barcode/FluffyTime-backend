@@ -1,6 +1,7 @@
 package com.fluffytime.auth.jwt.service;
 
 import com.fluffytime.auth.jwt.dao.RefreshTokenDao;
+import com.fluffytime.auth.jwt.exception.InvalidToken;
 import com.fluffytime.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import io.jsonwebtoken.Claims;
@@ -68,7 +69,7 @@ public class JwtService {
             response.addCookie(refreshTokenCookie);
             response.addCookie(accessTokencookie);
 
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new InvalidToken();
         }
     }
 }

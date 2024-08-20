@@ -18,7 +18,7 @@ public class JwtApiController {
 
     // refresh token으로 access token 재발급
     @PostMapping("/refreshToken")
-    public ResponseEntity accessTokenReissue(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> accessTokenReissue(HttpServletRequest request, HttpServletResponse response) {
         return jwtService.reissue(request, response);
     }
 }
