@@ -1,14 +1,14 @@
 package com.fluffytime.userpage.service;
 
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
 import com.fluffytime.mypage.response.PostDto;
-import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.mypage.service.MyPageService;
 import com.fluffytime.repository.UserRepository;
-import com.fluffytime.userpage.exception.NotFoundUserPage;
+import com.fluffytime.userpage.exception.UserPageNotFound;
 import com.fluffytime.userpage.response.UserPageInformationDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -106,7 +106,7 @@ public class UserPageService {
 
         } else {
             log.info("UserPageInformationDto 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USERPAGE 예외 발생");
-            throw new NotFoundUserPage();
+            throw new UserPageNotFound();
         }
 
     }
