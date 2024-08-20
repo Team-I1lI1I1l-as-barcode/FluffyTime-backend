@@ -9,5 +9,4 @@ public class FluffytimeApplication {
     public static void main(String[] args) {
         SpringApplication.run(FluffytimeApplication.class, args);
     }
-
 }

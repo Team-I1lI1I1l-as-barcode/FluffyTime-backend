@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Sansita:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&display=swap');
+
+:root {
+  --primary-color: #FFCC00;
+  --text-color: #000000;
+  --background-color: #FFFFFF;
+  --content-text: #2c3e50;
+  --border-color: #ddd;
+  --hover-color: #da9500;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+input {
+  outline: none; /* 기본 포커스 아웃라인 제거 */
+}
+
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit; /* 방문 후에도 색상 변화 없음 */
+  text-decoration: none; /* 방문 후에도 밑줄 제거 */
+}
+
+button {
+  all: unset; /* 모든 기본 스타일을 제거 */
+  display: inline-block; /* 버튼을 인라인 블록으로 설정 */
+  cursor: pointer; /* 마우스 오버 시 포인터 커서 표시 */
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+/*아이콘
+https://fonts.google.com/icons?icon.style=Rounded에서 'Inserting the icon'부분 사용
+채워진 아이콘은 클래스에 icon-fill 추가하거나 직접 속성 추가*/
+.material-symbols-rounded {
+  font-family: 'Material Symbols Rounded', sans-serif;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle; /* 수직 중앙 정렬 */
+  font-size: 24px; /* 텍스트와 아이콘 크기 맞추기 */
+  line-height: 1;
+}
+
+.icon-fill {
+  font-variation-settings: 'FILL' 1;
+}
+
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.sidebar h2 {
+  margin-top: 0;
+  font-family: "Sansita One", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.sidebar ul li .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+
+li {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.sidebar ul li a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.04rem;
+}
+
+.sidebar ul li a:hover {
+  text-decoration: underline;
+}
+
+.more-menu {
+  position: absolute;
+  bottom: 0; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.more-menu .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+
+.more-menu a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.07rem;
+}
+
+.more-menu a:hover {
+  text-decoration: underline;
+}
+
+/* 메인 콘텐츠를 사이드바와 함께 표시하도록 설정 */
+.content-container {
+  margin-left: 250px; /* 사이드바의 너비만큼 왼쪽 여백 추가 */
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  flex-grow: 1; /* 남은 공간을 차지 */
+  display: flex;
+  justify-content: center; /* 수평 중앙 정렬 */
+}
+
+/* 콘텐츠 */
+.content {
+  width: 600px; /* 고정된 콘텐츠 너비 */
+  padding: 1rem;
+  background-color: var(--background-color);
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: -250px; /* 사이드바를 화면 밖으로 숨김 */
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.show {
+    left: 0; /* 사이드바를 표시 */
+  }
+
+  .content-container {
+    margin-left: 0;
+  }
+
+  .content {
+    width: 100%; /* 작은 화면에서 콘텐츠 너비를 100%로 확장 */
+    margin-left: 0;
+  }
+}

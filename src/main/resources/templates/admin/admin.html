@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>admin</title>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+</head>
+<body>
+<h1>admin 페이지 입니다.</h1>
+<button id="logout">로그아웃</button>
+</body>
+<script>
+  const btn = document.getElementById('logout');
+  btn.addEventListener('click', async () => {
+    try {
+      await fetch(
+          '/api/users/logout', {
+            method: 'POST'
+          });
+      window.location.href="/login"
+    } catch (error) {
+      console.error(error);
+    }
+  })
+</script>
+</html>

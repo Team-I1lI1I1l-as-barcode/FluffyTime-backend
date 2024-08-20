@@ -1,0 +1,415 @@
+/* 전체 컨테이너 */
+#my_profile_container1 {
+  flex: 1;
+  padding: 2rem;
+  background-color: #f7f8fa; /* 밝은 배경색 */
+  color: #333; /* 기본 텍스트 색상 */
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 100vh;
+}
+
+/*프로필 편집 텍스트*/
+#profile_title {
+  font-weight: bold;
+  margin-right: auto;
+  font-size: 20px;
+}
+
+/* 프로필 편집 컨테이너 */
+#my_profile_container2 {
+  max-width: 600px; /* 최대 너비 조정 */
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  border-radius: 12px; /* 둥근 모서리 */
+  background-color: #fff; /* 카드 배경색 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem; /* 요소 간의 간격 */
+}
+
+/*닉네임 텍스트*/
+#nickname {
+  font-size: 1.5rem;
+}
+
+/* 프로필 이미지 및 버튼 */
+#profile_preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  width: 100%;
+  border: 1px solid #ccc;
+}
+
+/* 이미지 미리보기 및 출력 영역의 스타일 설정 */
+#Profile-image-Preview {
+  width: 60px;
+  height: 60px;
+  overflow: hidden;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  background-color: #fff;
+  flex-shrink: 0;
+}
+
+/* 이미지 스타일 설정 */
+#Profile-image-Preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지 비율을 유지하면서 잘림을 방지 */
+  display: block; /* 이미지 주위의 여백 제거 */
+}
+
+/* 닉네임 스타일 설정 */
+#nickname {
+  flex-grow: 1; /* 남은 공간을 모두 차지하도록 설정 */
+  font-size: 16px;
+}
+
+/* 버튼 스타일 설정 */
+#imageBtn {
+
+  padding: 0.6rem 1rem;
+  background-color: #fbc02d;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  line-height: normal;
+}
+
+#imageBtn:hover {
+  background-color: #ffa000; /* 호버 효과 */
+}
+
+/* 이메일 영역 */
+#email_container {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 1.5rem;
+}
+
+#email_label {
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+#email {
+  width: 100%; /* 다른 input 필드와 동일한 너비 */
+  padding: 1.1rem; /* 다른 input 필드와 동일한 패딩 */
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  color: #777;
+  border: 1px solid #ddd; /* 다른 input 필드와 동일한 테두리 */
+  box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 설정 */
+}
+
+/* 입력 필드 그룹 */
+#profile_edit_form {
+  width: 100%;
+}
+
+#profile_edit_form label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.input-group {
+  display: flex;
+  align-items: center; /* 요소들을 수직 가운데 정렬 */
+  margin-bottom: 1.2rem;
+}
+
+.input-group input[type="text"] {
+  flex: 1; /* 입력 필드가 가능한 넓게 차지하도록 설정 */
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-right: 0.5rem;
+  box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 설정 */
+}
+
+#check_username_Btn {
+  margin-bottom: auto;
+  padding: 0.6rem 1rem;
+  background-color: #fbc02d;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-sizing: border-box; /* 패딩과 테두리를 포함한 크기 설정 */
+  line-height: normal; /* 텍스트의 수직 정렬을 조정 */
+}
+
+/* 비활성화된 버튼 스타일 */
+#check_username_Btn:disabled {
+  background-color: #ccc; /* 비활성화 상태의 배경색 (회색) */
+  color: #666; /* 비활성화 상태의 텍스트 색상 (회색) */
+  cursor: not-allowed; /* 비활성화 상태의 커서 변경 */
+  opacity: 0.6; /* 비활성화 상태의 투명도 */
+}
+
+
+#check_username_Btn:hover {
+  background-color: #ffa000;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1.2rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+select {
+  background-color: #e0e0e0;
+  cursor: pointer;
+}
+
+/* 계정 공개 스위치 */
+#account_status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+#public_status {
+  position: absolute;
+  opacity: 0;
+}
+
+#switch {
+  width: 50px;
+  height: 30px;
+  background-color: #ccc;
+  border-radius: 40px;
+  cursor: pointer;
+  position: relative;
+}
+
+/* 계정 공개/비공개 스위치 -> 레이블 가상요소(스위치 버튼) */
+#switch::after {
+  content: " ";
+  position: absolute;
+  left: 3px;
+  top: 50%;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
+  background-color: #fff;
+  transform: translateY(-50%);
+  box-shadow: 1px 3px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s;
+}
+
+/* 계정 공개/비공개 스위치 -> 레이블 가상요소 */
+#switch::before {
+  font-family: Arial, Helvetica, sans-serif;
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.4s;
+}
+
+/* 계정 공개/비공개 스위치 -> 레이블 가상요소 */
+#public_status:checked + label {
+  background: #fbc02d;
+}
+
+/* 계정 공개/비공개 스위치 -> 체크되었을때 배경 */
+#public_status:checked + label::after {
+  left: calc(100% - 28px);
+}
+
+/* 계정 공개/비공개 스위치 -> 체크되었을때 버튼 */
+#public_status:checked + label::before {
+  color: #fff;
+  left: 5px;
+}
+
+/* 제출 버튼 */
+#submit {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #fbc02d;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* 비활성화된 버튼 스타일 */
+#submit:disabled {
+  background-color: #ccc; /* 비활성화 상태의 배경색 (회색) */
+  color: #666; /* 비활성화 상태의 텍스트 색상 (회색) */
+  cursor: not-allowed; /* 비활성화 상태의 커서 변경 */
+  opacity: 0.6; /* 비활성화 상태의 투명도 */
+}
+
+#submit:hover {
+  background-color: #ffa000;
+}
+
+/* 하단 옵션 버튼들 */
+#block,
+#account_delete {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+/* 버튼 텍스트 영역을 늘리기 위해 너비 수정 */
+#block button,
+#account_delete button {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 8px;
+  color: #333;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+#block p,
+#account_delete p {
+  width: 100%; /* 텍스트 영역을 확장 */
+  text-align: left; /* 텍스트를 왼쪽 정렬 */
+  margin-bottom: 0.5rem; /* 텍스트와 버튼 사이 간격 */
+}
+
+#block button:hover,
+#account_delete button:hover {
+  background-color: #ccc;
+}
+
+#account_delete button {
+  background-color: #ff5252; /* 삭제 버튼 색상 */
+  color: #fff;
+}
+
+#account_delete button:hover {
+  background-color: #ff1744;
+}
+
+#account_delete button {
+  background-color: #ff5252; /* 삭제 버튼 색상 */
+  color: #fff;
+}
+
+#account_delete button:hover {
+  background-color: #ff1744;
+}
+
+/* 모달 오버레이 스타일 */
+.profile-modal-overlay {
+  display: none; /* 기본적으로 숨김 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4); /* 반투명 배경 */
+  z-index: 1000; /* 모달이 다른 콘텐츠 위에 위치하도록 설정 */
+  transition: opacity 0.3s ease; /* 부드러운 전환 효과 */
+}
+
+/* 모달 창 스타일 */
+#profile-modal {
+  display: none; /* 기본적으로 숨김 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 중앙 정렬 */
+  background-color: #fff; /* 모달 배경색 */
+  border-radius: 8px; /* 둥근 테두리 */
+  padding: 20px; /* 패딩 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 부드러운 그림자 */
+  z-index: 1001; /* 모달이 오버레이 위에 위치하도록 설정 */
+  max-width: 500px; /* 최대 너비 */
+  width: 100%; /* 너비 설정 */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* 부드러운 전환 효과 */
+  opacity: 0; /* 초기 상태에서 투명도 0 */
+  transform: translate(-50%, -60%); /* 초기 상태에서 위로 이동 */
+}
+
+/* 모달을 활성화했을 때 스타일 */
+#profile-modal.show {
+  display: block;
+  opacity: 1;
+  transform: translate(-50%, -50%); /* 중앙 정렬로 이동 */
+}
+
+/* 모달 콘텐츠 스타일 (내부) */
+#profile-modal .profile-modal-content {
+  text-align: center; /* 내용 중앙 정렬 */
+}
+
+#modal_title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px; /* 제목과 콘텐츠 사이 간격 */
+}
+
+/* 모달 메뉴 항목 */
+#profile_image_upload,
+#profile_image_delete,
+#profile_image_cancel {
+  display: block;
+  font-size: 16px;
+  font-weight: normal;
+  cursor: pointer;
+  padding: 10px 0;
+  color: #333;
+  transition: background-color 0.3s ease; /* 배경색 전환 효과 */
+}
+
+/* 항목에 마우스 올렸을 때 */
+#profile_image_upload:hover,
+#profile_image_delete:hover,
+#profile_image_cancel:hover {
+  background-color: #f5f5f5; /* 항목에 마우스를 올렸을 때 배경색 변경 */
+}
+
+/* 활성화된 상태에서 항목 강조 */
+#profile_image_upload:active,
+#profile_image_delete:active,
+#profile_image_cancel:active {
+  background-color: #e0e0e0; /* 클릭했을 때 배경색 변경 */
+}
+
+#profile_image_upload {
+  color: #007bff;
+}
+
+#profile_image_delete {
+  color: #dc3545;
+}
+
+#profile_image_cancel {
+  color: black;
+}
