@@ -64,7 +64,7 @@
 
 /* 사용자 정보 p와 버튼을 가로로 배치 */
 #profile_information_container p,
-#follow_button {
+#follow_button, #unblock_comment {
   font-size: 1.2rem;
   display: inline-flex; /* 수평 배치를 위한 설정 */
   align-items: center; /* 수직 가운데 정렬 */
@@ -95,7 +95,7 @@
   font-size: 15px;
 }
 
-/* 프로필 편집 버튼 */
+/* 팔로우 버튼 */
 #follow_button {
   background-color: var(--primary-color);
   color: black;
@@ -109,6 +109,19 @@
 #follow_button:hover {
   background-color: #e6b800; /* Primary color를 조금 어둡게 */
 }
+
+
+/* 차단 해제 버튼  - 평상시에는 비활성화, 차단 시 활성화*/
+#unblock_comment {
+  display: none;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.8em; /* 버튼의 폰트 사이즈 조정 */
+}
+
 
 /* header부분 (프로필 정보 + nav) */
 #user_information_container {
@@ -177,7 +190,8 @@
   padding: 1rem 0;
 }
 
-#no_post {
+/*게시물이 없을때, 비공계 계정일 때, 차단된 계정일 때 */
+#no_post, #private_account, #block_account {
   display: none;
   flex-direction: column;
   align-items: center;
@@ -188,32 +202,13 @@
   gap: 1rem;
 }
 
-#post_create {
+#post_create, #lock, #block {
   font-size: 5rem;
 }
 
-#post_comment {
+#post_comment, #lock_comment1, #lock_comment1, #block_comment1 {
   font-size: 40px;
-}
-
-/*비공개 계정 */
-#private_account {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  grid-column: 1 / -1;
-  grid-row: 1 / -1;
-  gap: 1rem;
-}
-
-#lock {
-  font-size: 5rem;
-}
-
-#lock_comment1, #lock_comment1 {
-  font-size: 40px;
+  margin-top: 10px;
 }
 
 /* 게시글 이미지 */
@@ -277,7 +272,7 @@
 
 /* 모달 메뉴 항목 */
 #block_follow,
-  /*#block_follow_cancel,*/
+#block_follow_cancel,
 #block_cancel {
   display: block;
   font-size: 16px;
@@ -290,14 +285,14 @@
 
 /* 항목에 마우스 올렸을 때 */
 #block_follow:hover,
-  /*#block_follow_cancel:hover,*/
+#block_follow_cancel:hover,
 #block_cancel:hover {
   background-color: #f5f5f5; /* 항목에 마우스를 올렸을 때 배경색 변경 */
 }
 
 /* 활성화된 상태에서 항목 강조 */
 #block_follow:active,
-  /*#block_follow_cancel:active,*/
+#block_follow_cancel:active,
 #block_cancel:active {
   background-color: #e0e0e0; /* 클릭했을 때 배경색 변경 */
 }
@@ -306,9 +301,10 @@
   color: #dc3545;
 }
 
-/*#block_follow_cancel {*/
-/*  color: #dc3545;*/
-/*}*/
+#block_follow_cancel {
+  display: none;
+  color: #dc3545;
+}
 
 #block_cancel {
   color: black;

@@ -275,7 +275,14 @@ public class MyPageService {
             log.info("AccountDelete 실행 >> 해당 유저가 존재하여 회원 탈퇴");
             userRepository.delete(user);
 
-            // 회원 탈퇴 시 refreshToken 쿠키 삭제
+            // accessToken 쿠키 삭제
+            Cookie aceessTokenCookie = new Cookie("accessToken", null);
+            aceessTokenCookie.setPath("/");
+            aceessTokenCookie.setHttpOnly(true);
+            aceessTokenCookie.setMaxAge(0);
+            response.addCookie(aceessTokenCookie);
+
+            // refreshToken 쿠키 삭제
             Cookie refreshTokenCookie = new Cookie("refreshToken", null);
             refreshTokenCookie.setPath("/");
             refreshTokenCookie.setHttpOnly(true);

@@ -5,6 +5,7 @@
   <title>유저페이지</title>
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/userpage/userpage.js}" defer></script>
+  <script th:src="@{/js/userpage/blockUser.js}" defer></script>
   <link rel="stylesheet" href="/css/userpage/userpage.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
   <link rel="stylesheet" href="/css/styles.css">
@@ -35,7 +36,7 @@
     <div id="userPage-modal" class="userPage-modal">
       <div id="userPage-modal-content">
         <a id="block_follow">유저 차단</a>
-        <!--          <a id="block_follow_cancel">유저 차단 해제</a>-->
+        <a id="block_follow_cancel">유저 차단 해제</a>
         <a id="block_cancel">취소</a>
       </div>
     </div>
@@ -50,6 +51,9 @@
         <button id="follow_button">
           팔로우
         </button>
+        <a id="unblock_comment">
+          차단됨
+        </a>
         <!-- 더보기 버튼 -->
         <span id="more" class="material-symbols-rounded">more_horiz</span>
 
@@ -84,11 +88,17 @@
       <p id="post_create" class="material-symbols-rounded">no_photography</p>
       <p id="post_comment">게시물 없음</p>
     </div>
-
+    <!--     비공계 계정일 때  -->
     <div id="private_account">
       <p id="lock" class="material-symbols-rounded">lock_person</p>
-      <p id="lock_comment1">비공개 계정입니다.</p>
+      <p id="lock_comment1">비공개 계정</p>
       <p id="lock_comment2">게시물을 보려면 팔로우하세요.</p>
+    </div>
+
+    <!--  차단 계정일 때 -->
+    <div id="block_account">
+      <p id="block" class="material-symbols-rounded">block</p>
+      <p id="block_comment1">차단한 계정</p>
     </div>
 
   </section>
