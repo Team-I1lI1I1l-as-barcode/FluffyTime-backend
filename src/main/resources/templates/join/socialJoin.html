@@ -4,17 +4,15 @@
   <meta charset="UTF-8">
   <title>가입하기</title>
   <link rel="stylesheet" href="/css/styles.css">
-  <link rel="stylesheet" href="/css/join/join.css">
+  <link rel="stylesheet" href="/css/join/socialJoin.css">
 </head>
 <body>
 <div class="container">
-  <h1>회원가입</h1>
+  <h1>간편회원가입</h1>
   <form method="post" id="joinForm">
-    <p class="email-notice notice hidden"></p>
     <div class="input">
       <label for="email"></label>
       <input type="text" id="email" name="email" required placeholder="이메일을 입력해주세요.">
-      <button type="button" id="checkEmailBtn" class="checkBtn">중복확인</button>
     </div>
 
     <p class="password-notice notice hidden"></p>
@@ -38,6 +36,6 @@
     <button type="submit" id="joinBtn" class="btn submit">회원가입</button>
   </form>
 </div>
-<script th:src="@{/js/join/join.js}"></script>
+<script th:src="@{/js/join/socialJoin.js}"></script>
 </body>
 </html>
