@@ -8,7 +8,8 @@ const pet_sex = getElement("pet_sex"); // 반려동물 성별
 const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
-const ProfileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
+const profileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
+const bookmark = getElement('bookmark');
 
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
@@ -95,6 +96,12 @@ function handleProfileData(data) {
     // 게시글이 없을시 문구 출력
     getElement('no_post').style.display = 'flex';
   }
+  // 북마크 클릭시 북마크 게시글 렌더링 처리
+  bookmark.addEventListener('click', (event) => {
+    const postListElement = document.querySelector('#post_list');
+    postListElement.innerHTML = ''; // 기존 리스트 비우기
+    renderPosts(data.bookmarkList);
+  });
 }
 
 // 게시물 목록을 렌더링하는 함수
@@ -131,7 +138,7 @@ function initialize() {
   fetchMyPage("/api/mypage/info", "GET", handleProfileData);
 
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림
-  ProfileImagePreview.addEventListener('click', event => {
+  profileImagePreview.addEventListener('click', event => {
     event.preventDefault();
     document.getElementById("mypage-images").click();  // 프로필 이미지 등록
 
