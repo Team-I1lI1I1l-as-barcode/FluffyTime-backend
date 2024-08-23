@@ -62,10 +62,10 @@ public class UserApiController {
     @PostMapping("login")
     public ResponseEntity<Void> login(
         @RequestBody @Valid LoginUser loginUser,
-        @RequestParam(defaultValue = "/") String redirectURL,
+        @RequestParam(defaultValue = "/", name = "redirectURL") String redirectURL,
         HttpServletResponse response
     ) {
-        loginService.loginProcess(response,loginUser);
+        loginService.loginProcess(response, loginUser);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, redirectURL);
@@ -112,7 +112,8 @@ public class UserApiController {
         @Email
         String email
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(certificationService.sendCertificationMail(email));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(certificationService.sendCertificationMail(email));
     }
 
     // 메일 인증
@@ -123,6 +124,7 @@ public class UserApiController {
         @Email
         String email
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body(certificationService.certificateEmail(email));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(certificationService.certificateEmail(email));
     }
 }

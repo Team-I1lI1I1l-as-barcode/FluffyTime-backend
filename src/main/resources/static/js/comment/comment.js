@@ -44,14 +44,21 @@ async function fetchComments() {
     contentSpan.textContent = comment.content;
 
     // 좋아요 버튼 추가
-    const likeButton = document.createElement('button');
-    likeButton.className = 'like-button';
-    likeButton.innerHTML = comment.liked ? '♥' : '♡'; // 좋아요 상태에 따라 버튼 모양 설정
+    const likeButton = document.createElement('span');
+    likeButton.className = 'like-button material-icons';
+    likeButton.innerHTML = comment.liked ? 'favorite' : 'favorite_border'; // 좋아요 상태에 따라 버튼 모양 설정
+
+    // 좋아요 상태에 따른 클래스 적용
+    if (comment.liked) {
+      likeButton.classList.add('liked');
+    } else {
+      likeButton.classList.remove('liked');
+    }
 
     // 좋아요 개수
     const likeCountSpan = document.createElement('span');
     likeCountSpan.className = 'like-count';
-    likeCountSpan.textContent = `${comment.likeCount} Likes`;
+    likeCountSpan.textContent = `${comment.likeCount}`;
 
     // 좋아요 버튼 클릭 이벤트
     likeButton.onclick = () => {
