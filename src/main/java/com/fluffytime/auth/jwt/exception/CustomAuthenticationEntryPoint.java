@@ -77,7 +77,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 JwtResponseProvider.setResponse(response, JwtErrorCode.UNKNOWN_ERROR);
             }
         }
-        response.sendRedirect("/login");
+        String requestURI = request.getRequestURI();
+        log.info("redirect url = {}", request.getRequestURI());
+        response.sendRedirect("/login?redirectURL="+requestURI);
     }
 
     // 사용자 요청이 RESTful라면 이에 대한 처리 구현

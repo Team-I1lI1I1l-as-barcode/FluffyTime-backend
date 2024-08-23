@@ -14,12 +14,17 @@ public class CommentLikeResponseDto {
     private String nickname;
     private int likeCount;
     private boolean isLiked;
+    private String profileImageurl;
+    private String intro;
 
     @Builder
-    public CommentLikeResponseDto(Long userId, String nickname, int likeCount, boolean isLiked) {
+    public CommentLikeResponseDto(Long userId, String nickname, int likeCount, boolean isLiked,
+        String profileImageurl, String intro) {
         this.userId = userId;
         this.nickname = nickname;
         this.likeCount = likeCount;
         this.isLiked = isLiked;
+        this.profileImageurl = profileImageurl;
+        this.intro = intro;
     }
 }

@@ -56,11 +56,14 @@ body {
 
 .profile-content {
   display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .nickname-content {
   display: flex;
   flex-direction: column;
+  width: 80%;
 }
 
 .default-content {
@@ -97,7 +100,7 @@ body {
 .comment .text {
   font-size: 14px;
   color: #262626;
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .comment .buttons {
@@ -111,7 +114,8 @@ body {
   width: 160px;
   display: flex;
   justify-content: space-between;
-  margin-left: 3.2rem;
+  margin-left: 3.3rem;
+  margin-top: 0.5rem;
 }
 
 .comment .buttons button {

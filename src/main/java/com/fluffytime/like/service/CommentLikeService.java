@@ -73,6 +73,10 @@ public class CommentLikeService {
                 .nickname(like.getUser().getNickname())
                 .likeCount(commentLikeRepository.countByComment(comment))
                 .isLiked(true) //좋아요 목록이므로 항상 true
+                .profileImageurl(Optional.ofNullable(like.getUser().getProfile())
+                    .map(profile -> profile.getProfileImages().getFilePath())
+                    .orElse("/image/profile/profile.png"))
+                .intro(like.getUser().getProfile().getIntro())
                 .build())
             .collect(Collectors.toList());
     }
