@@ -17,6 +17,7 @@ public class MyPageInformationDto {
 
     private String nickname;  // 사용자 이름
     private List<PostDto> postsList;// 게시물 리스트
+    private List<PostDto> bookmarkList; // 북마크 리스트
     private int followerCount;  // 팔로워 수
     private int followCount;// 팔로우 수
     private String petName; // 애완동물 이름
@@ -27,10 +28,11 @@ public class MyPageInformationDto {
 
     @Builder
     public MyPageInformationDto(String nickname,
-        List<PostDto> postsList,
+        List<PostDto> postsList, List<PostDto> bookmarkList,
         String petName, String petSex, Long petAge, String intro, String fileUrl) {
         this.nickname = nickname;
         this.postsList = postsList;
+        this.bookmarkList = bookmarkList;
         this.petName = petName;
         this.petSex = petSex;
         this.petAge = petAge;
