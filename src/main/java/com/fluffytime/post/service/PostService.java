@@ -310,25 +310,8 @@ public class PostService {
                 }
             }
         }
-
-        if (accessToken == null || accessToken.isEmpty()) {
-            log.error("토큰이 존재하지 않습니다.");
-            throw new IllegalArgumentException("토큰이 존재하지 않습니다.");
-        }
-
-        log.info("Extracted Token: {}", accessToken);
-
-        try {
-            Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
-            return userRepository.findById(userId)
-                .orElseThrow(UserNotFound::new);
-
-        } catch (IllegalArgumentException e) {
-            log.error("유효하지 않은 토큰입니다: {}", accessToken, e);
-            throw new UserNotFound();
-        } catch (Exception e) {
-            log.error("토큰 처리 중 오류가 발생했습니다: {}", accessToken, e);
-            throw new UserNotFound();
-        }
+        
+        Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
+        return userRepository.findById(userId).orElseThrow(UserNotFound::new);
     }
 }

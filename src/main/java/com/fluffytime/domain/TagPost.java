@@ -28,11 +28,11 @@ public class TagPost {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private Post post;  // postId가 아니라 post
+    private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_id", nullable = false)
-    private Tag tag;  // tagId가 아니라 tag
+    private Tag tag;
 
     @Builder
     public TagPost(Post post, Tag tag) {

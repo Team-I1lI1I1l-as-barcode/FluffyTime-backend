@@ -27,7 +27,7 @@ public class Tag {
     @Column(name = "tag_id", nullable = false)
     private Long tagId;
 
-    @Column(name = "tag_name", nullable = false, unique = true)
+    @Column(name = "tag_name", nullable = false)
     private String tagName;
 
     @OneToMany(
