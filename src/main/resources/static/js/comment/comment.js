@@ -43,6 +43,33 @@ async function fetchComments() {
     contentSpan.className = 'text';
     contentSpan.textContent = comment.content;
 
+    // 좋아요 버튼 추가
+    const likeButton = document.createElement('button');
+    likeButton.className = 'like-button';
+    likeButton.innerHTML = comment.liked ? '♥' : '♡'; // 좋아요 상태에 따라 버튼 모양 설정
+
+    // 좋아요 개수
+    const likeCountSpan = document.createElement('span');
+    likeCountSpan.className = 'like-count';
+    likeCountSpan.textContent = `${comment.likeCount} Likes`;
+
+    // 좋아요 버튼 클릭 이벤트
+    likeButton.onclick = () => {
+      toggleLike(comment.commentId, likeButton, likeCountSpan);
+    };
+
+    //좋아요 목록 모달 보여줌 (개수 클릭 시)
+    likeCountSpan.onclick = async = async () => {
+      const users = await fetchUsersWhoLiked(comment.commentId);
+      showLikeUserModal(users);
+    }
+
+    // 좋아요 버튼/개수 묶음
+    const likedDiv = document.createElement('div');
+    likedDiv.className = 'liked-box';
+    likedDiv.appendChild(likeButton);
+    likedDiv.appendChild(likeCountSpan);
+
     // nicknameSpan과 contentSpan을 한 번 더 묶음
     const nicknameContentDiv = document.createElement('div');
     nicknameContentDiv.className = 'nickname-content';
@@ -54,6 +81,7 @@ async function fetchComments() {
     profileContentDiv.className = 'profile-content';
     profileContentDiv.appendChild(profileImg);
     profileContentDiv.appendChild(nicknameContentDiv);
+    profileContentDiv.appendChild(likedDiv);
 
     // 버튼들 묶음
     const editDeleteButtonsDiv = document.createElement('div');
@@ -219,6 +247,7 @@ function showEditReply(replyId, currentContent) {
   editTextarea.value = currentContent;
 
   const saveButton = document.createElement('button');
+  saveButton.className = 'comment-edit-button';
   saveButton.textContent = '수정 완료';
   saveButton.onclick = () => updateReply(replyId, editTextarea.value);
 

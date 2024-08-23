@@ -218,6 +218,10 @@ button {
   cursor: pointer;
 }
 
+.comment-edit-button {
+  width: 100px;
+}
+
 button:hover {
   background-color: var(--hover-color);
 }
