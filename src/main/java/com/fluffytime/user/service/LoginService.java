@@ -4,9 +4,11 @@ import com.fluffytime.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.UserNotFound;
+import com.fluffytime.domain.LoginType;
 import com.fluffytime.domain.User;
 import com.fluffytime.repository.UserRepository;
 import com.fluffytime.user.dto.request.LoginUser;
+import com.fluffytime.user.exception.LoginTypeError;
 import com.fluffytime.user.exception.MismatchedPassword;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +36,10 @@ public class LoginService {
     public void loginProcess(HttpServletResponse response, LoginUser loginUser) {
 
         User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFound::new);
+
+        if(user.getLoginType() == LoginType.Social) {
+            throw new LoginTypeError();
+        }
 
         if(!passwordEncoder.matches(loginUser.getPassword(),user.getPassword())) {
             throw new MismatchedPassword();

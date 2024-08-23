@@ -1,5 +1,6 @@
-package com.fluffytime.auth.security;
+package com.fluffytime.auth.jwt.service;
 
+import com.fluffytime.auth.jwt.dto.CustomUserDetails;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.User;
 import com.fluffytime.repository.UserRepository;

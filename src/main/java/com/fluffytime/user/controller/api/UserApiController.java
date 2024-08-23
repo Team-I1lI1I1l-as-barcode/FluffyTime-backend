@@ -47,6 +47,14 @@ public class UserApiController {
             .body(joinService.tempJoin(joinUser));
     }
 
+    // 간편 회원가입
+    @PostMapping("/social-join")
+    public ResponseEntity<JoinResponse> socialJoin(
+        @RequestBody @Valid JoinRequest joinUser
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(joinService.socialJoin(joinUser));
+    }
+
     // 회원가입
     @GetMapping("/join")
     public ResponseEntity<JoinResponse> join(
@@ -58,11 +66,13 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.join(email));
     }
 
+
+
     // 로그인
     @PostMapping("login")
     public ResponseEntity<Void> login(
         @RequestBody @Valid LoginUser loginUser,
-        @RequestParam(defaultValue = "/") String redirectURL,
+        @RequestParam(defaultValue = "/", name = "redirectURL") String redirectURL,
         HttpServletResponse response
     ) {
         loginService.loginProcess(response,loginUser);

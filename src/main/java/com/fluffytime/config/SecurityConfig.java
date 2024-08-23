@@ -3,6 +3,8 @@ package com.fluffytime.config;
 import com.fluffytime.auth.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.auth.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.auth.oauth2.handler.CustomSuccessHandler;
+import com.fluffytime.auth.oauth2.service.CustomOAuth2UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +25,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomSuccessHandler customSuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtTokenizer jwtTokenizer;
 
     @Bean
@@ -30,6 +34,8 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
+                    "/oauth2/**",
+                    "/login/oauth2/code/**",
                     "/login",
                     "/join/**",
                     "/api/users/**",
@@ -41,14 +47,10 @@ public class SecurityConfig {
                     "/image/**"
                 ).permitAll()
                 .anyRequest().authenticated()
-
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
                 UsernamePasswordAuthenticationFilter.class)
             .formLogin(form -> form.disable())
-            .sessionManagement(
-                sessionManagement -> sessionManagement.sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS))
             .csrf(csrf -> csrf.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -56,8 +58,19 @@ public class SecurityConfig {
                 exception
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
                     .accessDeniedPage("/error.html")
-            )
-        ;
+            );
+
+        http.oauth2Login((oauth2) -> oauth2
+            .loginPage("/login")
+            .userInfoEndpoint((userInfoEndpointConfig -> userInfoEndpointConfig
+                .userService(customOAuth2UserService)
+                ))
+            .successHandler(customSuccessHandler)
+        );
+
+        http.sessionManagement(
+            sessionManagement -> sessionManagement.sessionCreationPolicy(
+                SessionCreationPolicy.STATELESS));
 
         return http.build();
     }

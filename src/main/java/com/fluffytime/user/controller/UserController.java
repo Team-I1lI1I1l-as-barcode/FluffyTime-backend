@@ -20,6 +20,12 @@ public class UserController {
         return "join/join";
     }
 
+    // oauth2 회원가입 화면 (간편회원가입)
+    @GetMapping("/join/social")
+    public String socialJoinPage() {
+        return "join/socialJoin";
+    }
+
     // 회원가입 이메일 인증 대기 화면
     @GetMapping("/join/email-certificate/{email}")
     public String emailCertificatePage() {

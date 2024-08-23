@@ -109,3 +109,36 @@ input:focus {
 .hidden {
   display: none;
 }
+
+.social {
+  display: flex;
+}
+
+.divider {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.divider p {
+  width: 200px;
+  margin: 0 5px;
+  border: 1px solid var(--primary-color);
+}
+
+.divider span {
+  text-align: center;
+  width: 100px;
+  color: var(--primary-color);
+}
+
+.social .naver img,
+.social .google img {
+  height: 100px;
+}
+
+.socialLogin {
+  margin: 10px;
+}

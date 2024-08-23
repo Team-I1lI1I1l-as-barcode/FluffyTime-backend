@@ -3,6 +3,8 @@ package com.fluffytime.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,8 +47,13 @@ public class User {
     @Column(name = "nickname", nullable = false, length = 100)
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_type", nullable = false)
+    private LoginType loginType;
+
     @Column(name = "registration_at", nullable = false)
     private LocalDateTime registrationAt;
+
 
     @OneToMany(
         mappedBy = "user",
@@ -89,9 +96,10 @@ public class User {
     }
 
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(String email, String password, String nickname, LoginType loginType) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.loginType = loginType;
     }
 }
