@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="/css/post/postDetail.css">
   <link rel="stylesheet" href="/css/comment/comment.css">
   <link rel="stylesheet" href="/css/like/commentLike.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/post/postDetail.js}" defer></script>
   <script th:src="@{/js/comment/comment.js}"></script>
@@ -81,10 +82,12 @@
   </div>
 </div>
 
-<div id="like-user-modal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <h2>좋아요한 유저 목록</h2>
+<div id="like-user-modal" class="modal-like">
+  <div class="modal-content-like">
+    <div class="like-modal-top">
+      <h2>좋아요</h2>
+      <span class="close-like" onclick="closeModal()">&times;</span>
+    </div>
     <div class="user-list">
       <!-- 유저 목록이 동적으로 추가됩니다 -->
     </div>

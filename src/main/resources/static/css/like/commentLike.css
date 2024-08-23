@@ -1,4 +1,4 @@
-.modal {
+.modal-like {
   display: none;
   position: fixed;
   z-index: 1;
@@ -6,28 +6,49 @@
   top: 0;
   width: 100%;
   height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
+  overflow: hidden;
   background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
 }
 
-.modal-content {
-  background-color: #fefefe;
-  margin: 15% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
+.like-modal-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid #bfbfbf;
+  padding: 10px 20px 10px 20px;
 }
 
-.close {
-  color: #aaa;
-  float: right;
+.like-modal-top h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.like-modal-top .close-like {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 28px;
   font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
 }
 
-.close:hover,
-.close:focus {
+.modal-content-like {
+  background-color: #fefefe;
+  margin: 12% auto;
+  border: 1px solid #888;
+  width: 400px;
+  border-radius: 20px;
+  height: 500px;
+}
+
+.close-like:hover,
+.close-like:focus {
   color: black;
   text-decoration: none;
   cursor: pointer;
@@ -36,12 +57,15 @@
 .user-list {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .user {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  border-bottom: 1px solid #bfbfbf;
+  padding: 10px 20px 10px 20px;
 }
 
 .user .profile-img {
@@ -58,6 +82,7 @@
 .liked-box {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 /* like-button 스타일 */
@@ -72,20 +97,18 @@
   display: flex;
   align-items: center;
   transition: transform 0.2s ease;
+  color: #b0b0b0; /* 기본 회색 색상 */
 }
 
-.like-button .filled-heart {
-  display: none;
+.like-count {
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 0.5rem;
+}
+
+.like-button.liked {
   color: #ed4956; /* 인스타그램 좋아요 색상 (빨간색) */
-}
-
-.like-button.liked .filled-heart {
-  display: inline;
   animation: like-animation 0.5s forwards;
-}
-
-.like-button.liked .empty-heart {
-  display: none;
 }
 
 .like-button:hover {
@@ -104,4 +127,13 @@
   100% {
     transform: scale(1);
   }
+}
+
+.nickname-intro {
+  display: flex;
+  flex-direction: column;
+}
+
+.follow-button {
+  margin-left: auto;
 }

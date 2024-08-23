@@ -16,8 +16,9 @@ async function toggleLike(commentId, likeButton, likeCountSpan) {
     const data = await response.json();
 
     if (data) {
-      likeButton.innerHTML = data.liked ? '♥' : '♡'; // 버튼 모양 업데이트
-      likeCountSpan.textContent = `${data.likeCount} Likes`; // 좋아요 수 업데이트
+      likeButton.innerHTML = data.liked ? 'favorite' : 'favorite_border'; // 버튼 모양 업데이트
+      likeButton.classList.toggle('liked', data.liked);
+      likeCountSpan.textContent = `${data.likeCount}`; // 좋아요 수 업데이트
     }
   } catch (error) {
     console.error('Error:', error);
@@ -57,8 +58,25 @@ function showLikeUserModal(users) {
     nicknameSpan.className = 'nickname';
     nicknameSpan.textContent = user.nickname;
 
+    const introSpan = document.createElement('span');
+    introSpan.className = 'intro-text';
+    introSpan.textContent = user.intro;
+
+    // nicknameSpan과 introSpan을 묶어줄 컨테이너 div 생성
+    const nicknameIntroDiv = document.createElement('div');
+    nicknameIntroDiv.className = 'nickname-intro';
+
+    nicknameIntroDiv.appendChild(nicknameSpan);
+    nicknameIntroDiv.appendChild(introSpan);
+
+    const followButton = document.createElement('button');
+    followButton.className = 'follow-button';
+    followButton.textContent = '팔로우';
+
     userDiv.appendChild(profileImg);
-    userDiv.appendChild(nicknameSpan);
+    userDiv.appendChild(nicknameIntroDiv);
+    userDiv.appendChild(followButton);
+
     userList.appendChild(userDiv);
   });
 
