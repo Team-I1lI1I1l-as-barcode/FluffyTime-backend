@@ -106,7 +106,7 @@ public class JoinService {
 
         User user = User.builder()
             .email(tempUser.getEmail())
-            .password(joinUser.getPassword())
+            .password(bCryptPasswordEncoder.encode(joinUser.getPassword()))
             .nickname(joinUser.getNickname())
             .loginType(tempUser.getLoginType())
             .build();
