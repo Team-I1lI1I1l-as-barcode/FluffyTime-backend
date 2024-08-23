@@ -45,8 +45,7 @@ public class PostRestController {
         }
 
         log.info("게시물 등록 성공, ID: {}", postId);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postId));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(postId));
     }
 
     // 임시 게시물 등록
@@ -60,8 +59,7 @@ public class PostRestController {
         Long postId = postService.createTempPost(postRequest, files, request);
 
         log.info("임시 게시물 등록 성공, ID: {}", postId);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postId));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(postId));
     }
 
     // 임시 게시물 삭제
@@ -70,8 +68,7 @@ public class PostRestController {
         log.info("임시 게시물 삭제 요청 받음, ID: {}", id);
         postService.deleteTempPost(id);
         log.info("임시 게시물 삭제 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(null));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(null));
     }
 
     // 임시 게시물 목록 조회
@@ -80,8 +77,7 @@ public class PostRestController {
         log.info("임시 게시물 목록 조회 요청 받음");
         List<PostResponse> tempPosts = postService.getTempPosts();
         log.info("임시 게시물 목록 조회 성공, 개수: {}", tempPosts.size());
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(tempPosts));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(tempPosts));
     }
 
     // 게시물 상세 정보 조회
@@ -90,8 +86,7 @@ public class PostRestController {
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
         PostResponse postResponse = postService.getPostById(id);
         log.info("게시물 상세 정보 조회 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(postResponse));
     }
 
     // 게시물 수정
@@ -115,7 +110,6 @@ public class PostRestController {
 
         postService.deletePost(id, request);
         log.info("게시물 삭제 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(null));
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(null));
     }
 }

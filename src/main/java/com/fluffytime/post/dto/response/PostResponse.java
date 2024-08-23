@@ -15,7 +15,6 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     private List<ImageResponse> imageUrls;
     private String createdAt;
     private String updatedAt;
-    //private List<String> tagNames;
 
     @Getter
     @Setter
