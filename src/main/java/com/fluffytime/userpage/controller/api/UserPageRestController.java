@@ -1,5 +1,6 @@
 package com.fluffytime.userpage.controller.api;
 
+import com.fluffytime.userpage.response.BlockUserListDto;
 import com.fluffytime.userpage.response.UserBlockResponseDto;
 import com.fluffytime.userpage.response.UserPageInformationDto;
 import com.fluffytime.userpage.service.UserPageService;
@@ -37,7 +38,7 @@ public class UserPageRestController {
     @PostMapping("/api/users/block")
     public ResponseEntity<?> blockUser(@RequestParam("nickname") String nickname,
         HttpServletRequest httpServletRequest) {
-        log.info("유저 차단 진행");
+        log.info("유저 차단");
         UserBlockResponseDto userBlockResponseDto = userPageService.userBlock(nickname,
             httpServletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userBlockResponseDto);
@@ -47,8 +48,18 @@ public class UserPageRestController {
     @DeleteMapping("/api/users/unblock")
     public ResponseEntity<?> unblockUser(@RequestParam("nickname") String nickname,
         HttpServletRequest httpServletRequest) {
+        log.info("유저 차단 해제");
         UserBlockResponseDto userBlockResponseDto = userPageService.removeUserBlock(nickname,
             httpServletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userBlockResponseDto);
     }
+
+    // 유저 차단 목록 가져오기
+    @GetMapping("/api/users/block/list")
+    public ResponseEntity<?> blockUserList(HttpServletRequest httpServletRequest) {
+        log.info("유저 차단 리스트 불러오기");
+        BlockUserListDto blockUserListDto = userPageService.blockUserList(httpServletRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(blockUserListDto);
+    }
+
 }

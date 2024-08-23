@@ -10,11 +10,15 @@ import com.fluffytime.mypage.service.MyPageService;
 import com.fluffytime.repository.UserRepository;
 import com.fluffytime.userpage.dao.UserBlockDao;
 import com.fluffytime.userpage.exception.UserPageNotFound;
+import com.fluffytime.userpage.response.BlockUserListDto;
 import com.fluffytime.userpage.response.UserBlockResponseDto;
 import com.fluffytime.userpage.response.UserPageInformationDto;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -164,5 +168,35 @@ public class UserPageService {
         userBlockDao.removeUserBlockList(blocker, targetUser);
 
         return userBlockResponseDto;
+    }
+
+    // 유저 차단 목록 가져오기
+    public BlockUserListDto blockUserList(HttpServletRequest httpServletRequest) {
+        log.info("blockUserList 실행");
+        String blocker = findByAccessToken(httpServletRequest).getNickname();
+        if (blocker == null) {
+            throw new TokenNotFound();
+        }
+        // 차단된 사용자 리스트 가져오기
+        Set<String> blockedUsers = userBlockDao.getUserBlockList(blocker);
+        // 사용자명 - 프로필 사진 url를 담을 리스트
+        List<Map<String, String>> userBlockList = new ArrayList<>();
+
+        // 리스트에 목록 추가하기
+        for (String nickname : blockedUsers) {
+            // 프로필 객체 찾기
+            Profile profile = findUserByNickname(nickname).getProfile();
+            // 프로필 사진 url 찾기
+            String fileUrl = myPageService.profileFileUrl(profile.getProfileImages());
+
+            // 닉네임과 URL을 매칭하여 맵에 저장
+            Map<String, String> blockUserMap = new HashMap<>();
+            blockUserMap.put("nickname", nickname);
+            blockUserMap.put("fileUrl", fileUrl);
+
+            // 리스트에 추가
+            userBlockList.add(blockUserMap);
+        }
+        return new BlockUserListDto(userBlockList);
     }
 }

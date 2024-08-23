@@ -28,14 +28,16 @@ function handleApiRequest(url, method, successMessage) {
 }
 
 // 유저 차단
-blockFollow.addEventListener('click', () => {
+blockFollow.addEventListener('click', (event) => {
+  event.preventDefault();
   const nickname = window.location.pathname.split('/').pop();
   handleApiRequest(`/api/users/block?nickname=${encodeURIComponent(nickname)}`,
       'POST', '유저 차단');
 });
 
 // 유저 차단 해제
-blockFollowCancel.addEventListener('click', () => {
+blockFollowCancel.addEventListener('click', (event) => {
+  event.preventDefault();
   const nickname = window.location.pathname.split('/').pop();
   handleApiRequest(
       `/api/users/unblock?nickname=${encodeURIComponent(nickname)}`, 'DELETE',
