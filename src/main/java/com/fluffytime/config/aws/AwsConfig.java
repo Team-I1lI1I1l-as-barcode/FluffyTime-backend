@@ -1,4 +1,4 @@
-package com.fluffytime.post.aws;
+package com.fluffytime.config.aws;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
