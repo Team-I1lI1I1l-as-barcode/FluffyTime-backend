@@ -74,6 +74,13 @@ public class User {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+    private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<CommentLike> likes = new ArrayList<>();
 
     // 유저 - 프로필 (일대일 단방향 -> 양방향으로 수정(프로필의 반려동물 이름을 기반으로 아이디를 찾아야 하기 때문)

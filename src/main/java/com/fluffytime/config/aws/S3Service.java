@@ -1,4 +1,4 @@
-package com.fluffytime.post.aws;
+package com.fluffytime.config.aws;
 
 import java.io.IOException;
 import java.nio.file.Paths;

@@ -2,6 +2,7 @@ package com.fluffytime.mypage.service;
 
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.UserNotFound;
+import com.fluffytime.config.aws.S3Service;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.TempStatus;
@@ -15,7 +16,6 @@ import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.PostDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
 import com.fluffytime.mypage.response.RequestResultDto;
-import com.fluffytime.post.aws.S3Service;
 import com.fluffytime.repository.ProfileRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
