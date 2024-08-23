@@ -58,6 +58,13 @@ public class Comment {
     )
     private List<Reply> replyList = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "comment",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<CommentLike> likes = new ArrayList<>();
+
     @Builder
     public Comment(String content, User user, Post post) {
         this.content = content;
