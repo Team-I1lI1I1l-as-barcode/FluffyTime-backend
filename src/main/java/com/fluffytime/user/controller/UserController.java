@@ -50,6 +50,16 @@ public class UserController {
         return "join/joinFail";
     }
 
+    @GetMapping("/login/find-email")
+    public String findUserPage() {
+        return "login/findEmail";
+    }
+
+    @GetMapping("/login/find-password")
+    public String findPasswordPage() {
+        return "login/findPassword";
+    }
+
     // 테스트용 admin 화면
     @GetMapping("/admin")
     public String adminPage() {

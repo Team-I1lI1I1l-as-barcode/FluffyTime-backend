@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/oauth2/**",
                     "/login/oauth2/code/**",
-                    "/login",
+                    "/login/**",
                     "/join/**",
                     "/api/users/**",
                     "/api/auth/**",
@@ -44,7 +44,8 @@ public class SecurityConfig {
                     "/static/**",
                     "/js/**",
                     "/css/**",
-                    "/image/**"
+                    "/image/**",
+                    "/favicon.ico"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

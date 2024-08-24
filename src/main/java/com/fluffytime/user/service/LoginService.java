@@ -6,7 +6,9 @@ import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.User;
 import com.fluffytime.repository.UserRepository;
-import com.fluffytime.user.dto.request.LoginUser;
+import com.fluffytime.user.dto.request.FindEmailRequest;
+import com.fluffytime.user.dto.request.LoginUserRequest;
+import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.exception.MismatchedPassword;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,7 +33,7 @@ public class LoginService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenDao refreshTokenDao;
 
-    public void loginProcess(HttpServletResponse response, LoginUser loginUser) {
+    public void loginProcess(HttpServletResponse response, LoginUserRequest loginUser) {
 
         User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFound::new);
 
@@ -108,5 +110,13 @@ public class LoginService {
         response.addCookie(accessTokencookie);
         response.sendRedirect("/login");
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    public ResponseEntity<FindEmailResponse> findEmail(FindEmailRequest findEmailRequest) {
+        FindEmailResponse findEmailResponse = FindEmailResponse.builder()
+            .email(findEmailRequest.getEmail())
+            .isExists(userRepository.existsUserByEmail(findEmailRequest.getEmail()))
+            .build();
+        return ResponseEntity.status(HttpStatus.OK).body(findEmailResponse);
     }
 }

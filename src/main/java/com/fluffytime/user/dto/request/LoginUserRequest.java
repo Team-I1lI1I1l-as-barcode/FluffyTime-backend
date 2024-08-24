@@ -1,5 +1,6 @@
 package com.fluffytime.user.dto.request;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
@@ -8,18 +9,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginUser {
+public class LoginUserRequest {
 
     @NotEmpty
-    private String email;
+    @Email
+    private final String email;
 
     @NotEmpty
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$")
-    private String password;
+    private final String password;
 
     @Builder
-    public LoginUser(String email, String password) {
+    public LoginUserRequest(String email, String password) {
         this.email = email;
         this.password = password;
     }

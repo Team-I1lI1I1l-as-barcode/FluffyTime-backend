@@ -1,8 +1,10 @@
 package com.fluffytime.user.controller.api;
 
+import com.fluffytime.user.dto.request.FindEmailRequest;
 import com.fluffytime.user.dto.request.JoinRequest;
-import com.fluffytime.user.dto.request.LoginUser;
+import com.fluffytime.user.dto.request.LoginUserRequest;
 import com.fluffytime.user.dto.response.CheckDuplicationResponse;
+import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.dto.response.JoinResponse;
 import com.fluffytime.user.dto.response.SucceedCertificationResponse;
 import com.fluffytime.user.dto.response.SucceedSendEmailResponse;
@@ -66,12 +68,10 @@ public class UserApiController {
         return ResponseEntity.status(HttpStatus.OK).body(joinService.join(email));
     }
 
-
-
     // 로그인
     @PostMapping("login")
     public ResponseEntity<Void> login(
-        @RequestBody @Valid LoginUser loginUser,
+        @RequestBody @Valid LoginUserRequest loginUser,
         @RequestParam(defaultValue = "/", name = "redirectURL") String redirectURL,
         HttpServletResponse response
     ) {
@@ -136,5 +136,13 @@ public class UserApiController {
     ) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(certificationService.certificateEmail(email));
+    }
+
+    @PostMapping("/find-email")
+    public ResponseEntity<FindEmailResponse> findEmail(
+        @RequestBody @Valid FindEmailRequest findEmailRequest
+    ) {
+        log.info("Dto ={}",findEmailRequest);
+        return loginService.findEmail(findEmailRequest);
     }
 }

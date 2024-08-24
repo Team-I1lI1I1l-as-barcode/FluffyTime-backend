@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>이메일찾기</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/login/findEmail.css">
+  <script th:src="@{/js/login/findEmail.js}" defer></script>
+</head>
+<body>
+<div class="container">
+  <h1>이메일찾기</h1>
+  <form id="findEmailForm">
+    <p class="email-error error hidden"></p>
+    <div class="input">
+      <label for="email"></label>
+      <input type="text" id="email" name="email" placeholder="회원가입에 사용한 이메일을 입력해주세요.">
+    </div>
+    <button type="submit" id="findBtn" name="findBtn">이메일찾기</button>
+    <div class="result">
+      <p class="resultMsg"></p>
+    </div>
+    <div class="find-info">
+      <a href="/login/find-password">비밀번호를 잊어버렸나요?</a>
+    </div>
+  </form>
+</div>
+</body>
+</html>
