@@ -1,4 +1,4 @@
-package com.fluffytime.like.dto;
+package com.fluffytime.like.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentLikeRequestDto {
-    
+
     private Long userId;
 }

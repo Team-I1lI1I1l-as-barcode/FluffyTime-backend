@@ -1,7 +1,7 @@
 //좋아요 등록/취소
-async function toggleLikeComment(commentId, likeButton, likeCountSpan) {
+async function toggleLikeReply(replyId, likeButton, likeCountSpan) {
   try {
-    const response = await fetch(`/api/likes/comment/${commentId}`, {
+    const response = await fetch(`/api/likes/reply/${replyId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -26,9 +26,9 @@ async function toggleLikeComment(commentId, likeButton, likeCountSpan) {
 }
 
 //좋아요 유저 목록
-async function fetchUsersWhoLikedComment(commentId) {
+async function fetchUsersWhoLikedReply(replyId) {
   try {
-    const response = await fetch(`/api/likes/comment/${commentId}/list`);
+    const response = await fetch(`/api/likes/reply/${replyId}/list`);
     if (!response.ok) {
       console.error('좋아요 유저 목록 가져오기 실패!', response.status);
       return [];
@@ -41,7 +41,7 @@ async function fetchUsersWhoLikedComment(commentId) {
 }
 
 //유저 목록 모달창 띄우기
-function showLikeUserModalComment(users) {
+function showLikeUserModalReply(users) {
   const modal = document.getElementById('like-user-modal');
   const userList = modal.querySelector('.user-list');
   userList.innerHTML = ''; //기존 목록 초기화
