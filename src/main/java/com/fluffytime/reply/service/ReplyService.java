@@ -1,15 +1,16 @@
 package com.fluffytime.reply.service;
 
-import com.fluffytime.common.exception.global.NotFoundComment;
-import com.fluffytime.common.exception.global.NotFoundReply;
-import com.fluffytime.common.exception.global.NotFoundUser;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.common.exception.global.CommentNotFound;
+import com.fluffytime.common.exception.global.ReplyNotFound;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
 import com.fluffytime.reply.dto.ReplyRequestDto;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import com.fluffytime.repository.CommentRepository;
+import com.fluffytime.repository.ReplyLikeRepository;
 import com.fluffytime.repository.ReplyRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -29,13 +30,14 @@ public class ReplyService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final ReplyLikeRepository replyLikeRepository;
 
     //답글 저장
     public void createReply(ReplyRequestDto requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(NotFoundUser::new);
+            .orElseThrow(UserNotFound::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
-            .orElseThrow(NotFoundComment::new); //임시 예외처리
+            .orElseThrow(CommentNotFound::new); //임시 예외처리
 
         Reply reply = Reply.builder()
             .content(requestDto.getContent())
@@ -48,15 +50,30 @@ public class ReplyService {
     //답글 조회
     public List<ReplyResponseDto> getRepliesByCommentId(Long commentId, Long currentUserId) {
         List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
-        return replyList.stream()
-            .map(reply -> new ReplyResponseDto(reply, currentUserId))
-            .collect(Collectors.toList());
+        return replyList.stream().map(reply -> {
+            int likeCount = replyLikeRepository.countByReply(reply);
+            boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
+
+            return ReplyResponseDto.builder()
+                .replyId(reply.getReplyId())
+                .userId(reply.getUser().getUserId())
+                .content(reply.getContent())
+                .nickname(reply.getUser().getNickname())
+                .createdAt(reply.getCreatedAt())
+                .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+                .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                    .map(profile -> profile.getProfileImages().getFilePath())
+                    .orElse("/image/profile/profile.png"))
+                .likeCount(likeCount)
+                .isLiked(isLiked)
+                .build();
+        }).collect(Collectors.toList());
     }
 
     //답글 수정
     public void updateReply(Long replyId, String content) {
         Reply reply = replyRepository.findById(replyId)
-            .orElseThrow(NotFoundReply::new);
+            .orElseThrow(ReplyNotFound::new);
         reply.setContent(content);
         replyRepository.save(reply);
     }
@@ -64,7 +81,7 @@ public class ReplyService {
     //답글 삭제
     public void deleteReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
-            .orElseThrow(NotFoundReply::new);
+            .orElseThrow(ReplyNotFound::new);
         replyRepository.delete(reply);
     }
 
@@ -84,7 +101,7 @@ public class ReplyService {
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
-        User user = findUserById(userId).orElseThrow(NotFoundUser::new);
+        User user = findUserById(userId).orElseThrow(UserNotFound::new);
         return user;
     }
 
@@ -97,7 +114,23 @@ public class ReplyService {
     //답글 ID로 답글 조회하기
     public ReplyResponseDto getReplyByReplyId(Long replyId, Long currentUserId) {
         Reply reply = replyRepository.findById(replyId)
-            .orElseThrow(NotFoundReply::new);
-        return new ReplyResponseDto(reply, currentUserId);
+            .orElseThrow(ReplyNotFound::new);
+
+        int likeCount = replyLikeRepository.countByReply(reply);
+        boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
+
+        return ReplyResponseDto.builder()
+            .replyId(reply.getReplyId())
+            .userId(reply.getUser().getUserId())
+            .content(reply.getContent())
+            .nickname(reply.getUser().getNickname())
+            .createdAt(reply.getCreatedAt())
+            .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+            .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                .map(profile -> profile.getProfileImages().getFilePath())
+                .orElse("/image/profile/profile.png"))
+            .likeCount(likeCount)
+            .isLiked(isLiked)
+            .build();
     }
 }

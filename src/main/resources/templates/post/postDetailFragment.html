@@ -1,0 +1,72 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--  <title>게시물 상세보기</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--<div th:fragment="postDetailModal">-->
+<!--  <div class="modal" id="postModal">-->
+<!--    <div class="modal-content">-->
+<!--      <button class="close-btn" onclick="closePostDetailModal()">&times;</button> &lt;!&ndash; 모달 닫기 버튼 &ndash;&gt;-->
+<!--      <div class="left-content">-->
+<!--        <button class="nav-button prev" id="prevButton" onclick="prevImage(event)"-->
+<!--                style="display: none;">&#10094;-->
+<!--        </button> &lt;!&ndash; 이전 이미지 버튼 &ndash;&gt;-->
+<!--        <div id="imageContainer" class="image-slider"></div> &lt;!&ndash; 이미지 슬라이더 컨테이너 &ndash;&gt;-->
+<!--        <button class="nav-button next" id="nextButton" onclick="nextImage(event)"-->
+<!--                style="display: none;">&#10095;-->
+<!--        </button> &lt;!&ndash; 다음 이미지 버튼 &ndash;&gt;-->
+<!--      </div>-->
+<!--      <div class="right-content">-->
+<!--        <div class="header">-->
+<!--          <div class="profile">-->
+<!--            <img id="profileImage" src="" alt="사용자의 프로필 이미지">-->
+<!--            <span id="nicknameDisplay"></span>-->
+<!--          </div>-->
+<!--          <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> &lt;!&ndash; 더보기 옵션 버튼 &ndash;&gt;-->
+<!--        </div>-->
+<!--        <div id="postContent" class="content"></div>&lt;!&ndash; 게시물 내용 컨테이너 &ndash;&gt;-->
+<!--        <div id="comment-list" class="comment-list"></div> &lt;!&ndash; 댓글 목록 &ndash;&gt;-->
+<!--        <div class="comment-form">-->
+<!--          <textarea id="comment-content" placeholder="댓글 내용 적기" required></textarea>-->
+<!--          <button id="commentButton">댓글 달기</button> &lt;!&ndash;postId에 댓글 달기&ndash;&gt;-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+
+<!--  <div class="dropdown-menu" id="dropdownMenu"> &lt;!&ndash; 드롭다운 메뉴 &ndash;&gt;-->
+<!--    <a href="javascript:void(0);" class="delete" onclick="deletePost()">삭제</a>-->
+<!--    <a href="javascript:void(0);" onclick="openEditModal()">수정</a>-->
+<!--    <a href="javascript:void(0);">다른 사람에게 좋아요 수 숨기기</a>-->
+<!--    <a href="javascript:void(0);">댓글 기능 해제</a>-->
+<!--    <a href="javascript:void(0);" onclick="copyLinkToClipboard()">링크 복사</a>-->
+<!--    <a href="javascript:void(0);" onclick="toggleDropdownMenu()">취소</a>-->
+<!--  </div>-->
+
+<!--  <div class="edit-modal" id="editModal"> &lt;!&ndash; 수정 모달 &ndash;&gt;-->
+<!--    <div class="edit-modal-content">-->
+<!--      <button class="close-btn" onclick="closeEditModal()">&times;</button> &lt;!&ndash; 수정 모달 닫기 버튼 &ndash;&gt;-->
+<!--      <div class="edit-left-content">-->
+<!--        <button class="nav-button prev" id="prevEditButton" onclick="prevEditImage(event)"-->
+<!--                style="display: none;">&#10094;-->
+<!--        </button> &lt;!&ndash; 이전 이미지 버튼 &ndash;&gt;-->
+<!--        <div id="editImagePreviewContainer"></div> &lt;!&ndash; 이미지 미리보기 컨테이너 &ndash;&gt;-->
+<!--        <button class="nav-button next" id="nextEditButton" onclick="nextEditImage(event)"-->
+<!--                style="display: none;">&#10095;-->
+<!--        </button> &lt;!&ndash; 다음 이미지 버튼 &ndash;&gt;-->
+<!--      </div>-->
+<!--      <div class="edit-right-content">-->
+<!--        <div class="header">게시물 수정</div>-->
+<!--        <form id="editForm" enctype="multipart/form-data">-->
+<!--          <input type="text" id="editContent" name="content" placeholder="내용을 입력하세요">-->
+<!--          &lt;!&ndash; 수정 내용 입력 &ndash;&gt;-->
+<!--          <button type="button" onclick="submitEdit()">저장</button> &lt;!&ndash; 저장 버튼 &ndash;&gt;-->
+<!--          <button type="button" onclick="closeEditModal()">취소</button> &lt;!&ndash; 취소 버튼 &ndash;&gt;-->
+<!--        </form>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!--</body>-->
+<!--</html>-->

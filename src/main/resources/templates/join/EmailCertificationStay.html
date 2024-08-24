@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>가입하기-이메일인증</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/join/EmailCertificationStay.css">
+</head>
+<body>
+<div class="container">
+  <img src="/image/logo/logo.png" alt="logo">
+  <span>인증 메일이 전송되었습니다.</span>
+  <span><strong>5분 이내로</strong> 메일 인증링크 클릭 후</span>
+  <span>아래의 완료 버튼을 눌러주세요.</span>
+  <button type="button" id="succeedBtn">인증완료</button>
+</div>
+</body>
+<script th:src="@{/js/join/completeCertification.js}"></script>
+</html>

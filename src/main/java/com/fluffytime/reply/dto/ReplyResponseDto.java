@@ -1,8 +1,7 @@
 package com.fluffytime.reply.dto;
 
-import com.fluffytime.domain.Reply;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class ReplyResponseDto {
 
     private Long replyId;
@@ -19,13 +17,22 @@ public class ReplyResponseDto {
     private String nickname;
     private LocalDateTime createdAt;
     private boolean isAuthor; //현재 사용자 = 작성자??
+    private String profileImageurl;
+    private int likeCount;
+    private boolean isLiked;
 
-    public ReplyResponseDto(Reply reply, Long currentUserId) {
-        this.replyId = reply.getReplyId();
-        this.userId = reply.getUser().getUserId();
-        this.content = reply.getContent();
-        this.nickname = reply.getUser().getNickname();
-        this.createdAt = reply.getCreatedAt();
-        this.isAuthor = this.userId.equals(currentUserId);
+    @Builder
+    public ReplyResponseDto(Long replyId, Long userId, String content, String nickname,
+        LocalDateTime createdAt, boolean isAuthor, String profileImageurl, int likeCount,
+        boolean isLiked) {
+        this.replyId = replyId;
+        this.userId = userId;
+        this.content = content;
+        this.nickname = nickname;
+        this.createdAt = createdAt;
+        this.isAuthor = isAuthor;
+        this.profileImageurl = profileImageurl;
+        this.likeCount = likeCount;
+        this.isLiked = isLiked;
     }
 }

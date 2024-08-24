@@ -1,9 +1,8 @@
 package com.fluffytime.config;
 
-import com.fluffytime.login.jwt.exception.CustomAuthenticationEntryPoint;
-import com.fluffytime.login.jwt.filter.JwtAuthenticationFilter;
-import com.fluffytime.login.jwt.util.JwtTokenizer;
-import com.fluffytime.login.security.CustomUserDetailsService;
+import com.fluffytime.auth.jwt.exception.CustomAuthenticationEntryPoint;
+import com.fluffytime.auth.jwt.filter.JwtAuthenticationFilter;
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtTokenizer jwtTokenizer;
 
@@ -33,18 +31,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/login",
-                    "/logout",
                     "/join/**",
                     "/api/users/**",
-                    // "/api/posts/**",
-
+                    "/api/auth/**",
+                    "/error",
                     "/static/**",
-                    "/html/**",
                     "/js/**",
                     "/css/**",
                     "/image/**"
                 ).permitAll()
                 .anyRequest().authenticated()
+
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
                 UsernamePasswordAuthenticationFilter.class)
@@ -55,10 +52,12 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .exceptionHandling(
-                exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint)
-                    .accessDeniedPage("/error")
-            );
+            .exceptionHandling( exception ->
+                exception
+                    .authenticationEntryPoint(customAuthenticationEntryPoint)
+                    .accessDeniedPage("/error.html")
+            )
+        ;
 
         return http.build();
     }
@@ -72,7 +71,6 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

@@ -15,7 +15,5 @@ import lombok.Setter;
 // 프로필 수정 등 요청 결과를 담아 보내는 응답 DTO
 public class RequestResultDto {
 
-    private String code; // 상태코드
-    private String message; // 상태 메시지
-    private Boolean result; // 중복 결과 여부
+    private Boolean result; // 요청 결과 여부
 }

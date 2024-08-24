@@ -1,6 +1,6 @@
 package com.fluffytime.post.controller;
 
-import com.fluffytime.post.aws.S3Service;
+import com.fluffytime.config.aws.S3Service;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

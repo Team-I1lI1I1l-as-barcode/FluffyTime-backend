@@ -93,6 +93,8 @@ body {
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
+  overflow-x: hidden; /* 가로 스크롤 숨기기 */
+  overflow-y: auto; /* 세로 스크롤은 자동으로 표시되도록 */
 }
 
 .header {
@@ -107,7 +109,8 @@ body {
 .content {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0 1 auto;
+  display: block;
   padding: 20px;
 }
 
@@ -190,3 +193,39 @@ body {
 .edit-left-content img.active {
   display: block;
 }
+
+.profile {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px; /* 하단 간격을 줄임 */
+  margin-top: 5px; /* 상단 간격을 줄임 */
+}
+
+.profile img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 20px; /* 이미지와 닉네임 사이 간격 */
+}
+
+.post-header {
+  margin-bottom: 10px; /* 프로필 위쪽의 간격을 줄임 */
+}
+
+.post-content {
+  padding-top: 5px; /* 프로필 아래쪽의 간격을 줄임 */
+  padding-bottom: 5px;
+}
+
+/*북마크*/
+.bookmark-section {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.bookmark-section img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+

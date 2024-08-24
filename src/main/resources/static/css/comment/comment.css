@@ -1,19 +1,231 @@
-.comment-container {
-  margin-top: 20px;
+/* 기본적인 글꼴 및 색상 설정 */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #262626;
+  background-color: #fafafa; /* 배경색을 밝게 유지 */
+  padding: 20px; /* 페이지 여백 */
+  margin: 0;
 }
 
-.comment {
-  border: 1px solid #ccc;
+/* 댓글 목록 전체 스타일 */
+#comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.comment-form {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
   padding: 10px;
-  margin: 5px 0;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
 }
 
-.status-message {
-  margin-top: 10px;
-  color: green;
+#comment-content {
+  flex-grow: 1;
+  margin-right: 10px; /* 버튼과의 간격 */
+  padding: 5px;
+  box-sizing: border-box;
 }
 
-.error-message {
+#commentButton {
+  padding: 5px 10px; /* padding을 조정하여 글씨가 세로로 나오지 않게 함 */
+  white-space: nowrap; /* 버튼의 텍스트가 강제로 한 줄에 나오도록 설정 */
+  height: 100%; /* 버튼의 높이를 textarea와 맞추기 위해 추가 */
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* 댓글 스타일 */
+.comment {
+  display: flex;
+  flex-direction: column; /* 댓글 본문과 버튼을 수직으로 배치 */
+  margin-bottom: 20px; /* 댓글 간 간격 */
+  padding: 12px;
+  border-radius: 10px;
+  background-color: #fff; /* 배경색 흰색 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 효과 */
+}
+
+.profile-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nickname-content {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.default-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+}
+
+.comment .profile-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.comment .nickname {
+  font-weight: bold;
+  font-size: 14px;
+  color: #262626;
+  margin-right: 8px;
+}
+
+.comment .timestamp {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-left: 8px;
+}
+
+.comment .text {
+  font-size: 14px;
+  color: #262626;
+  margin: 4px 0;
+}
+
+.comment .buttons {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.edit-delete-buttons {
+  width: 160px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 3.3rem;
+  margin-top: 0.5rem;
+}
+
+.comment .buttons button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.comment .buttons button:hover {
+  text-decoration: underline;
+}
+
+/* 답글 섹션 스타일 */
+.replies {
   margin-top: 10px;
-  color: red;
+  padding-left: 48px; /* 답글 들여쓰기 */
+}
+
+.reply {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.reply .profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
+}
+
+.reply .nickname {
+  font-weight: bold;
+  font-size: 13px;
+  color: #262626;
+}
+
+.reply .text {
+  font-size: 13px;
+  color: #262626;
+  margin-top: 4px;
+}
+
+/* 답글 입력 및 수정 섹션 */
+.reply-section {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.reply-section textarea {
+  width: calc(100% - 22px);
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: none;
+}
+
+.reply-section button {
+  margin-top: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.reply-section button:hover {
+  background-color: var(--hover-color);
+}
+
+.edit-delete-buttons-reply {
+  width: 106px;
+  display: flex;
+  justify-content: space-between;
+  margin-left: 2.5rem;
+}
+
+/* 댓글/답글 수정 칸 */
+textarea {
+  width: calc(100% - 22px);
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  resize: none;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.comment-edit-button {
+  width: 100px;
+}
+
+button:hover {
+  background-color: var(--hover-color);
 }

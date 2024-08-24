@@ -8,6 +8,6 @@ public class CommentController {
 
     @GetMapping("/test")
     public String test() {
-        return "html/comment/testView.html";
+        return "comment/testView";
     }
 }

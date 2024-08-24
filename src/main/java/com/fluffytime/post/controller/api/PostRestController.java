@@ -1,140 +1,121 @@
 package com.fluffytime.post.controller.api;
 
-import com.fluffytime.domain.Post;
-import com.fluffytime.domain.TempStatus;
-import com.fluffytime.post.aws.S3Service;
-import com.fluffytime.post.dto.PostRequest;
+import com.fluffytime.post.dto.request.PostRequest;
+import com.fluffytime.post.dto.response.ApiResponse;
+import com.fluffytime.post.dto.response.PostResponse;
 import com.fluffytime.post.service.PostService;
-import java.net.URI;
-import java.util.ArrayList;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
+@Slf4j
 public class PostRestController {
 
     private final PostService postService;
-    private final S3Service s3Service;
 
-    // 게시물 등록 및 임시 저장된 글 삭제
+    // 게시물 등록
     @PostMapping("/reg")
-    public ResponseEntity<Long> regPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files) {
-        Long postId = handlePostRequest(postRequest, files, TempStatus.SAVE);
+    public ResponseEntity<ApiResponse<Long>> regPost(@RequestPart("post") PostRequest postRequest,
+        @RequestPart(value = "images", required = false) MultipartFile[] files,
+        HttpServletRequest request) {
+        log.info("게시물 등록 요청 받음: {}", postRequest);
 
         if (postRequest.getTempId() != null) {
-            // 임시 저장된 글 삭제
+            // 임시 저장된 글 최종 등록 시 이미지 추가/수정 불가
+            files = null;
+        }
+
+        Long postId = postService.createPost(postRequest, files, request);
+
+        if (postRequest.getTempId() != null) {
             postService.deleteTempPost(postRequest.getTempId());
         }
 
-        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
+        log.info("게시물 등록 성공, ID: {}", postId);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(postId));
     }
 
-    // 게시물 임시등록
+    // 임시 게시물 등록
     @PostMapping("/temp-reg")
-    public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files) {
-        Long postId = handlePostRequest(postRequest, files, TempStatus.TEMP);
-        return ResponseEntity.created(URI.create("/api/posts/" + postId)).body(postId);
+    public ResponseEntity<ApiResponse<Long>> tempRegPost(
+        @RequestPart("post") PostRequest postRequest,
+        @RequestPart("images") MultipartFile[] files,
+        HttpServletRequest request) {
+        log.info("임시 게시물 등록 요청 받음: {}", postRequest);
+
+        Long postId = postService.createTempPost(postRequest, files, request);
+
+        log.info("임시 게시물 등록 성공, ID: {}", postId);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(postId));
     }
 
-    private Long handlePostRequest(PostRequest postRequest, MultipartFile[] files,
-        TempStatus tempStatus) {
-        try {
-            postRequest.setTempStatus(tempStatus); // 임시 상태 설정
-            log.info("Received post request: {}", postRequest);
-
-            if (files.length > 10) {
-                log.error("Too many files uploaded: {}", files.length);
-                throw new IllegalArgumentException("Too many files uploaded");
-            }
-
-            // 기존에 업로드된 이미지 URL 리스트 초기화
-            postRequest.setImageUrls(new ArrayList<>());
-
-            for (MultipartFile file : files) {
-                String fileName = s3Service.uploadFile(file);
-                String fileUrl = s3Service.getFileUrl(fileName);
-                postRequest.getImageUrls().add(fileUrl); // 파일 업로드 및 URL 추가
-                log.info("Uploaded file: {}, URL: {}", fileName, fileUrl);
-            }
-
-            return postService.createPost(postRequest,
-                new MultipartFile[]{}); // 빈 배열로 전달하여 중복 업로드 방지
-        } catch (Exception e) {
-            log.error("Failed to upload files", e);
-            throw new RuntimeException("Failed to upload files", e);
-        }
-    }
-
-    // 임시 등록 게시물 삭제하기
+    // 임시 게시물 삭제
     @PostMapping("/temp-delete/{id}")
-    public ResponseEntity<Void> deleteTempPost(@PathVariable Long id) {
-        try {
-            postService.deleteTempPost(id);// 임시 게시물 삭제
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Failed to delete temp post", e);
-            return ResponseEntity.status(500).build();
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteTempPost(@PathVariable(name = "id") Long id) {
+        log.info("임시 게시물 삭제 요청 받음, ID: {}", id);
+        postService.deleteTempPost(id);
+        log.info("임시 게시물 삭제 성공, ID: {}", id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(null));
     }
 
-    // 임시 등록 게시물 목록 불러오기
+    // 임시 게시물 목록 조회
     @GetMapping("/temp-posts/list")
-    public ResponseEntity<List<Post>> getTempPosts() {
-        List<Post> tempPosts = postService.getTempPosts(); // 임시 게시물 목록 조회
-        return ResponseEntity.ok(tempPosts);
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getTempPosts() {
+        log.info("임시 게시물 목록 조회 요청 받음");
+        List<PostResponse> tempPosts = postService.getTempPosts();
+        log.info("임시 게시물 목록 조회 성공, 개수: {}", tempPosts.size());
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(tempPosts));
     }
 
-    // 게시물 상세보기
+    // 게시물 상세 정보 조회
     @GetMapping("/detail/{id}")
-    public ResponseEntity<Post> getPost(@PathVariable Long id) {
-        Post post = postService.getPostById(id); // 게시물 상세 정보 조회
-        if (post != null) {
-            return ResponseEntity.ok(post);
-        } else {
-            return ResponseEntity.notFound().build(); // 게시물 찾을 수 없을 때 404 반환
-        }
+    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable(name = "id") Long id) {
+        log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
+        PostResponse postResponse = postService.getPostById(id);
+        log.info("게시물 상세 정보 조회 성공, ID: {}", id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(postResponse));
     }
 
-    // 게시물 수정하기
+    // 게시물 수정
     @PostMapping("/edit/{id}")
-    public ResponseEntity<Post> editPost(@PathVariable Long id,
-        @RequestParam("content") String content,
-        @RequestParam(value = "imageUrls", required = false) List<String> imageUrls) {
-        PostRequest postRequest = new PostRequest();
-        postRequest.setContent(content);
+    public ResponseEntity<ApiResponse<PostResponse>> editPost(@PathVariable(name = "id") Long id,
+        @RequestPart(value = "post") PostRequest postRequest,
+        @RequestPart(value = "files", required = false) MultipartFile[] files,
+        HttpServletRequest request) {
+        log.info("게시물 수정 요청 받음, ID: {}", id);
 
-        if (imageUrls != null) {
-            postRequest.setImageUrls(imageUrls); // 이미지 URL 설정
-        }
-
-        Post updatedPost = postService.updatePost(id, postRequest, new MultipartFile[]{});// 게시물 수정
-        return ResponseEntity.ok(updatedPost);
+        PostResponse updatedPostResponse = postService.updatePost(id, postRequest, files, request);
+        log.info("게시물 수정 성공, ID: {}", updatedPostResponse.getPostId());
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(updatedPostResponse));
     }
 
-    // 게시물 삭제하기
+    // 게시물 삭제
     @PostMapping("/delete/{id}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        try {
-            postService.deletePost(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Failed to delete post", e);
-            return ResponseEntity.status(500).build(); // 삭제 실패 시 에러 반환
-        }
+    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable(name = "id") Long id,
+        HttpServletRequest request) {
+        log.info("게시물 삭제 요청 받음, ID: {}", id);
+
+        postService.deletePost(id, request);
+        log.info("게시물 삭제 성공, ID: {}", id);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.response(null));
     }
 }

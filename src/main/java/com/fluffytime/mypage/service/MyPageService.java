@@ -1,25 +1,35 @@
 package com.fluffytime.mypage.service;
 
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.common.exception.global.UserNotFound;
+import com.fluffytime.config.aws.S3Service;
+import com.fluffytime.domain.Bookmark;
 import com.fluffytime.domain.Profile;
+import com.fluffytime.domain.ProfileImages;
+import com.fluffytime.domain.TempStatus;
 import com.fluffytime.domain.User;
-import com.fluffytime.mypage.exception.MyPageException;
-import com.fluffytime.mypage.exception.MyPageExceptionCode;
-import com.fluffytime.mypage.request.PostDto;
+import com.fluffytime.mypage.exception.MyPageNotFound;
+import com.fluffytime.mypage.exception.NoProfileImage;
 import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
+import com.fluffytime.mypage.response.ImageResultDto;
 import com.fluffytime.mypage.response.MyPageInformationDto;
+import com.fluffytime.mypage.response.PostDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
 import com.fluffytime.mypage.response.RequestResultDto;
-import com.fluffytime.repository.PostRepository;
+import com.fluffytime.repository.BookmarkRepository;
 import com.fluffytime.repository.ProfileRepository;
 import com.fluffytime.repository.UserRepository;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -27,71 +37,118 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyPageService {
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final JwtTokenizer jwtTokenizer;
+    private final S3Service s3Service;
 
-    // 마이페이지 사용자 조회(userId로 조회)
+
+    // 사용자 조회(userId로 조회)
     @Transactional(readOnly = true)
-    public Optional<User> findUserById(String userId) {
+    public User findUserById(Long userId) {
         log.info("findUserById 실행");
-        Long username = Long.parseLong(userId); // String -> Long 변환
-        return userRepository.findById(username);
+        return userRepository.findById(userId).orElse(null);
     }
 
-    // 마이페이지 사용자 조회(nickname으로 조회)
-//    @Transactional(readOnly = true)
-//    public User findUserByNickname(String nickname) {
-//        log.info("findUserByNickname 실행");
-//        return userRepository.findByNickname(nickname).orElseThrow(
-//            () -> new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
-//                MyPageExceptionCode.NOT_FOUND_USER.getMessage()));
-//    }
+    // 사용자 조회(nickname으로 조회)
     @Transactional(readOnly = true)
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
-        Optional<User> optionalUser = userRepository.findByNickname(nickname);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return user;
-        } else {
-            return null;
-        }
+        return userRepository.findByNickname(nickname).orElse(null);
     }
 
+    // accessToken 토큰으로 사용자 찾기
+    @Transactional(readOnly = true)
+    public User findByAccessToken(HttpServletRequest httpServletRequest) {
+        log.info("findByAccessToken 실행");
+        String accessToken = null;
+
+        // accessTokne 값 추출
+        Cookie[] cookies = httpServletRequest.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("accessToken".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                }
+            }
+        }
+        // accessToken값으로  UserId 추출
+        Long userId = Long.valueOf(
+            ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
+        // id(pk)에 해당되는 사용자 추출
+        return findUserById(userId);
+    }
+
+    // 접근한 사용자와 실제 권한을 가진 사용자가 동일한지 판단하는 메서드
+    public boolean isUserAuthorized(String accessNickname, String actuallyNickname) {
+        return accessNickname.equals(actuallyNickname);
+    }
+
+    // 프로필 사진 url 조회
+    public String profileFileUrl(ProfileImages profileImages) {
+        if (profileImages == null) {
+            log.info("createProfileResponseDto 실행 >> 프로필 사진 미등록 상태");
+            return null;
+        } else {
+            log.info("createProfileResponseDto 실행 >> 프로필 사진 등록 상태");
+            return profileImages.getFilePath();
+        }
+    }
 
     // 마이페이지 정보 불러오기 응답 dto 구성
     @Transactional(readOnly = true)
     public MyPageInformationDto createMyPageResponseDto(String nickname) {
         User user = findUserByNickname(nickname);
+
         if (user != null) {
             log.info("createMyPageResponseDto 실행 >> 해당 유저가 존재하여 MyPageInformationDto를 구성");
             String nickName = user.getNickname(); // 닉네임
+            Profile profile = user.getProfile(); //프로필 객체
 
-            // 기존 게시물 리스트에서 필요한 데이터만 담은 postDto 리스트로 변환
+            // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostDto> postsList = user.getPostList().stream()
-                .map(post -> new PostDto(post.getContent()))
+                // TempStatus가 TEMP가 아닌것만 필터링(임시저장글 제외)
+                .filter(post -> post.getTempStatus() != TempStatus.TEMP)
+                // 한 포스트에 쓰인 사진 리스트 중 첫번째 사진을 썸네일로 설정하여 해당 파일의 경로 사용
+                .map(post -> {
+                    String filePath = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
+                        : post.getPostImages().getFirst().getFilepath();
+                    return new PostDto(post.getPostId(), filePath);
+                })
                 .collect(Collectors.toList());
 
-            Profile profile = user.getProfile(); //프로필 객체
-            String petName = profile.getPetName(); // 반려동물 이름
-            String petSex = profile.getPetSex(); // 반려동물 성별
-            Long petAge = profile.getPetAge(); // 반려동물 나이
-            String intro = profile.getIntro(); //소개글
+            // 해당 유저의 게시물이 없을때
+            if (postsList.isEmpty()) {
+                postsList = null;
+            }
 
+            // 북마크 게시물 리스트
+            List<Bookmark> bookmarks = bookmarkRepository.findByUserUserId(user.getUserId());
+            List<PostDto> bookmarkList = bookmarks.stream()
+                .map(Bookmark::getPost) // 북마크에서 게시글을 가져옴
+                .map(post -> {
+                    // 첫 번째 이미지의 파일 경로를 가져옴
+                    String filePath = post.getPostImages().isEmpty() ? null
+                        : post.getPostImages().get(0).getFilepath();
+                    // PostDto 생성
+                    return new PostDto(post.getPostId(), filePath);
+                })
+                .collect(Collectors.toList());
+
+            // 기능 구현후 팔로우, 팔로워 수 추가 예정
             return MyPageInformationDto.builder()
-                .code(MyPageExceptionCode.OK.getCode())
-                .message(MyPageExceptionCode.OK.getMessage())
-                .nickname(nickName)
-                .postsList(postsList)
-                .petName(petName)
-                .petSex(petSex)
-                .petAge(petAge)
-                .intro(intro)
+                .nickname(nickName) // 닉네임
+                .postsList(postsList) // 유저의 게시물 리스트
+                .bookmarkList(bookmarkList) // 북마크 리스트
+                .petName(profile.getPetName()) // 반려동물 이름
+                .petSex(profile.getPetSex()) // 반려동물 성별
+                .petAge(profile.getPetAge()) // 반려동물 나이
+                .fileUrl(profileFileUrl(profile.getProfileImages())) // 프로필 파일 경로
                 .build();
+
         } else {
             log.info("createMyPageResponseDto 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_MYPAGE 예외 발생");
-            throw new MyPageException(MyPageExceptionCode.NOT_FOUND_MYPAGE.getCode(),
-                MyPageExceptionCode.NOT_FOUND_MYPAGE.getMessage());
+            throw new MyPageNotFound();
         }
 
     }
@@ -104,81 +161,46 @@ public class MyPageService {
 
         if (user != null) {
             log.info("createProfileResponseDto 실행 >> 해당 유저가 존재하여 ProfileInformationDto 구성");
-            String email = user.getEmail(); // 이메일
-
-            Profile profile = user.getProfile(); // 프로필 객체
-            // 사용자는 있으나, 프로필이 없는 경우 기본 뼈대 프로필 생성 (회원가입 후 프로필을 수정하지 않은 경우에 해당)
-            if (profile == null) {
-                throw new MyPageException(MyPageExceptionCode.NOT_FOUND_PROFILE.getCode(),
-                    MyPageExceptionCode.NOT_FOUND_PROFILE.getMessage());
-            }
-            String petName = profile.getPetName(); // 반려동물 이름
-            String petSex = profile.getPetSex(); // 반려동물 성별
-            Long petAge = profile.getPetAge(); // 반려동물 나이
-            String intro = profile.getIntro(); //소개글
-            String category = profile.getPetCategory(); // 카테고리
-            String publicStatus = profile.getPublicStatus(); // 계정 비공개/공개 여부
+            String email = user.getEmail();
+            Profile profile = user.getProfile();
 
             return ProfileInformationDto.builder()
-                .code(MyPageExceptionCode.OK.getCode())
-                .message(MyPageExceptionCode.OK.getCode())
-                .nickname(nickname)
-                .email(email)
-                .intro(intro)
-                .petName(petName)
-                .petSex(petSex)
-                .petAge(petAge)
-                .petCategory(category)
-                .publicStatus(publicStatus)
+                .nickname(nickname) // 닉네임
+                .email(email) // 이메일
+                .intro(profile.getIntro()) //  소개글
+                .petName(profile.getPetName()) // 반려동물 이름
+                .petSex(profile.getPetSex()) // 반려동물 성별
+                .petAge(profile.getPetAge()) // 반려동물 나이
+                .petCategory(profile.getPetCategory()) // 반려동물 카테고리
+                .publicStatus(profile.getPublicStatus()) // 계정 공개 여부
+                .fileUrl(profileFileUrl(profile.getProfileImages())) // 프로필 파일 경로
                 .build();
 
         } else {
             log.info("createProfileResponseDto 실행 >> 해당 유저가 존재하지 않아  NOT_FOUND_USER 예외 발생");
-            throw new MyPageException(MyPageExceptionCode.NOT_FOUND_USER.getCode(),
-                MyPageExceptionCode.NOT_FOUND_USER.getMessage());
+            throw new UserNotFound();
         }
     }
 
-    // 닉네임 중복 응답 dto 구성
+    // 닉네임 중복 여부
     @Transactional
     public CheckUsernameDto nicknameExists(String nickname) {
         log.info("nicknameExists 실행 >> CheckUsernameDto 구성");
         return CheckUsernameDto.builder()
-            .code(MyPageExceptionCode.OK.getCode())
-            .message(MyPageExceptionCode.OK.getMessage())
             .result(userRepository.existsByNickname(nickname))
             .build();
     }
 
-    // 프로필 등록(기본틀)
-    public RequestResultDto createProfile(String nickname) {
-        Profile basicProfile = new Profile();
-        RequestResultDto requestResultDto = new RequestResultDto();
-        User user = findUserByNickname(nickname);
-
-        if (user != null) { // 사용자가 있을때 프로필이 없다면 프로필 생성
-            log.info("createProfile 실행 >> 해당 유저가 존재하여 프로필을 등록 하고 updateResultDto 구성");
-            user.setProfile(basicProfile);
-            userRepository.save(user);
-            requestResultDto.setCode(MyPageExceptionCode.MYPAGE_CREATED.getCode());
-            requestResultDto.setMessage(MyPageExceptionCode.MYPAGE_CREATED.getMessage());
-            requestResultDto.setResult(true);
-        } else { // 유저가 없으므로 프로필 생성 실패
-            log.info("createProfile 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USER 예외 발생");
-            requestResultDto.setCode(MyPageExceptionCode.NOT_FOUND_USER.getCode());
-            requestResultDto.setMessage(MyPageExceptionCode.NOT_FOUND_USER.getMessage());
-            requestResultDto.setResult(false);
-        }
-        return requestResultDto;
-    }
 
     // 프로필 수정
     @Transactional
     public RequestResultDto profileSave(ProfileDto profileDto) {
         User user = findUserByNickname(profileDto.getNickname());
+
         if (user != null) {
             log.info("profileSave 실행 >> 해당 유저가 존재하여 프로필을 업데이트하고 UpdateResultDto 구성");
             user.setNickname(profileDto.getUsername());
+
             Profile profile = user.getProfile();
             profile.setIntro(profileDto.getIntro());
             profile.setPetName(profileDto.getPetName());
@@ -189,43 +211,110 @@ public class MyPageService {
 
             userRepository.save(user);
             profileRepository.save(profile);
+
             return RequestResultDto.builder()
-                .code(MyPageExceptionCode.OK.getCode())
-                .message(MyPageExceptionCode.OK.getMessage())
                 .result(true)
                 .build();
         } else {
-            log.info("profileSave 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_PROFILE 예외 발생");
+            log.info("profileSave 실행 >> 해당 유저가 존재하지 않아 프로필 수정 불가 발생");
             return RequestResultDto.builder()
-                .code(MyPageExceptionCode.NOT_FOUND_PROFILE.getCode())
-                .message(MyPageExceptionCode.NOT_FOUND_PROFILE.getMessage())
                 .result(false)
                 .build();
         }
     }
 
+
+    // 프로필 이미지 등록 / 수정
+    public ImageResultDto uploadProfileImage(String nickname,
+        MultipartFile file) {
+        log.info("uploadProfileImage 실행 ");
+        User user = findUserByNickname(nickname);
+        Profile profile = user.getProfile();
+
+        ImageResultDto imageResultDto = new ImageResultDto();
+        imageResultDto.setResult(true);
+
+        if (file == null || file.isEmpty()) {
+            imageResultDto.setResult(false);
+            throw new NoProfileImage(); // 파일이 없거나 비어있는 경우 예외 처리
+        }
+
+        String s3iFileName = s3Service.uploadFile(file); // 파일 업로드
+        String Url = s3Service.getFileUrl(s3iFileName);
+
+        ProfileImages profileImage = ProfileImages.builder()
+            .fileName(file.getOriginalFilename()) // 원본 파일 이름
+            .s3iFileName(s3iFileName)
+            .filePath(Url) // S3에 저장된 파일 URL 또는 경로
+            .fileSize(file.getSize()) // 파일 크기
+            .mimeType(file.getContentType()) // MIME 타입
+            .build();
+
+        profile.setProfileImages(profileImage);
+        profileRepository.save(profile);
+        imageResultDto.setFileUrl(Url);
+
+        return imageResultDto;
+    }
+
+    // 이미지 삭제하기
+    public ImageResultDto deleteProfileImage(String nickname) {
+        log.info("uploadProfileImage 실행");
+        User user = findUserByNickname(nickname);
+        ImageResultDto imageResultDto = new ImageResultDto();
+        imageResultDto.setResult(true);
+
+        if (user == null) {
+            log.info("uploadProfileImage 실행 >> 해당 유저가 없습니다. ");
+            imageResultDto.setResult(false);
+            throw new UserNotFound();
+        }
+
+        Profile profile = user.getProfile();
+        if (profile.getProfileImages() == null) {
+            log.info("uploadProfileImage 실행 >> 등록된 프로필 사진이 없습니다. ");
+            throw new NoProfileImage();
+        }
+
+        imageResultDto.setFileUrl(profile.getProfileImages().getFilePath());
+        profile.setProfileImages(null);
+        profileRepository.save(profile);
+
+        return imageResultDto;
+    }
+
     // 회원 탈퇴 기능
     @Transactional
-    public RequestResultDto AccountDelete(String nickname) {
+    public RequestResultDto AccountDelete(String nickname, HttpServletResponse response) {
         User user = findUserByNickname(nickname);
+
         if (user != null) { // 유저가 있다면 계정 삭제 진행
             log.info("AccountDelete 실행 >> 해당 유저가 존재하여 회원 탈퇴");
             userRepository.delete(user);
+
+            // accessToken 쿠키 삭제
+            Cookie aceessTokenCookie = new Cookie("accessToken", null);
+            aceessTokenCookie.setPath("/");
+            aceessTokenCookie.setHttpOnly(true);
+            aceessTokenCookie.setMaxAge(0);
+            response.addCookie(aceessTokenCookie);
+
+            // refreshToken 쿠키 삭제
+            Cookie refreshTokenCookie = new Cookie("refreshToken", null);
+            refreshTokenCookie.setPath("/");
+            refreshTokenCookie.setHttpOnly(true);
+            refreshTokenCookie.setMaxAge(0);
+            response.addCookie(refreshTokenCookie);
+
             return RequestResultDto.builder()
-                .code(MyPageExceptionCode.OK.getCode())
-                .message(MyPageExceptionCode.OK.getMessage())
                 .result(true)
                 .build();
         } else {
             log.info("AccountDelete 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USER 예외 발생");
             return RequestResultDto.builder()
-                .code(MyPageExceptionCode.NOT_FOUND_PROFILE.getCode())
-                .message(MyPageExceptionCode.NOT_FOUND_PROFILE.getMessage())
                 .result(false)
                 .build();
 
         }
-
-
     }
 }

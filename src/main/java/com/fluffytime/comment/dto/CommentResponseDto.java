@@ -1,11 +1,9 @@
 package com.fluffytime.comment.dto;
 
-import com.fluffytime.domain.Comment;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,7 +11,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class CommentResponseDto {
 
     private Long commentId;
@@ -23,16 +20,23 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private List<ReplyResponseDto> replyList;
     private boolean isAuthor; //현재 사용자 = 작성자??
+    private String profileImageurl; //프로필 이미지
+    private int likeCount;
+    private boolean isLiked;
 
-    public CommentResponseDto(Comment comment, Long currentUserId) {
-        this.commentId = comment.getCommentId();
-        this.userId = comment.getUser().getUserId();
-        this.content = comment.getContent();
-        this.nickname = comment.getUser().getNickname();
-        this.createdAt = comment.getCreatedAt();
-        this.replyList = comment.getReplyList().stream()
-            .map(reply -> new ReplyResponseDto(reply, currentUserId))
-            .collect(Collectors.toList());
-        this.isAuthor = this.userId.equals(currentUserId);
+    @Builder
+    public CommentResponseDto(Long commentId, Long userId, String content, String nickname,
+        LocalDateTime createdAt, List<ReplyResponseDto> replyList, boolean isAuthor,
+        String profileImageurl, int likeCount, boolean isLiked) {
+        this.commentId = commentId;
+        this.userId = userId;
+        this.content = content;
+        this.nickname = nickname;
+        this.createdAt = createdAt;
+        this.replyList = replyList;
+        this.isAuthor = isAuthor;
+        this.profileImageurl = profileImageurl;
+        this.likeCount = likeCount;
+        this.isLiked = isLiked;
     }
 }
