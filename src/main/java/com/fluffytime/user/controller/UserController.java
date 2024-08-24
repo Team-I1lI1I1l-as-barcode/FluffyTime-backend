@@ -60,6 +60,11 @@ public class UserController {
         return "login/findPassword";
     }
 
+    @GetMapping("/login/change-password")
+    public String changePasswordPage() {
+     return "login/changePassword";
+    }
+
     // 테스트용 admin 화면
     @GetMapping("/admin")
     public String adminPage() {

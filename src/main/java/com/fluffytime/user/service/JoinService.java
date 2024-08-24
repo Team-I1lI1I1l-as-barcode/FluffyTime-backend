@@ -18,6 +18,7 @@ import com.fluffytime.user.dto.TempUser;
 import com.fluffytime.user.dto.request.JoinRequest;
 import com.fluffytime.user.dto.response.CheckDuplicationResponse;
 import com.fluffytime.user.dto.response.JoinResponse;
+import com.fluffytime.user.dto.response.SucceedCertificationResponse;
 import com.fluffytime.user.exception.AlreadyExistsEmail;
 import com.fluffytime.user.exception.AlreadyExistsNickname;
 import com.fluffytime.user.exception.InvalidTempUser;
@@ -154,6 +155,18 @@ public class JoinService {
         }
         return CheckDuplicationResponse.builder()
             .isExists(false)
+            .build();
+    }
+
+    // 인증 성공 or 실패 응답을 구현해야함
+    public SucceedCertificationResponse certificateEmail(String email) {
+        TempUser user = emailCertificationDao.getTempUser(email)
+            .orElseThrow(TempUserNotFound::new);
+        user.successCertification();
+        emailCertificationDao.saveEmailCertificationTempUser(user);
+
+        return SucceedCertificationResponse.builder()
+            .email(email)
             .build();
     }
 }

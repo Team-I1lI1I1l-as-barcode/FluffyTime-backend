@@ -1,5 +1,8 @@
 package com.fluffytime.user.controller.api;
 
+import com.fluffytime.common.smtp.builder.CertificationEmailContent;
+import com.fluffytime.common.smtp.builder.ChangePasswordEmailContent;
+import com.fluffytime.common.smtp.service.EmailService;
 import com.fluffytime.user.dto.request.FindEmailRequest;
 import com.fluffytime.user.dto.request.JoinRequest;
 import com.fluffytime.user.dto.request.LoginUserRequest;
@@ -8,7 +11,6 @@ import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.dto.response.JoinResponse;
 import com.fluffytime.user.dto.response.SucceedCertificationResponse;
 import com.fluffytime.user.dto.response.SucceedSendEmailResponse;
-import com.fluffytime.user.service.CertificationService;
 import com.fluffytime.user.service.JoinService;
 import com.fluffytime.user.service.LoginService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class UserApiController {
 
+    private final EmailService emailService;
     private final JoinService joinService;
     private final LoginService loginService;
-    private final CertificationService certificationService;
 
     // 임시 회원 가입 (redis에 회원 정보 임시 저장)
     @PostMapping("/temp-join")
@@ -122,8 +124,10 @@ public class UserApiController {
         @Email
         String email
     ) {
+        String subject = "[ FluffyTime - 반려동물 전용 SNS ] 가입 인증 메일입니다.";
+
         return ResponseEntity.status(HttpStatus.OK)
-            .body(certificationService.sendCertificationMail(email));
+            .body(emailService.sendHtmlMail(email,subject,new CertificationEmailContent()));
     }
 
     // 메일 인증
@@ -135,7 +139,7 @@ public class UserApiController {
         String email
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(certificationService.certificateEmail(email));
+            .body(joinService.certificateEmail(email));
     }
 
     @PostMapping("/find-email")
@@ -144,5 +148,19 @@ public class UserApiController {
     ) {
         log.info("Dto ={}",findEmailRequest);
         return loginService.findEmail(findEmailRequest);
+    }
+
+    // 비밀번호 변경 메일 전송
+    @GetMapping("/email-changePassword/send")
+    public ResponseEntity<SucceedSendEmailResponse> sendChangePasswordMail(
+        @RequestParam(name = "email")
+        @NotBlank
+        @Email
+        String email
+    ) {
+        String subject = "[ FluffyTime - 반려동물 전용 SNS ] 비밀번호 변경 메일입니다.";
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(emailService.sendHtmlMail(email,subject,new ChangePasswordEmailContent()));
     }
 }
