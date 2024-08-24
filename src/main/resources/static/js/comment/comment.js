@@ -62,13 +62,13 @@ async function fetchComments() {
 
     // 좋아요 버튼 클릭 이벤트
     likeButton.onclick = () => {
-      toggleLike(comment.commentId, likeButton, likeCountSpan);
+      toggleLikeComment(comment.commentId, likeButton, likeCountSpan);
     };
 
     //좋아요 목록 모달 보여줌 (개수 클릭 시)
     likeCountSpan.onclick = async = async () => {
-      const users = await fetchUsersWhoLiked(comment.commentId);
-      showLikeUserModal(users);
+      const users = await fetchUsersWhoLikedComment(comment.commentId);
+      showLikeUserModalComment(users);
     }
 
     // 좋아요 버튼/개수 묶음
@@ -174,7 +174,6 @@ async function fetchReplies(commentId, replyDiv) {
     replyElement.dataset.id = reply.replyId;
 
     // 프로필 이미지
-    // 프로필 이미지
     const profileImg = document.createElement('img');
     profileImg.src = reply.profileImageurl || '/image/profile/profile.png'; // 프로필 이미지 가져오기
     profileImg.className = 'profile-img';
@@ -188,6 +187,40 @@ async function fetchReplies(commentId, replyDiv) {
     contentSpan.className = 'text';
     contentSpan.textContent = reply.content;
 
+    // 좋아요 버튼 추가
+    const likeButton = document.createElement('span');
+    likeButton.className = 'like-button material-icons';
+    likeButton.innerHTML = reply.liked ? 'favorite' : 'favorite_border'; // 좋아요 상태에 따라 버튼 모양 설정
+
+    // 좋아요 상태에 따른 클래스 적용
+    if (reply.liked) {
+      likeButton.classList.add('liked');
+    } else {
+      likeButton.classList.remove('liked');
+    }
+
+    // 좋아요 개수
+    const likeCountSpan = document.createElement('span');
+    likeCountSpan.className = 'like-count';
+    likeCountSpan.textContent = `${reply.likeCount}`;
+
+    // 좋아요 버튼 클릭 이벤트
+    likeButton.onclick = () => {
+      toggleLikeReply(reply.replyId, likeButton, likeCountSpan);
+    };
+
+    //좋아요 목록 모달 보여줌 (개수 클릭 시)
+    likeCountSpan.onclick = async = async () => {
+      const users = await fetchUsersWhoLikedReply(reply.replyId);
+      showLikeUserModalReply(users);
+    }
+
+    // 좋아요 버튼/개수 묶음
+    const likedDiv = document.createElement('div');
+    likedDiv.className = 'liked-box';
+    likedDiv.appendChild(likeButton);
+    likedDiv.appendChild(likeCountSpan);
+
     // nicknameSpan과 contentSpan을 한 번 더 묶음
     const nicknameContentDiv = document.createElement('div');
     nicknameContentDiv.className = 'nickname-content';
@@ -199,6 +232,7 @@ async function fetchReplies(commentId, replyDiv) {
     profileContentDiv.className = 'profile-content';
     profileContentDiv.appendChild(profileImg);
     profileContentDiv.appendChild(nicknameContentDiv);
+    profileContentDiv.appendChild(likedDiv);
 
     const editDeleteButtonsDiv = document.createElement('div');
     editDeleteButtonsDiv.className = 'edit-delete-buttons-reply';

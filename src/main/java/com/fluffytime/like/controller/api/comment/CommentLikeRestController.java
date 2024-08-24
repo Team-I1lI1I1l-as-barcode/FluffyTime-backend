@@ -1,12 +1,13 @@
-package com.fluffytime.like.controller.api;
+package com.fluffytime.like.controller.api.comment;
 
 import com.fluffytime.domain.User;
-import com.fluffytime.like.dto.CommentLikeRequestDto;
-import com.fluffytime.like.dto.CommentLikeResponseDto;
-import com.fluffytime.like.service.CommentLikeService;
+import com.fluffytime.like.dto.comment.CommentLikeRequestDto;
+import com.fluffytime.like.dto.comment.CommentLikeResponseDto;
+import com.fluffytime.like.service.comment.CommentLikeService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/likes")
 @RequiredArgsConstructor
+@Slf4j
 public class CommentLikeRestController {
 
     private final CommentLikeService commentLikeService;
@@ -28,7 +30,6 @@ public class CommentLikeRestController {
     public ResponseEntity<CommentLikeResponseDto> likeOrUnlikeComment(
         @PathVariable(name = "commentId") Long commentId,
         @RequestBody CommentLikeRequestDto requestDto) {
-
         //현재 사용자 ID
         User currentUser = commentLikeService.findByAccessToken(httpServletRequest);
         requestDto.setUserId(currentUser.getUserId());
