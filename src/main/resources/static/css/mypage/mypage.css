@@ -1,3 +1,8 @@
+.page-layout {
+  display: flex;
+  height: 100vh; /* 전체 화면 높이 설정 */
+}
+
 /* 사이드바 제외 마이페이지 영역 */
 #mypage_container {
   flex: 1;
@@ -5,7 +10,8 @@
   background-color: var(--background-color);
   color: var(--text-color);
   overflow-y: auto;
-  height: 100vh;
+  margin-left: 250px; /* 사이드바 너비만큼 마진 추가 */
+  box-sizing: border-box;
 }
 
 /* 프로필 영역 */
@@ -26,6 +32,8 @@
   align-items: center;
   height: 150px;
   width: 200px;
+  min-height: 20px;
+  min-width: 40px;
   border: 1px solid #ccc;
   border-radius: 50%;
   overflow: hidden;
@@ -35,8 +43,10 @@
 
 /* 프로필 이미지 */
 #Profile-image-Preview img {
-  height: 100%;
-  width: 100%;
+  height: 150px;
+  width: 200px;
+  min-height: 20px;
+  min-width: 40px;
   object-fit: cover;
   border-radius: 50%;
   cursor: pointer;
@@ -72,6 +82,8 @@
   display: inline-flex; /* 수평 배치를 위한 설정 */
   align-items: center; /* 수직 가운데 정렬 */
   margin: -3px 0;
+  flex-direction: row; /* 가로 정렬 유지 */
+  white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
 }
 
 /* 프로필 정보 p 간격 조정*/
@@ -122,10 +134,6 @@
   text-align: center;
 }
 
-#user_information_container + * {
-  margin: 0 20rem; /* 왼쪽과 오른쪽에 10px의 여백 추가 */
-}
-
 #profile_information_container > div:nth-of-type(1) {
   display: flex;
   gap: 20px;
@@ -149,8 +157,13 @@
   padding-right: 40vh;
 }
 
+#user_information_container nav div {
+  flex-direction: row; /* 가로 정렬 유지 */
+  white-space: nowrap; /* 텍스트 줄 바꿈 방지 */
+}
+
 #user_information_container nav span {
-  margin-right: -1.5rem;
+  margin-right: 1rem;
 }
 
 #user_information_container nav::before {
@@ -172,13 +185,28 @@
   font-weight: bold;
 }
 
+#user_information_container + * {
+  margin: 0 calc(15vw + 1rem); /* 화면 너비의 10% + 1rem 여백 */
+}
+
 /* 게시글 영역 */
 .posts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 10px; /* 그리드 셀 간의 간격 설정 */
   padding: 1rem 0;
 }
+
+/* 게시글 이미지 */
+.posts img {
+  width: 100%; /* 그리드 셀에 맞게 너비 조정 */
+  height: 30vh;
+  object-fit: cover; /* 이미지 잘림 방지 */
+  border: 1px solid #ccc;
+  cursor: pointer;
+  min-height: 150px; /* 최소 높이 설정으로 이미지가 사라지는 것을 방지 */
+}
+
 
 #no_post {
   display: none;
@@ -205,12 +233,190 @@
   font-weight: bold;
 }
 
-/* 게시글 이미지 */
-.posts img {
-  width: 100%;
-  height: 30vh;
-  object-fit: cover;
-  border: 1px solid #ccc;
-  cursor: pointer;
+
+/*반응형 웹 페이지 */
+/* 대형 화면 (1200px 이상) */
+@media (max-width: 1200px) {
+  #user_information_container nav {
+    padding-left: 30vh;
+    padding-right: 30vh;
+    gap: 1.5rem;
+  }
+
+  #user_information_container nav span,
+  #user_information_container nav a {
+    font-size: 1.2rem; /* 아이콘과 텍스트 크기 조정 */
+  }
+
+  #Profile-image-Preview {
+    height: 120px;
+    width: 160px;
+    margin-right: 3rem;
+  }
+
+  #Profile-image-Preview img {
+    height: 120px;
+    width: 160px;
+  }
+
+  #Profile-image-Preview .material-symbols-rounded {
+    font-size: 2.5rem; /* 아이콘 크기 조정 */
+  }
+
+  #profile_information_container p,
+  #profile_edit_button {
+    font-size: 1rem;
+  }
+
+  #profile_edit_button {
+    padding: 0.15rem 0.4rem;
+  }
+
+  #user_information_container nav {
+    padding-left: 30vh;
+    padding-right: 30vh;
+  }
+
+  #user_information_container + * {
+    margin: 0 calc(15vw + 1rem); /* 기본값 유지 */
+  }
+
+  .posts {
+    grid-template-columns: repeat(3, 1fr); /* 3열 그리드 유지 */
+  }
+
+  .posts img {
+    min-width: 150px; /* 최소 너비 설정 */
+    min-height: 150px; /* 최소 높이 설정 */
+  }
+}
+
+/* 중형 화면 (800px ~ 1199px) */
+@media (max-width: 800px) {
+  #user_information_container nav {
+    padding-left: 20vh;
+    padding-right: 20vh;
+    gap: 1rem;
+  }
+
+  #user_information_container nav span,
+  #user_information_container nav a {
+    font-size: 1rem; /* 아이콘과 텍스트 크기 축소 */
+  }
+
+  #Profile-image-Preview {
+    height: 100px;
+    width: 130px;
+    margin-right: 2rem;
+  }
+
+  #Profile-image-Preview img {
+    height: 100px;
+    width: 130px;
+  }
+
+  #Profile-image-Preview .material-symbols-rounded {
+    font-size: 2rem; /* 아이콘 크기 조정 */
+  }
+
+  #profile_information_container p,
+  #profile_edit_button {
+    font-size: 0.8rem;
+  }
+
+  #profile_information_container > div:nth-of-type(1) {
+    gap: 15px;
+  }
+
+  #profile_edit_button {
+    padding: 0.1rem 0.3rem;
+  }
+
+  #user_information_container nav {
+    padding-left: 20vh;
+    padding-right: 20vh;
+  }
+
+  #user_information_container + * {
+    margin: 0 calc(10vw + 1rem); /* 화면 너비의 10% + 1rem 여백 */
+  }
+
+  .posts {
+    grid-template-columns: repeat(2, 1fr); /* 2열 그리드로 변경 */
+  }
+
+  .posts img {
+    min-width: 120px; /* 최소 너비 설정 */
+    min-height: 120px; /* 최소 높이 설정 */
+  }
+}
+
+/* 소형 화면 (600px ~ 799px) */
+@media (max-width: 600px) {
+  #user_information_container nav {
+    padding-left: 10vh;
+    padding-right: 10vh;
+    gap: 0.5rem;
+    flex-direction: column; /* 세로 정렬 */
+    align-items: center;
+
+  }
+
+  #user_information_container nav span,
+  #user_information_container nav a {
+    font-size: 0.9rem; /* 아이콘과 텍스트 크기 축소 */
+  }
+
+  #user_information_container nav span {
+    margin-bottom: 0.5rem;
+  }
+
+  #Profile-image-Preview {
+    height: 80px;
+    width: 100px;
+    margin-right: 1.5rem;
+    margin-left: 1rem;
+  }
+
+  #Profile-image-Preview img {
+    height: 80px;
+    width: 100px;
+  }
+
+  #Profile-image-Preview .material-symbols-rounded {
+    font-size: 1.5rem; /* 아이콘 크기 조정 */
+  }
+
+  #profile_information_container p,
+  #profile_edit_button {
+    font-size: 0.7rem;
+    margin-right: 0.3rem;
+  }
+
+  #profile_information_container > div:nth-of-type(1) {
+    gap: 1px;
+  }
+
+  #profile_edit_button {
+    padding: 0.1rem 0.25rem;
+  }
+
+  #user_information_container nav {
+    padding-left: 15vh;
+    padding-right: 15vh;
+  }
+
+  #user_information_container + * {
+    margin: 0 calc(5vw + 0.5rem); /* 화면 너비의 5% + 0.5rem 여백 */
+  }
+
+  .posts {
+    grid-template-columns: 1fr; /* 1열 그리드로 변경 */
+  }
+
+  .posts img {
+    min-width: 100px; /* 최소 너비 설정 */
+    min-height: 100px; /* 최소 높이 설정 */
+  }
 }
 

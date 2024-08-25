@@ -132,10 +132,6 @@
   text-align: center;
 }
 
-#user_information_container + * {
-  margin: 0 20rem; /* 왼쪽과 오른쪽에 10px의 여백 추가 */
-}
-
 #profile_information_container > div:nth-of-type(1) {
   display: flex;
   gap: 20px;
@@ -182,12 +178,25 @@
   font-weight: bold;
 }
 
+#user_information_container + * {
+  margin: 0 20rem; /* 왼쪽과 오른쪽에 10px의 여백 추가 */
+}
+
 /* 게시글 영역 */
 .posts {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   padding: 1rem 0;
+}
+
+/* 게시글 이미지 */
+.posts img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  cursor: pointer;
 }
 
 /*게시물이 없을때, 비공계 계정일 때, 차단된 계정일 때 */
@@ -209,15 +218,6 @@
 #post_comment, #lock_comment1, #lock_comment1, #block_comment1 {
   font-size: 40px;
   margin-top: 10px;
-}
-
-/* 게시글 이미지 */
-.posts img {
-  width: 100%;
-  height: 30vh;
-  object-fit: cover;
-  border: 1px solid #ccc;
-  cursor: pointer;
 }
 
 /* 더보기 */
