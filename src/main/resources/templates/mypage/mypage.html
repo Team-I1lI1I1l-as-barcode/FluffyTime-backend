@@ -13,73 +13,72 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
 <body>
-<div class="container">
-  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
-</div>
+<div class="page-layout">
+  <div class="container">
+    <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+  </div>
 
-<div id="mypage_container">
-  <header id="user_information_container">
-    <span id="profile_picture"></span>
-    <br/>
-    <br/>
-    <form id="profileImageForm" method="post" enctype="multipart/form-data">
-      <!-- 이미지 파일 입력 필드 -->
-      <input type="file" id="mypage-images" name="images" style="display: none;"/>
-      <!-- 이미지 업로드 버튼 -->
-    </form>
-    <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
-    <div id="profile_container">
-      <!-- 이미지 미리보기 및 출력 영역 -->
-      <div id="Profile-image-Preview">
-        <span class="material-symbols-rounded">photo_camera</span>
-        <img src="../../../image/profile/profile.png" id="img">
+  <div id="mypage_container">
+    <header id="user_information_container">
+      <span id="profile_picture"></span>
+      <br/>
+      <br/>
+      <form id="profileImageForm" method="post" enctype="multipart/form-data">
+        <!-- 이미지 파일 입력 필드 -->
+        <input type="file" id="mypage-images" name="images" style="display: none;"/>
+        <!-- 이미지 업로드 버튼 -->
+      </form>
+      <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
+      <div id="profile_container">
+        <!-- 이미지 미리보기 및 출력 영역 -->
+        <div id="Profile-image-Preview">
+          <span class="material-symbols-rounded">photo_camera</span>
+          <img src="../../../image/profile/profile.png" id="img">
+        </div>
+        <div id="profile_information_container">
+          <p id="nickname"></p>
+          <button id="profile_edit_button">
+            프로필 편집
+          </button>
+          <div id="profile_information_user">
+            <p>게시물 <span id="posts_count"></span></p>
+            <p>팔로워 0 <span id="follower_count"></span></p>
+            <p> 팔로우 0 <span id="follow_count"></span></p>
+          </div>
+          <div id="profile_information_pet">
+            <p id="pet_name"></p>
+            <p id="pet_sex"></p>
+            <p id="pet_age"></p>
+          </div>
+          <div id="profile_information_intro">
+            <p id="intro"></p>
+          </div>
+        </div>
       </div>
-      <div id="profile_information_container">
-        <p id="nickname"></p>
-        <button id="profile_edit_button">
-          프로필 편집
-        </button>
-        <div id="profile_information_user">
-          <p>게시물 <span id="posts_count"></span></p>
-          <p>팔로워 0 <span id="follower_count"></span></p>
-          <p> 팔로우 0 <span id="follow_count"></span></p>
-        </div>
-        <div id="profile_information_pet">
-          <p id="pet_name"></p>
-          <p id="pet_sex"></p>
-          <p id="pet_age"></p>
-        </div>
-        <div id="profile_information_intro">
-          <p id="intro"></p>
-        </div>
+      <nav>
+        <div><span class="material-symbols-rounded">content_paste</span><a
+            href="javascript:window.location.reload();">게시물</a></div>
+        <div><span class="material-symbols-rounded">bookmark</span><a
+            id="bookmark">저장됨</a></div>
+        <div><span class="material-symbols-rounded">sell</span><a
+            href="javascript:window.location.reload();">태그됨</a></div>
+      </nav>
+    </header>
+
+    <section class="posts" id="post_list">
+
+      <div id="no_post">
+        <p id="post_create" class="material-symbols-rounded">add_circle</p>
+        <p id="post_comment1">첫 게시물 공유하기</p>
+        <p id="post_comment2">사진을 공유하면 회원님의 프로필에 표시됩니다.</p>
       </div>
-    </div>
-    <nav>
-      <span class="material-symbols-rounded">content_paste</span><a
-        href="javascript:window.location.reload();">게시물</a>
-      <span class="material-symbols-rounded">bookmark</span><a
-        id="bookmark">저장됨</a>
-      <span class="material-symbols-rounded">sell</span><a
-        href="javascript:window.location.reload();">태그됨</a>
-    </nav>
-  </header>
+    </section>
+  </div>
 
-  <section class="posts" id="post_list">
-
-    <div id="no_post">
-      <p id="post_create" class="material-symbols-rounded">add_circle</p>
-      <p id="post_comment1">첫 게시물 공유하기</p>
-      <p id="post_comment2">사진을 공유하면 회원님의 프로필에 표시됩니다.</p>
-    </div>
-  </section>
+  <th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+  <!-- 임시 저장 모달 -->
+  <th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
 </div>
-
-<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
-<!-- 임시 저장 모달 -->
-<div th:include="common/tempModal :: tempModal" class="modal" id="draftModal"
-     style="display: none;"></div>
-<!--<div th:insert="post/postDetailFragment :: postDetailModal"></div>-->
-
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
 </body>
 </html>
