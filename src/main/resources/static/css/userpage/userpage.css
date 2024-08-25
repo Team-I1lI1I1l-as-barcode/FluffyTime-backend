@@ -96,7 +96,7 @@
 }
 
 /* 프로필 편집 버튼 */
-#follow_button {
+.follow_button {
   background-color: var(--primary-color);
   color: black;
   border: none;

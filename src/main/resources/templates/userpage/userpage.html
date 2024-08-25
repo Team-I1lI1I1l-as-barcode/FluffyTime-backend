@@ -5,6 +5,7 @@
   <title>유저페이지</title>
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/userpage/userpage.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
   <link rel="stylesheet" href="/css/userpage/userpage.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
   <link rel="stylesheet" href="/css/styles.css">
@@ -47,9 +48,7 @@
       </div>
       <div id="profile_information_container">
         <p id="nickename"></p>
-        <button id="follow_button">
-          팔로우
-        </button>
+        <button class="follow_button">팔로우</button>
         <!-- 더보기 버튼 -->
         <span id="more" class="material-symbols-rounded">more_horiz</span>
 

@@ -10,6 +10,7 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
+// const followButton = getElement("follow_button"); // 팔로우 버튼
 
 // 모달 관련 요소
 const userPageModal = document.getElementById('userPage-modal');
@@ -101,6 +102,17 @@ function renderPosts(posts) {
       postListElement.appendChild(img); // <img>를 섹션에 추가
     }
   });
+}
+
+async function checkFollowStatus() {
+  console.log("checkFollowStatus() 실행")
+  const response = await fetch(
+      '/api/follow/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 }
 
 // 초기화 함수
