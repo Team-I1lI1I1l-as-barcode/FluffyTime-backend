@@ -9,15 +9,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
 public class LoginUserRequest {
 
     @NotEmpty
     @Email
-    private final String email;
+    private String email;
 
     @NotEmpty
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\d)(?=.*\\W).{8,20}$")
-    private final String password;
+    private String password;
 
     @Builder
     public LoginUserRequest(String email, String password) {
