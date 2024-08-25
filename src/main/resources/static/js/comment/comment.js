@@ -292,8 +292,18 @@ function showEditReply(replyId, currentContent) {
   saveButton.textContent = '수정 완료';
   saveButton.onclick = () => updateReply(replyId, editTextarea.value);
 
+  const cancelButton = document.createElement('button');
+  cancelButton.className = 'comment-cancel-button';
+  cancelButton.textContent = '취소';
+  cancelButton.onclick = () => fetchComments(postId); // 페이지 새로고침으로 수정 취소
+
+  const saveCancleDiv = document.createElement('div');
+  saveCancleDiv.className = 'save-cancle-button-box';
+  saveCancleDiv.appendChild(saveButton);
+  saveCancleDiv.appendChild(cancelButton);
+
   replyDiv.appendChild(editTextarea);
-  replyDiv.appendChild(saveButton);
+  replyDiv.appendChild(saveCancleDiv);
 }
 
 // 답글 수정
@@ -375,11 +385,22 @@ function showEdit(commentId, currentContent) {
   editTextarea.value = currentContent;
 
   const saveButton = document.createElement('button');
+  saveButton.className = 'comment-edit-button';
   saveButton.textContent = '수정 완료';
   saveButton.onclick = () => updateComment(commentId, editTextarea.value);
 
+  const cancelButton = document.createElement('button');
+  cancelButton.className = 'comment-cancel-button';
+  cancelButton.textContent = '취소';
+  cancelButton.onclick = () => fetchComments(postId); // 페이지 새로고침으로 수정 취소
+
+  const saveCancleDiv = document.createElement('div');
+  saveCancleDiv.className = 'save-cancle-button-box';
+  saveCancleDiv.appendChild(saveButton);
+  saveCancleDiv.appendChild(cancelButton);
+
   commentDiv.appendChild(editTextarea);
-  commentDiv.appendChild(saveButton);
+  commentDiv.appendChild(saveCancleDiv);
 }
 
 //댓글 수정

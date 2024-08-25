@@ -86,6 +86,11 @@
   margin-left: auto;
 }
 
+.liked-box-post {
+  display: flex;
+  align-items: center;
+}
+
 /* like-button 스타일 */
 .like-button {
   background: none;
@@ -104,6 +109,13 @@
   cursor: pointer;
   font-size: 14px;
   margin-top: 0.5rem;
+}
+
+.liked-box-post .like-count {
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 0.5rem;
+  margin-top: 0.1rem;
 }
 
 .like-button.liked {
