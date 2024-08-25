@@ -289,6 +289,18 @@
     min-width: 150px; /* 최소 너비 설정 */
     min-height: 150px; /* 최소 높이 설정 */
   }
+
+  #no_post {
+    gap: 1.5rem; /* 간격 조정 */
+  }
+
+  #post_create {
+    font-size: 6rem; /* 소형 화면에서 아이콘 크기 축소 */
+  }
+
+  #post_comment1, #post_comment2 {
+    font-size: 1.5rem; /* 폰트 크기 축소 */
+  }
 }
 
 /* 중형 화면 (800px ~ 1199px) */
@@ -348,6 +360,18 @@
   .posts img {
     min-width: 120px; /* 최소 너비 설정 */
     min-height: 120px; /* 최소 높이 설정 */
+  }
+
+  #no_post {
+    gap: 1.2rem; /* 간격 조정 */
+  }
+
+  #post_create {
+    font-size: 5rem; /* 소형 화면에서 아이콘 크기 축소 */
+  }
+
+  #post_comment1, #post_comment2 {
+    font-size: 1.2rem; /* 폰트 크기 축소 */
   }
 }
 
@@ -417,6 +441,18 @@
   .posts img {
     min-width: 100px; /* 최소 너비 설정 */
     min-height: 100px; /* 최소 높이 설정 */
+  }
+
+  #no_post {
+    gap: 1rem; /* 간격 조정 */
+  }
+
+  #post_create {
+    font-size: 4rem; /* 소형 화면에서 아이콘 크기 축소 */
+  }
+
+  #post_comment1, #post_comment2 {
+    font-size: 1rem; /* 폰트 크기 축소 */
   }
 }
 
