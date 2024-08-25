@@ -76,7 +76,8 @@ public class CommentLikeService {
                 .likeCount(commentLikeRepository.countByComment(comment))
                 .isLiked(true) //좋아요 목록이므로 항상 true
                 .profileImageurl(Optional.ofNullable(like.getUser().getProfile())
-                    .map(profile -> profile.getProfileImages().getFilePath())
+                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                    .map(profileImages -> profileImages.getFilePath())
                     .orElse("/image/profile/profile.png"))
                 .intro(like.getUser().getProfile().getIntro())
                 .build())
