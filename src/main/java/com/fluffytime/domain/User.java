@@ -92,7 +92,6 @@ public class User {
 
     // 유저 - 프로필 (일대일 단방향 -> 양방향으로 수정(프로필의 반려동물 이름을 기반으로 아이디를 찾아야 하기 때문)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-
     @JoinColumn(name = "profile_id")
     private Profile profile;
 
@@ -110,10 +109,21 @@ public class User {
     }
 
     @Builder
-    public User(String email, String password, String nickname, LoginType loginType) {
+    public User(
+        Long userId,
+        String email,
+        String password,
+        String nickname,
+        LoginType loginType,
+        Profile profile,
+        LocalDateTime registrationAt
+    ) {
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.loginType = loginType;
+        this.profile = profile;
+        this.registrationAt = registrationAt;
     }
 }

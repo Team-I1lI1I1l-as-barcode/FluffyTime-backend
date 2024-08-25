@@ -1,11 +1,15 @@
 package com.fluffytime.user.controller.api;
 
+import com.fluffytime.common.exception.global.BadRequest;
+import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.common.smtp.builder.CertificationEmailContent;
 import com.fluffytime.common.smtp.builder.ChangePasswordEmailContent;
 import com.fluffytime.common.smtp.service.EmailService;
+import com.fluffytime.user.dto.request.PasswordChangeRequest;
 import com.fluffytime.user.dto.request.FindEmailRequest;
 import com.fluffytime.user.dto.request.JoinRequest;
 import com.fluffytime.user.dto.request.LoginUserRequest;
+import com.fluffytime.user.dto.request.SendEmailRequest;
 import com.fluffytime.user.dto.response.CheckDuplicationResponse;
 import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.dto.response.JoinResponse;
@@ -151,16 +155,33 @@ public class UserApiController {
     }
 
     // 비밀번호 변경 메일 전송
-    @GetMapping("/email-changePassword/send")
+    @PostMapping("/email-changePassword/send")
     public ResponseEntity<SucceedSendEmailResponse> sendChangePasswordMail(
-        @RequestParam(name = "email")
-        @NotBlank
-        @Email
-        String email
+        @RequestBody @Valid SendEmailRequest sendEmailRequest
     ) {
-        String subject = "[ FluffyTime - 반려동물 전용 SNS ] 비밀번호 변경 메일입니다.";
+        if(loginService.existsUserByEmail(sendEmailRequest.getEmail())) {
+            String subject = "[ FluffyTime - 반려동물 전용 SNS ] 비밀번호 변경 메일입니다.";
 
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(emailService.sendHtmlMail(email,subject,new ChangePasswordEmailContent()));
+            loginService.savePasswordChangeTtl(sendEmailRequest.getEmail());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(emailService.sendHtmlMail(sendEmailRequest.getEmail(),subject,new ChangePasswordEmailContent()));
+        } else {
+            throw new UserNotFound();
+        }
     }
+
+    @PostMapping("/change/password")
+    public ResponseEntity<?> changePassword(
+        @RequestBody @Valid PasswordChangeRequest passwordChangeRequest
+    ) {
+        if (loginService.findPasswordChangeTtl(passwordChangeRequest.getEmail())) {
+            loginService.changePassword(passwordChangeRequest);
+            loginService.removePasswordChangeTtl(passwordChangeRequest.getEmail());
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } else {
+            throw new BadRequest();
+        }
+    }
+
 }

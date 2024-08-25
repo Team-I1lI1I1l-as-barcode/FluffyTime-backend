@@ -68,11 +68,14 @@ public class JoinService {
 
         Role role = roleRepository.findByRoleName(ROLE_USER).orElseThrow(RoleNameNotFound::new);
 
+        Profile basicProfile = new Profile("none", Long.valueOf(0), "none");
+
         User user = User.builder()
             .email(tempUser.getEmail())
             .password(tempUser.getPassword())
             .nickname(tempUser.getNickname())
             .loginType(tempUser.getLoginType())
+            .profile(basicProfile)
             .build();
 
         UserRole userRole = UserRole.builder()
@@ -82,10 +85,7 @@ public class JoinService {
 
         user.getUserRoles().add(userRole);
 
-        Profile basicProfile = new Profile("none", Long.valueOf(0), "none");
-
         basicProfile.setUser(user);
-        user.setProfile(basicProfile);
 
         userRepository.save(user);
 
@@ -158,6 +158,7 @@ public class JoinService {
             .build();
     }
 
+    @Transactional
     // 인증 성공 or 실패 응답을 구현해야함
     public SucceedCertificationResponse certificateEmail(String email) {
         TempUser user = emailCertificationDao.getTempUser(email)

@@ -1,13 +1,13 @@
-const findBtn = document.getElementById('findBtn');
+const sendBtnElement = document.getElementById("sendBtn");
 
-findBtn.addEventListener("click", findEmail);
+sendBtnElement.addEventListener("click", sendChangePasswordLink);
 
 const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
 
-async function findEmail(event) {
+async function sendChangePasswordLink(event) {
   event.preventDefault();
 
-  const formElement = document.getElementById('findEmailForm');
+  const formElement = document.getElementById('findPasswordForm');
   const emailErrorElement = document.querySelector('.email-error');
   const resultMsgElement = document.querySelector('.resultMsg');
 
@@ -28,26 +28,28 @@ async function findEmail(event) {
     emailErrorElement.classList.add('hidden');
   }
 
-  const response= await fetch('/api/users/find-email', {
-    method: 'POST',
+  const response = await fetch('/api/users/email-changePassword/send', {
+    method:'POST',
     headers: {
-      'Content-Type':'application/json'
+      'Content-Type' : 'application/json'
     },
     body: JSON.stringify(jsonData)
   });
 
-  const data  = await response.json();
+  const data = await response.json();
 
   if (!response.ok) {
+    if(data.code === "GE-001") {
+      resultMsgElement.innerText = "해당 이메일로 가입된 유저를 찾을 수 없습니다."
+      return
+    }
     emailErrorElement.innerText = "올바르지 않은 이메일 입력입니다."
     resultMsgElement.innerText = ""
     emailErrorElement.classList.remove('hidden')
-    return;
+      return
   }
 
-  if(data.isExists) {
-    resultMsgElement.innerText = "해당 이메일로 가입한 유저가 존재합니다."
-  } else {
-    resultMsgElement.innerText = "해당 이메일로 가입된 유저 정보를 찾을 수 없습니다."
-  }
+    resultMsgElement.innerText =
+        "해당 이메일 주소로 비밀번호 변경 링크 메일이 전송되었습니다. "
+        + "\n 5분 이내로 전송된 링크를 통해 비밀번호를 변경해주세요."
 }
