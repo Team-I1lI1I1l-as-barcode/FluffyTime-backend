@@ -18,7 +18,8 @@ public enum GlobalErrorCode implements ErrorCode {
     PERMISSION_NOT_ACCESS(HttpStatus.FORBIDDEN, "GE-008", "접근 권한이 없습니다."),
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GE-009", "서버 에러"),
     BAD_REQUEST(HttpStatus.BAD_REQUEST, "GE-010", "잘못된 요청"),
-    ROLE_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "GE-011", "유저 권한 명을 찾을 수 없습니다");
+    ROLE_NAME_NOT_FOUND(HttpStatus.NOT_FOUND, "GE-011", "유저 권한 명을 찾을 수 없습니다"),
+    FAILED_TO_SEND_EMAIL(HttpStatus.BAD_REQUEST, "GE-012", "인증 메일 전송 실패");
 
     private final HttpStatus httpStatus;
     private final String code;

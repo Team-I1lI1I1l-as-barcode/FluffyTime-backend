@@ -4,11 +4,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
+@NoArgsConstructor
 public class JoinRequest {
 
     @NotEmpty
@@ -23,4 +26,11 @@ public class JoinRequest {
     @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "닉네임은 숫자, 문자, _, -만 사용가능합니다.")
     @Size(max = 20)
     private String nickname;
+
+    @Builder
+    public JoinRequest(String email, String password, String nickname) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+    }
 }

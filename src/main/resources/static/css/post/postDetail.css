@@ -220,7 +220,7 @@ body {
 /*북마크*/
 .bookmark-section {
   text-align: right;
-  margin-top: 20px;
+  margin-top: 0.6rem;
 }
 
 .bookmark-section img {
@@ -229,3 +229,8 @@ body {
   cursor: pointer;
 }
 
+.postDetail-footer-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
