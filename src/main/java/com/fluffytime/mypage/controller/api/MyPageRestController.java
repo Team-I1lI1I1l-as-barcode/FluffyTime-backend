@@ -1,8 +1,8 @@
 package com.fluffytime.mypage.controller.api;
 
 
-import com.fluffytime.domain.User;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.domain.User;
 import com.fluffytime.mypage.request.ProfileDto;
 import com.fluffytime.mypage.response.CheckUsernameDto;
 import com.fluffytime.mypage.response.ImageResultDto;
@@ -35,7 +35,7 @@ public class MyPageRestController {
 
     // 마이페이지 정보 가져오기
     @GetMapping("/api/mypage/info")
-    public ResponseEntity<?> mypagesInfo(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<MyPageInformationDto> mypagesInfo(HttpServletRequest httpServletRequest) {
         log.info("마이페이지 정보 가져오기 api 실행 ");
 
         User user = myPageService.findByAccessToken(httpServletRequest);
@@ -47,7 +47,7 @@ public class MyPageRestController {
 
     // 프로필 정보 가져오기
     @GetMapping("/api/mypage/profiles/info")
-    public ResponseEntity<?> profilesInfo(
+    public ResponseEntity<ProfileInformationDto> profilesInfo(
         HttpServletRequest httpServletRequest) {
         log.info("프로필 정보 가져오기 api 실행 ");
 
@@ -60,7 +60,7 @@ public class MyPageRestController {
 
     // 프로필 정보 수정
     @PatchMapping("/api/mypage/profiles/edit")
-    public ResponseEntity<?> editProfiles(
+    public ResponseEntity<RequestResultDto> editProfiles(
         @RequestBody ProfileDto profileDto) {
         log.info(profileDto.getNickname() + "님의 프로필 정보 수정 api 실행 ");
 
@@ -71,7 +71,8 @@ public class MyPageRestController {
 
     // 프로필 유저명 중복 확인
     @GetMapping("/api/mypage/profiles/check-username")
-    public ResponseEntity<?> profilesCheckUsername(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<CheckUsernameDto> profilesCheckUsername(
+        @RequestParam("nickname") String nickname) {
         log.info("중복 확인 api 실행");
 
         CheckUsernameDto checkUsernameDto = myPageService.nicknameExists(nickname);
@@ -80,7 +81,8 @@ public class MyPageRestController {
 
     // 프로필 이미지 업데이트
     @PatchMapping("/api/mypage/profiles/images/edit")
-    public ResponseEntity<?> profileImagesEdit(@RequestParam("nickname") String nickname,
+    public ResponseEntity<ImageResultDto> profileImagesEdit(
+        @RequestParam("nickname") String nickname,
         @RequestPart("images") MultipartFile file) { // 폼데이터에서 파일을 MultipartFile로 추출
         log.info("프로필 이미지를 업데이트 api 실행");
 
@@ -90,7 +92,8 @@ public class MyPageRestController {
 
     // 프로필 이미지 삭제
     @DeleteMapping("/api/mypage/profiles/images/delete")
-    public ResponseEntity<?> profileImagesDelete(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<ImageResultDto> profileImagesDelete(
+        @RequestParam("nickname") String nickname) {
         log.info("프로필 이미지를 삭제 api 실행");
 
         ImageResultDto imageResultDto = myPageService.deleteProfileImage(nickname);
@@ -99,7 +102,7 @@ public class MyPageRestController {
 
     // 프로필 회원 탈퇴
     @GetMapping("/api/users/withdraw")
-    public ResponseEntity<?> withdrawAccount(HttpServletRequest httpServletRequest,
+    public ResponseEntity<RequestResultDto> withdrawAccount(HttpServletRequest httpServletRequest,
         HttpServletResponse response) {
         log.info("회원 탈퇴 api 실행");
         User user = myPageService.findByAccessToken(httpServletRequest);
