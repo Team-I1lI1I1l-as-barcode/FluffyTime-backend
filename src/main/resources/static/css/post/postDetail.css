@@ -216,3 +216,21 @@ body {
   padding-top: 5px; /* 프로필 아래쪽의 간격을 줄임 */
   padding-bottom: 5px;
 }
+
+/*북마크*/
+.bookmark-section {
+  text-align: right;
+  margin-top: 0.6rem;
+}
+
+.bookmark-section img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.postDetail-footer-box {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}

@@ -67,6 +67,20 @@ public class Post {
     )
     private List<TagPost> tagPosts = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<PostLike> likes = new ArrayList<>();
+
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
         LocalDateTime updatedAt, TempStatus tempStatus, User user) {

@@ -300,3 +300,64 @@ function copyLinkToClipboard() {
     alert('링크 복사에 실패했습니다.'); // 오류 메시지 표시
   });
 }
+
+let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
+
+// 북마크 상태 초기화 함수
+async function initializeBookmarkState(postId) {
+  try {
+    const response = await fetch(`/api/bookmarks/check?postId=${postId}`, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('북마크 상태를 확인할 수 없습니다.');
+    }
+
+    const bookmarkData = await response.json();
+    currentBookmarkId = bookmarkData.bookmarkId;  // 서버로부터 받은 bookmarkId 저장
+    const isBookmarked = bookmarkData.isBookmarked;
+
+    const bookmarkIcon = document.getElementById('bookmarkIcon');
+    bookmarkIcon.src = isBookmarked
+        ? "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg"
+        : "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg";
+  } catch (error) {
+    console.error('북마크 상태 초기화 중 오류 발생:', error);
+  }
+}
+
+// 북마크 토글 함수
+async function toggleBookmark() {
+  try {
+    const isBookmarked = currentBookmarkId !== null;  // 북마크 여부 확인
+    const bookmarkIcon = document.getElementById('bookmarkIcon');
+
+    if (isBookmarked) {
+      // 이미 북마크된 경우, 북마크 삭제 요청
+      await fetch(`/api/bookmarks/delete/${currentBookmarkId}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+      currentBookmarkId = null;  // 북마크 ID 초기화
+      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"; // 북마크 해제 아이콘으로 변경
+    } else {
+      // 북마크되지 않은 경우, 북마크 추가 요청
+      const response = await fetch(`/api/bookmarks/reg`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({postId: currentPostId})
+      });
+
+      const newBookmarkData = await response.json();
+      currentBookmarkId = newBookmarkData.bookmarkId;  // 서버로부터 받은 새 bookmarkId 저장
+      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg"; // 북마크 아이콘으로 변경
+    }
+  } catch (error) {
+    console.error('북마크 토글 중 오류 발생:', error);
+  }
+}

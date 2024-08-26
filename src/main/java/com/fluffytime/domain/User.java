@@ -3,6 +3,8 @@ package com.fluffytime.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -47,8 +49,13 @@ public class User {
     @Column(name = "nickname", nullable = false, length = 100)
     private String nickname;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "login_type", nullable = false)
+    private LoginType loginType;
+
     @Column(name = "registration_at", nullable = false)
     private LocalDateTime registrationAt;
+
 
     @OneToMany(
         mappedBy = "user",
@@ -70,6 +77,34 @@ public class User {
         orphanRemoval = true
     )
     private List<Reply> replyList = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Bookmark> bookmarkList = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<ReplyLike> replyLikes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<PostLike> postLikes = new ArrayList<>();
 
     // 유저 - 프로필 (일대일 단방향 -> 양방향으로 수정(프로필의 반려동물 이름을 기반으로 아이디를 찾아야 하기 때문)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -101,9 +136,21 @@ public class User {
     }
 
     @Builder
-    public User(String email, String password, String nickname) {
+    public User(
+        Long userId,
+        String email,
+        String password,
+        String nickname,
+        LoginType loginType,
+        Profile profile,
+        LocalDateTime registrationAt
+    ) {
+        this.userId = userId;
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        this.loginType = loginType;
+        this.profile = profile;
+        this.registrationAt = registrationAt;
     }
 }

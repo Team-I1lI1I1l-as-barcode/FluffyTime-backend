@@ -53,7 +53,9 @@ public class JwtService {
             accessTokenCookie.setHttpOnly(true);
             accessTokenCookie.setMaxAge(Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT)
                 / 1000);
+
             response.addCookie(accessTokenCookie);
+
             return ResponseEntity.status(HttpStatus.OK).build();
         } else {
             refreshTokenDao.removeRefreshToken(email);

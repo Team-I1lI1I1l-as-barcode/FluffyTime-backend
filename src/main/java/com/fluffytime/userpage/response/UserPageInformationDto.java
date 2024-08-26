@@ -26,12 +26,13 @@ public class UserPageInformationDto {
     private String intro;    // 소개글
     private String fileUrl; // 프로필 사진 등록 URL
     private String publicStatus; // 프로필 공개/비공개 여부
+    private Boolean isUserBlocked; // 해당 유저 차단 여부
 
     @Builder
     public UserPageInformationDto(String nickname,
         List<PostDto> postsList,
         String petName, String petSex, Long petAge, String intro, String fileUrl,
-        String publicStatus) {
+        String publicStatus, Boolean isUserBlocked) {
         this.nickname = nickname;
         this.postsList = postsList;
         this.petName = petName;
@@ -40,5 +41,6 @@ public class UserPageInformationDto {
         this.intro = intro;
         this.fileUrl = fileUrl;
         this.publicStatus = publicStatus;
+        this.isUserBlocked = isUserBlocked;
     }
 }

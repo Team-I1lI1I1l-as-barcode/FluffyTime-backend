@@ -2,6 +2,8 @@ package com.fluffytime.mypage.service;
 
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.UserNotFound;
+import com.fluffytime.config.aws.S3Service;
+import com.fluffytime.domain.Bookmark;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.ProfileImages;
 import com.fluffytime.domain.TempStatus;
@@ -15,7 +17,7 @@ import com.fluffytime.mypage.response.MyPageInformationDto;
 import com.fluffytime.mypage.response.PostDto;
 import com.fluffytime.mypage.response.ProfileInformationDto;
 import com.fluffytime.mypage.response.RequestResultDto;
-import com.fluffytime.post.aws.S3Service;
+import com.fluffytime.repository.BookmarkRepository;
 import com.fluffytime.repository.ProfileRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -36,6 +38,7 @@ public class MyPageService {
 
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
 
@@ -119,10 +122,24 @@ public class MyPageService {
                 postsList = null;
             }
 
+            // 북마크 게시물 리스트
+            List<Bookmark> bookmarks = bookmarkRepository.findByUserUserId(user.getUserId());
+            List<PostDto> bookmarkList = bookmarks.stream()
+                .map(Bookmark::getPost) // 북마크에서 게시글을 가져옴
+                .map(post -> {
+                    // 첫 번째 이미지의 파일 경로를 가져옴
+                    String filePath = post.getPostImages().isEmpty() ? null
+                        : post.getPostImages().get(0).getFilepath();
+                    // PostDto 생성
+                    return new PostDto(post.getPostId(), filePath);
+                })
+                .collect(Collectors.toList());
+
             // 기능 구현후 팔로우, 팔로워 수 추가 예정
             return MyPageInformationDto.builder()
                 .nickname(nickName) // 닉네임
                 .postsList(postsList) // 유저의 게시물 리스트
+                .bookmarkList(bookmarkList) // 북마크 리스트
                 .petName(profile.getPetName()) // 반려동물 이름
                 .petSex(profile.getPetSex()) // 반려동물 성별
                 .petAge(profile.getPetAge()) // 반려동물 나이
@@ -275,7 +292,14 @@ public class MyPageService {
             log.info("AccountDelete 실행 >> 해당 유저가 존재하여 회원 탈퇴");
             userRepository.delete(user);
 
-            // 회원 탈퇴 시 refreshToken 쿠키 삭제
+            // accessToken 쿠키 삭제
+            Cookie aceessTokenCookie = new Cookie("accessToken", null);
+            aceessTokenCookie.setPath("/");
+            aceessTokenCookie.setHttpOnly(true);
+            aceessTokenCookie.setMaxAge(0);
+            response.addCookie(aceessTokenCookie);
+
+            // refreshToken 쿠키 삭제
             Cookie refreshTokenCookie = new Cookie("refreshToken", null);
             refreshTokenCookie.setPath("/");
             refreshTokenCookie.setHttpOnly(true);

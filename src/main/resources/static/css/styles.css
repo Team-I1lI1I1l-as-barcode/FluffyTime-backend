@@ -24,8 +24,9 @@ a {
 }
 
 a:visited {
-  color: inherit; /* 방문 후에도 색상 변화 없음 */
-  text-decoration: none; /* 방문 후에도 밑줄 제거 */
+  color: inherit; /* 본래 색상을 유지하게 설정 */
+  text-decoration: none; /* underline 같은 텍스트 장식을 없애려면 추가 */
+  /*outline: none; !* 클릭 시 outline 제거 *!*/
 }
 
 button {
@@ -160,25 +161,3 @@ li {
   background-color: var(--background-color);
 }
 
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: -250px; /* 사이드바를 화면 밖으로 숨김 */
-    transition: left 0.3s ease;
-  }
-
-  .sidebar.show {
-    left: 0; /* 사이드바를 표시 */
-  }
-
-  .content-container {
-    margin-left: 0;
-  }
-
-  .content {
-    width: 100%; /* 작은 화면에서 콘텐츠 너비를 100%로 확장 */
-    margin-left: 0;
-  }
-}

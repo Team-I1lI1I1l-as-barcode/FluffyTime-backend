@@ -1,5 +1,6 @@
 package com.fluffytime.comment.service;
 
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.comment.dto.CommentRequestDto;
 import com.fluffytime.comment.dto.CommentResponseDto;
 import com.fluffytime.common.exception.global.CommentNotFound;
@@ -8,7 +9,8 @@ import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.User;
-import com.fluffytime.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.reply.dto.ReplyResponseDto;
+import com.fluffytime.repository.CommentLikeRepository;
 import com.fluffytime.repository.CommentRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
@@ -31,6 +33,7 @@ public class CommentService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final CommentLikeRepository commentLikeRepository;
 
     //댓글 저장
     public void createComment(CommentRequestDto requestDto) {
@@ -47,12 +50,45 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    //댓글 조회
+    //댓글 조회 - 게시글마다
     public List<CommentResponseDto> getCommentByPostId(Long postId, Long currentUserId) {
         List<Comment> commentList = commentRepository.findByPostPostId(postId);
-        return commentList.stream()
-            .map(comment -> new CommentResponseDto(comment, currentUserId))
-            .collect(Collectors.toList());
+        return commentList.stream().map(comment -> {
+            int likeCount = commentLikeRepository.countByComment(comment);
+            boolean isLiked = commentLikeRepository.existsByCommentAndUserUserId(comment,
+                currentUserId);
+
+            return CommentResponseDto.builder()
+                .commentId(comment.getCommentId())
+                .userId(comment.getUser().getUserId())
+                .content(comment.getContent())
+                .nickname(comment.getUser().getNickname())
+                .createdAt(comment.getCreatedAt())
+                .replyList(comment.getReplyList().stream()
+                    .map(reply -> ReplyResponseDto.builder()
+                        .replyId(reply.getReplyId())
+                        .userId(reply.getUser().getUserId())
+                        .content(reply.getContent())
+                        .nickname(reply.getUser().getNickname())
+                        .createdAt(reply.getCreatedAt())
+                        .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+                        .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                            .map(profileImages -> profileImages.getFilePath())
+                            .orElse("/image/profile/profile.png"))
+                        .likeCount(reply.getLikes().size())
+                        .isLiked(reply.getLikes().stream()
+                            .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
+                        .build()).collect(Collectors.toList()))
+                .isAuthor(comment.getUser().getUserId().equals(currentUserId))
+                .profileImageurl(Optional.ofNullable(comment.getUser().getProfile())
+                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                    .map(profileImages -> profileImages.getFilePath())
+                    .orElse("/image/profile/profile.png"))
+                .likeCount(likeCount)
+                .isLiked(isLiked)
+                .build();
+        }).collect(Collectors.toList());
     }
 
     //댓글 수정
@@ -99,10 +135,44 @@ public class CommentService {
         return user;
     }
 
-    //댓글 ID로 댓글 조회하기
+    //댓글 ID로 댓글 조회하기 - 수정 및 삭제
     public CommentResponseDto getCommentByCommentId(Long commentId, Long currentUserId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
-        return new CommentResponseDto(comment, currentUserId);
+
+        int likeCount = commentLikeRepository.countByComment(comment);
+        boolean isLiked = commentLikeRepository.existsByCommentAndUserUserId(comment,
+            currentUserId);
+
+        return CommentResponseDto.builder()
+            .commentId(comment.getCommentId())
+            .userId(comment.getUser().getUserId())
+            .content(comment.getContent())
+            .nickname(comment.getUser().getNickname())
+            .createdAt(comment.getCreatedAt())
+            .replyList(comment.getReplyList().stream()
+                .map(reply -> ReplyResponseDto.builder()
+                    .replyId(reply.getReplyId())
+                    .userId(reply.getUser().getUserId())
+                    .content(reply.getContent())
+                    .nickname(reply.getUser().getNickname())
+                    .createdAt(reply.getCreatedAt())
+                    .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+                    .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                        .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                        .map(profileImages -> profileImages.getFilePath())
+                        .orElse("/image/profile/profile.png"))
+                    .likeCount(reply.getLikes().size())
+                    .isLiked(reply.getLikes().stream()
+                        .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
+                    .build()).collect(Collectors.toList()))
+            .isAuthor(comment.getUser().getUserId().equals(currentUserId))
+            .profileImageurl(Optional.ofNullable(comment.getUser().getProfile())
+                .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                .map(profileImages -> profileImages.getFilePath())
+                .orElse("/image/profile/profile.png"))
+            .likeCount(likeCount)
+            .isLiked(isLiked)
+            .build();
     }
 }

@@ -6,7 +6,11 @@ import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.User;
 import com.fluffytime.repository.UserRepository;
-import com.fluffytime.user.dto.request.LoginUser;
+import com.fluffytime.user.dao.PasswordChangeDao;
+import com.fluffytime.user.dto.request.PasswordChangeRequest;
+import com.fluffytime.user.dto.request.FindEmailRequest;
+import com.fluffytime.user.dto.request.LoginUserRequest;
+import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.exception.MismatchedPassword;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @Service
@@ -30,8 +35,10 @@ public class LoginService {
     private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenDao refreshTokenDao;
+    private final PasswordChangeDao passwordChangeDao;
 
-    public void loginProcess(HttpServletResponse response, LoginUser loginUser) {
+    @Transactional
+    public void loginProcess(HttpServletResponse response, LoginUserRequest loginUser) {
 
         User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFound::new);
 
@@ -72,6 +79,7 @@ public class LoginService {
         log.info("로그인에 성공하였습니다.");
     }
 
+    @Transactional
     public ResponseEntity<Void> logoutProcess(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         String refreshToken = jwtTokenizer.getTokenFromCookie(request, "refreshToken");
@@ -108,5 +116,54 @@ public class LoginService {
         response.addCookie(accessTokencookie);
         response.sendRedirect("/login");
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<FindEmailResponse> findEmail(FindEmailRequest findEmailRequest) {
+        FindEmailResponse findEmailResponse = FindEmailResponse.builder()
+            .email(findEmailRequest.getEmail())
+            .isExists(userRepository.existsUserByEmail(findEmailRequest.getEmail()))
+            .build();
+        return ResponseEntity.status(HttpStatus.OK).body(findEmailResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsUserByEmail(String email) {
+        return userRepository.existsUserByEmail(email);
+    }
+
+    @Transactional
+    public void savePasswordChangeTtl(String email) {
+        passwordChangeDao.saveChangePasswordTtl(email);
+    }
+
+    @Transactional
+    public boolean findPasswordChangeTtl(String email) {
+        return passwordChangeDao.hasKey(email);
+    }
+
+    @Transactional
+    public void changePassword(PasswordChangeRequest passwordChangeRequest) {
+        String email = passwordChangeRequest.getEmail();
+        String password = passwordChangeRequest.getPassword();
+
+        User findUser = userRepository.findByEmail(email).orElseThrow(UserNotFound::new);
+
+        User user = User.builder()
+            .userId(findUser.getUserId())
+            .email(findUser.getEmail())
+            .password(passwordEncoder.encode(password))
+            .nickname(findUser.getNickname())
+            .loginType(findUser.getLoginType())
+            .profile(findUser.getProfile())
+            .registrationAt(findUser.getRegistrationAt())
+            .build();
+
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void removePasswordChangeTtl(String email) {
+        passwordChangeDao.removePasswordChangeTtl(email);
     }
 }

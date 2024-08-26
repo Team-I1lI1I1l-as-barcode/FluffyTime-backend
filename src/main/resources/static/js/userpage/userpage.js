@@ -10,17 +10,22 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
-// const followButton = getElement("follow_button"); // 팔로우 버튼
+
+const unblockComment = getElement('unblock_comment'); // 차단됨 문구
+// const follower_count = getElement("follower_count"); // 팔로워 수
+// const follow_count = getElement("follow_count");// 팔로우 수
+
+// div 영역
+const noPost = getElement('no_post'); // 게시물이 없을시 나올 div
+const privateAccount = getElement('private_account'); // 비공개 계정일시 나올 div
+const blockAccount = getElement('block_account'); // 차단된 게정일시 나올 div
 
 // 모달 관련 요소
 const userPageModal = document.getElementById('userPage-modal');
 const userPageOverlay = document.getElementById('userPage-modal-overlay');
 const closeModalButtons = document.querySelectorAll('#block_cancel');
-// const blockFollow = getElement('block_follow'); // 유저 차단
-// const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단 해제
-
-// const follower_count = getElement("follower_count"); // 팔로워 수
-// const follow_count = getElement("follow_count");// 팔로우 수
+const blockFollow = getElement('block_follow'); // 유저 차단
+const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단
 
 // api  요청  함수
 function fetchUserPage(url, func) {
@@ -65,21 +70,28 @@ function handleUserData(data) {
     console.log("등록된 프로필 사진 로드");
     img.src = data.fileUrl;
   }
+  // 해당 유저를 차단 했을때
+  if (data.isUserBlocked) {
+    blockAccount.style.display = "flex"; // 차단한 계정  div 활성화
+    blockFollow.style.display = "none"; // (모달) 유저 차단 비활성화
+    blockFollowCancel.style.display = "block"; // (모달) 유저 차단 해제 활성화
+    followBtn.style.display = "none"; // 팔로우 버튼 비활성화
+    unblockComment.style.display = "inline-flex"; // 유저 차단된 문구 활성화
+  } else {
+    // 해당 유저의 계정이 공개 계정일때
+    if (data.publicStatus === "1") {
+      (data.postsList !== null) ? renderPosts(data.postsList)
+          : noPost.style.display = 'flex';
 
-  console.log("타입 확인 코드 !!!!!!!" + typeof data.publicStatus);
-  // 해당 유저의 계정이 공개 계정일때
-  if (data.publicStatus === "1") {
-    (data.postsList !== null) ? renderPosts(data.postsList) : getElement(
-        'no_post').style.display = 'flex';
-
-  } else { // 해당 유저의 계정이 비공개 계정일때
-    // 추후 팔로우 관계일시에는 게시물이 보이게 변경할 예정
-    // if (data.postsList !== null) {
-    //   renderPosts(data.postsList);
-    // } else {
-    // 게시글이 없을시 문구 출력
-    getElement('private_account').style.display = 'flex';
-    // }
+    } else { // 해당 유저의 계정이 비공개 계정일때
+      // 추후 팔로우 관계일시에는 게시물이 보이게 변경할 예정
+      // if (data.postsList !== null) {
+      //   renderPosts(data.postsList);
+      // } else {
+      // 게시글이 없을시 문구 출력
+      privateAccount.style.display = 'flex';
+      // }
+    }
   }
 }
 
