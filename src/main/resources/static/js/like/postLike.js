@@ -10,13 +10,11 @@ async function initializeLikeStatus(postId) {
     }
 
     const data = await response.json();
-    // 'data' 속성 안에 실제 데이터가 들어있음
-    const postData = data.data;
 
-    if (postData) {
-      likeButton.innerHTML = postData.liked ? 'favorite' : 'favorite_border'; // 버튼 모양 업데이트
-      likeButton.classList.toggle('liked', postData.liked);
-      likeCountSpan.textContent = `${postData.likeCount}`; // 좋아요 수 업데이트
+    if (data) {
+      likeButton.innerHTML = data.liked ? 'favorite' : 'favorite_border'; // 버튼 모양 업데이트
+      likeButton.classList.toggle('liked', data.liked);
+      likeCountSpan.textContent = `${data.likeCount}`; // 좋아요 수 업데이트
     }
   } catch (error) {
     console.error('Error initializing like status:', error);
