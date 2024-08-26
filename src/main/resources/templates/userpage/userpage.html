@@ -5,6 +5,7 @@
   <title>유저페이지</title>
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/userpage/userpage.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
   <script th:src="@{/js/userpage/blockUser.js}" defer></script>
   <link rel="stylesheet" href="/css/userpage/userpage.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
@@ -42,6 +43,7 @@
         </div>
       </div>
 
+
       <div id="profile_container">
         <!-- 이미지 미리보기 및 출력 영역 -->
         <div id="Profile-image-Preview">
@@ -49,9 +51,7 @@
         </div>
         <div id="profile_information_container">
           <p id="nickename"></p>
-          <button id="follow_button">
-            팔로우
-          </button>
+        <button class="follow_button">팔로우</button>
           <a id="unblock_comment">
             차단됨
           </a>

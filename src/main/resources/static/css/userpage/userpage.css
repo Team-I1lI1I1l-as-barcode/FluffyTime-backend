@@ -97,8 +97,8 @@
   font-size: 15px;
 }
 
-/* 팔로우 버튼 */
-#follow_button {
+/* 프로필 편집 버튼 */
+.follow_button {
   background-color: var(--primary-color);
   color: black;
   border: none;

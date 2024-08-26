@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @Getter
@@ -116,6 +118,17 @@ public class User {
     )
     private Set<UserRole> userRoles = new HashSet<>();
 
+    // 내가 팔로우한 사용자들 (내가 followingUser인 경우)
+    @OneToMany(mappedBy = "followingUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude  // 순환 참조 방지
+    @EqualsAndHashCode.Exclude // 순환 참조 방지
+    private List<Follow> followingList = new ArrayList<>();
+
+    // 나를 팔로우한 사용자들 (내가 followedUser인 경우)
+    @OneToMany(mappedBy = "followedUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ToString.Exclude  // 순환 참조 방지
+    @EqualsAndHashCode.Exclude // 순환 참조 방지
+    private List<Follow> followerList = new ArrayList<>();
 
     @PrePersist
     public void create() {
