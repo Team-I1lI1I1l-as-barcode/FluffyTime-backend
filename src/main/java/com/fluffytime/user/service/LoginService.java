@@ -7,9 +7,9 @@ import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.User;
 import com.fluffytime.repository.UserRepository;
 import com.fluffytime.user.dao.PasswordChangeDao;
-import com.fluffytime.user.dto.request.PasswordChangeRequest;
 import com.fluffytime.user.dto.request.FindEmailRequest;
 import com.fluffytime.user.dto.request.LoginUserRequest;
+import com.fluffytime.user.dto.request.PasswordChangeRequest;
 import com.fluffytime.user.dto.response.FindEmailResponse;
 import com.fluffytime.user.exception.MismatchedPassword;
 import jakarta.servlet.http.Cookie;
@@ -42,7 +42,7 @@ public class LoginService {
 
         User user = userRepository.findByEmail(loginUser.getEmail()).orElseThrow(UserNotFound::new);
 
-        if(!passwordEncoder.matches(loginUser.getPassword(),user.getPassword())) {
+        if (!passwordEncoder.matches(loginUser.getPassword(), user.getPassword())) {
             throw new MismatchedPassword();
         }
 
@@ -80,7 +80,8 @@ public class LoginService {
     }
 
     @Transactional
-    public ResponseEntity<Void> logoutProcess(HttpServletRequest request, HttpServletResponse response)
+    public ResponseEntity<Void> logoutProcess(HttpServletRequest request,
+        HttpServletResponse response)
         throws IOException {
         String refreshToken = jwtTokenizer.getTokenFromCookie(request, "refreshToken");
 
@@ -149,17 +150,8 @@ public class LoginService {
 
         User findUser = userRepository.findByEmail(email).orElseThrow(UserNotFound::new);
 
-        User user = User.builder()
-            .userId(findUser.getUserId())
-            .email(findUser.getEmail())
-            .password(passwordEncoder.encode(password))
-            .nickname(findUser.getNickname())
-            .loginType(findUser.getLoginType())
-            .profile(findUser.getProfile())
-            .registrationAt(findUser.getRegistrationAt())
-            .build();
-
-        userRepository.save(user);
+        findUser.setPassword(passwordEncoder.encode(password));
+        userRepository.save(findUser);
     }
 
     @Transactional
