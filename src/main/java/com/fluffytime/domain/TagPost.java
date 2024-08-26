@@ -2,6 +2,7 @@ package com.fluffytime.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,17 +26,16 @@ public class TagPost {
     @Column(name = "tag_post_id", nullable = false)
     private Long tagPostId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
-    @ManyToOne
-    @JoinColumn(name = "tag_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tag_id", nullable = false)
     private Tag tag;
 
     @Builder
-    public TagPost(Long tagPostId, Post post, Tag tag) {
-        this.tagPostId = tagPostId;
+    public TagPost(Post post, Tag tag) {
         this.post = post;
         this.tag = tag;
     }

@@ -2,7 +2,6 @@ package com.fluffytime.post.controller.api;
 
 import com.fluffytime.domain.User;
 import com.fluffytime.post.dto.request.PostRequest;
-import com.fluffytime.post.dto.response.ApiResponse;
 import com.fluffytime.post.dto.response.PostResponse;
 import com.fluffytime.post.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,7 +28,7 @@ public class PostRestController {
 
     // 게시물 등록
     @PostMapping("/reg")
-    public ResponseEntity<ApiResponse<Long>> regPost(@RequestPart("post") PostRequest postRequest,
+    public ResponseEntity<Long> regPost(@RequestPart("post") PostRequest postRequest,
         @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("게시물 등록 요청 받음: {}", postRequest);
@@ -46,14 +45,12 @@ public class PostRestController {
         }
 
         log.info("게시물 등록 성공, ID: {}", postId);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postId));
+        return ResponseEntity.status(HttpStatus.OK).body(postId);
     }
 
     // 임시 게시물 등록
     @PostMapping("/temp-reg")
-    public ResponseEntity<ApiResponse<Long>> tempRegPost(
-        @RequestPart("post") PostRequest postRequest,
+    public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
         @RequestPart("images") MultipartFile[] files,
         HttpServletRequest request) {
         log.info("임시 게시물 등록 요청 받음: {}", postRequest);
@@ -61,53 +58,43 @@ public class PostRestController {
         Long postId = postService.createTempPost(postRequest, files, request);
 
         log.info("임시 게시물 등록 성공, ID: {}", postId);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postId));
+        return ResponseEntity.status(HttpStatus.OK).body(postId);
     }
 
     // 임시 게시물 삭제
     @PostMapping("/temp-delete/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteTempPost(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<Void> deleteTempPost(@PathVariable(name = "id") Long id) {
         log.info("임시 게시물 삭제 요청 받음, ID: {}", id);
         postService.deleteTempPost(id);
         log.info("임시 게시물 삭제 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(null));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     // 임시 게시물 목록 조회
     @GetMapping("/temp-posts/list")
-    public ResponseEntity<ApiResponse<List<PostResponse>>> getTempPosts(
-        HttpServletRequest httpServletRequest) {
-
+    public ResponseEntity<List<PostResponse>> getTempPosts(HttpServletRequest httpServletRequest) {
         User user = postService.findUserByAccessToken(httpServletRequest);
         Long currrentUserId = user.getUserId();
-
         log.info("임시 게시물 목록 조회 요청 받음");
         List<PostResponse> tempPosts = postService.getTempPosts(currrentUserId);
         log.info("임시 게시물 목록 조회 성공, 개수: {}", tempPosts.size());
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(tempPosts));
+        return ResponseEntity.status(HttpStatus.OK).body(tempPosts);
     }
 
     // 게시물 상세 정보 조회
     @GetMapping("/detail/{id}")
-    public ResponseEntity<ApiResponse<PostResponse>> getPost(@PathVariable(name = "id") Long id,
-        HttpServletRequest httpServletRequest) {
-
+    public ResponseEntity<PostResponse> getPost(@PathVariable(name = "id") Long id, HttpServletRequest httpServletRequest) {
         User user = postService.findUserByAccessToken(httpServletRequest);
         Long currentUserId = user.getUserId();
-
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
         PostResponse postResponse = postService.getPostById(id, currentUserId);
         log.info("게시물 상세 정보 조회 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(postResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(postResponse);
     }
 
     // 게시물 수정
     @PostMapping("/edit/{id}")
-    public ResponseEntity<ApiResponse<PostResponse>> editPost(@PathVariable(name = "id") Long id,
+    public ResponseEntity<PostResponse> editPost(@PathVariable(name = "id") Long id,
         @RequestPart(value = "post") PostRequest postRequest,
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         HttpServletRequest request) {
@@ -120,18 +107,17 @@ public class PostRestController {
         PostResponse updatedPostResponse = postService.updatePost(id, postRequest, files, request,
             currentUserId);
         log.info("게시물 수정 성공, ID: {}", updatedPostResponse.getPostId());
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.response(updatedPostResponse));
+        return ResponseEntity.status(HttpStatus.OK).body(updatedPostResponse);
     }
 
     // 게시물 삭제
     @PostMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable(name = "id") Long id,
+    public ResponseEntity<Void> deletePost(@PathVariable(name = "id") Long id,
         HttpServletRequest request) {
         log.info("게시물 삭제 요청 받음, ID: {}", id);
 
         postService.deletePost(id, request);
         log.info("게시물 삭제 성공, ID: {}", id);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(ApiResponse.response(null));
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -153,11 +153,11 @@ async function submitPostData(url, postRequest, images) {
   });
 
   const contentType = response.headers.get('content-type'); // 응답의 Content-Type 헤더 확인
-  if (contentType && contentType.indexOf('application/json') !== -1) {
+  if (contentType && contentType.includes('application/json')) {
     const data = await response.json(); // JSON 응답 파싱
-    return data;
+    return data; // 데이터 반환
   } else {
-    throw new Error('서버 에러..'); // 예상치 못한 응답 처리
+    throw new Error('서버 응답이 JSON 형식이 아닙니다.'); // JSON 응답이 아닌 경우 오류 처리
   }
 }
 
@@ -231,43 +231,48 @@ async function loadDraft() {
   const tempPostsContainer = document.getElementById('tempPostsContainer'); // 임시 저장된 글을 표시할 컨테이너 요소
   tempPostsContainer.innerHTML = ''; // 기존 목록 초기화
 
-  const response = await fetch(`/api/posts/temp-posts/list`, {
-    credentials: 'include', // 인증 정보를 포함하여 요청
-  });
+  try {
+    const response = await fetch(`/api/posts/temp-posts/list`, {
+      credentials: 'include', // 인증 정보를 포함하여 요청
+    });
 
-  const contentType = response.headers.get('content-type'); // 응답의 Content-Type 헤더 확인
-  if (contentType && contentType.includes('text/html')) {
-    window.location.href = '/login'; // 세션이 만료된 경우 로그인 페이지로 리디렉션
-    return;
-  }
-
-  if (contentType && contentType.includes('application/json')) {
-    const tempPosts = await response.json(); // JSON 응답 파싱
-
-    if (tempPosts.data.length === 0) {
-      tempPostsContainer.innerHTML = '<p>임시 저장된 글이 없습니다.</p>'; // 임시 저장된 글이 없을 경우 표시
-    } else {
-      tempPosts.data.forEach(post => { // 임시 저장된 각 글에 대해 반복
-        const postElement = document.createElement('div'); // 글을 표시할 div 생성
-        postElement.classList.add('temp-post'); // 스타일 적용을 위한 클래스 추가
-
-        const postContent = post.content.length > 40
-            ? post.content.substring(0, 40) + '...' : post.content; // 글 내용이 길면 40자까지 표시 후 생략
-        const postDate = new Date(post.createdAt).toLocaleDateString(); // 글 작성 날짜 포맷팅
-
-        postElement.innerHTML = `
-          <div class="post-details">
-            <p class="post-content">${postContent}</p>
-            <span class="post-date">${postDate}</span>
-            <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span> <!-- 삭제 링크 -->
-          </div>
-        `;
-        postElement.onclick = () => continueDraft(post); // 글 클릭 시 이어서 작성
-        tempPostsContainer.appendChild(postElement); // 컨테이너에 글 추가
-      });
+    const contentType = response.headers.get('content-type'); // 응답의 Content-Type 헤더 확인
+    if (contentType && contentType.includes('text/html')) {
+      window.location.href = '/login'; // 세션이 만료된 경우 로그인 페이지로 리디렉션
+      return;
     }
 
-    tempPostsContainer.style.display = 'flex'; // 임시 저장된 글 리스트 표시
+    if (contentType && contentType.includes('application/json')) {
+      const tempPosts = await response.json(); // JSON 응답 파싱
+
+      if (tempPosts.length === 0) {
+        tempPostsContainer.innerHTML = '<p>임시 저장된 글이 없습니다.</p>'; // 임시 저장된 글이 없을 경우 표시
+      } else {
+        tempPosts.forEach(post => { // 임시 저장된 각 글에 대해 반복
+          const postElement = document.createElement('div'); // 글을 표시할 div 생성
+          postElement.classList.add('temp-post'); // 스타일 적용을 위한 클래스 추가
+
+          const postContent = post.content.length > 40
+              ? post.content.substring(0, 40) + '...' : post.content; // 글 내용이 길면 40자까지 표시 후 생략
+          const postDate = new Date(post.createdAt).toLocaleDateString(); // 글 작성 날짜 포맷팅
+
+          postElement.innerHTML = `
+            <div class="post-details">
+              <p class="post-content">${postContent}</p>
+              <span class="post-date">${postDate}</span>
+              <span class="delete-link" onclick="deleteTempPost(${post.postId}, event)">삭제</span> <!-- 삭제 링크 -->
+            </div>
+          `;
+          postElement.onclick = () => continueDraft(post); // 글 클릭 시 이어서 작성
+          tempPostsContainer.appendChild(postElement); // 컨테이너에 글 추가
+        });
+      }
+
+      tempPostsContainer.style.display = 'flex'; // 임시 저장된 글 리스트 표시
+    }
+  } catch (error) {
+    console.error('임시 저장된 글 목록을 불러오는 중 오류 발생:', error);
+    tempPostsContainer.innerHTML = '<p>임시 저장된 글을 불러오는 중 오류가 발생했습니다.</p>'; // 오류 메시지 표시
   }
 }
 

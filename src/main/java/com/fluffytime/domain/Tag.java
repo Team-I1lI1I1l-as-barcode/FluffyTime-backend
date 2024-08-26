@@ -27,8 +27,8 @@ public class Tag {
     @Column(name = "tag_id", nullable = false)
     private Long tagId;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    @Column(name = "tag_name", nullable = false)
+    private String tagName;
 
     @OneToMany(
         mappedBy = "tag",
@@ -38,8 +38,7 @@ public class Tag {
     private List<TagPost> tagPosts = new ArrayList<>();
 
     @Builder
-    public Tag(Long tagId, String name) {
-        this.tagId = tagId;
-        this.name = name;
+    public Tag(String tagName) {
+        this.tagName = tagName;
     }
 }
