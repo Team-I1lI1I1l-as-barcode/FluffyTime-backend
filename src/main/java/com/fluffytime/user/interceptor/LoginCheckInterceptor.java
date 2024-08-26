@@ -1,5 +1,7 @@
 package com.fluffytime.user.interceptor;
 
+import static com.fluffytime.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
+
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,7 +19,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
         Object handler) throws Exception {
 
-        String accessToken = jwtTokenizer.getTokenFromCookie(request, "accessToken");
+        String accessToken = jwtTokenizer.getTokenFromCookie(request, ACCESS_TOKEN_NAME.getName());
 
         if (accessToken == null) {
             return true;

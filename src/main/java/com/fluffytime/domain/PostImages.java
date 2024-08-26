@@ -67,5 +67,4 @@ public class PostImages {
         this.uploadDate = uploadDate;
         this.post = post;
     }
-
 }

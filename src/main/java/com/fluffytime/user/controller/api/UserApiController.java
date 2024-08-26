@@ -172,7 +172,7 @@ public class UserApiController {
     }
 
     @PostMapping("/change/password")
-    public ResponseEntity<?> changePassword(
+    public ResponseEntity<Void> changePassword(
         @RequestBody @Valid PasswordChangeRequest passwordChangeRequest
     ) {
         if (loginService.findPasswordChangeTtl(passwordChangeRequest.getEmail())) {

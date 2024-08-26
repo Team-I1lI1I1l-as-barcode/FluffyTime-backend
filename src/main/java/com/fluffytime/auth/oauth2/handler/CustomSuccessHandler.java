@@ -1,5 +1,9 @@
 package com.fluffytime.auth.oauth2.handler;
 
+import static com.fluffytime.auth.jwt.util.TokenCookieManager.generateTokenCookie;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.REFRESH_TOKEN_EXPIRY;
+
 import com.fluffytime.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.auth.oauth2.dao.SocialTempUserDao;
@@ -47,17 +51,17 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
             refreshTokenDao.saveRefreshToken(email, refreshToken);
 
-            Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-            accessTokenCookie.setPath("/");
-            accessTokenCookie.setHttpOnly(true);
-            accessTokenCookie.setMaxAge(
-                Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT / 1000)); // 7일
+            Cookie accessTokenCookie = generateTokenCookie(
+                "accessToken",
+                accessToken,
+                ACCESS_TOKEN_EXPIRY.getExpiry() / 1000
+            );
 
-            Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-            refreshTokenCookie.setPath("/");
-            refreshTokenCookie.setHttpOnly(true);
-            refreshTokenCookie.setMaxAge(
-                Math.toIntExact(JwtTokenizer.REFRESH_TOKEN_EXPIRE_COUNT / 1000)); // 7일
+            Cookie refreshTokenCookie = generateTokenCookie(
+                "refreshToken",
+                refreshToken,
+                REFRESH_TOKEN_EXPIRY.getExpiry() / 1000
+            );
 
             response.addCookie(accessTokenCookie);
             response.addCookie(refreshTokenCookie);
