@@ -8,13 +8,13 @@ import com.fluffytime.common.exception.global.PostNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Post;
+import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import com.fluffytime.repository.CommentLikeRepository;
 import com.fluffytime.repository.CommentRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -53,42 +53,9 @@ public class CommentService {
     //댓글 조회 - 게시글마다
     public List<CommentResponseDto> getCommentByPostId(Long postId, Long currentUserId) {
         List<Comment> commentList = commentRepository.findByPostPostId(postId);
-        return commentList.stream().map(comment -> {
-            int likeCount = commentLikeRepository.countByComment(comment);
-            boolean isLiked = commentLikeRepository.existsByCommentAndUserUserId(comment,
-                currentUserId);
-
-            return CommentResponseDto.builder()
-                .commentId(comment.getCommentId())
-                .userId(comment.getUser().getUserId())
-                .content(comment.getContent())
-                .nickname(comment.getUser().getNickname())
-                .createdAt(comment.getCreatedAt())
-                .replyList(comment.getReplyList().stream()
-                    .map(reply -> ReplyResponseDto.builder()
-                        .replyId(reply.getReplyId())
-                        .userId(reply.getUser().getUserId())
-                        .content(reply.getContent())
-                        .nickname(reply.getUser().getNickname())
-                        .createdAt(reply.getCreatedAt())
-                        .isAuthor(reply.getUser().getUserId().equals(currentUserId))
-                        .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
-                            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                            .map(profileImages -> profileImages.getFilePath())
-                            .orElse("/image/profile/profile.png"))
-                        .likeCount(reply.getLikes().size())
-                        .isLiked(reply.getLikes().stream()
-                            .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
-                        .build()).collect(Collectors.toList()))
-                .isAuthor(comment.getUser().getUserId().equals(currentUserId))
-                .profileImageurl(Optional.ofNullable(comment.getUser().getProfile())
-                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                    .map(profileImages -> profileImages.getFilePath())
-                    .orElse("/image/profile/profile.png"))
-                .likeCount(likeCount)
-                .isLiked(isLiked)
-                .build();
-        }).collect(Collectors.toList());
+        return commentList.stream()
+            .map(comment -> convertToCommentResponseDto(comment, currentUserId))
+            .collect(Collectors.toList());
     }
 
     //댓글 수정
@@ -110,18 +77,7 @@ public class CommentService {
     //accessToken으로 사용자 찾기
     @Transactional(readOnly = true)
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        log.info("findByAccessToken 실행");
-        String accessToken = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    log.info("accessToken: " + accessToken);
-                    break;
-                }
-            }
-        }
+        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
@@ -140,6 +96,11 @@ public class CommentService {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
 
+        return convertToCommentResponseDto(comment, currentUserId);
+    }
+
+    //댓글 response convert
+    private CommentResponseDto convertToCommentResponseDto(Comment comment, Long currentUserId) {
         int likeCount = commentLikeRepository.countByComment(comment);
         boolean isLiked = commentLikeRepository.existsByCommentAndUserUserId(comment,
             currentUserId);
@@ -151,28 +112,37 @@ public class CommentService {
             .nickname(comment.getUser().getNickname())
             .createdAt(comment.getCreatedAt())
             .replyList(comment.getReplyList().stream()
-                .map(reply -> ReplyResponseDto.builder()
-                    .replyId(reply.getReplyId())
-                    .userId(reply.getUser().getUserId())
-                    .content(reply.getContent())
-                    .nickname(reply.getUser().getNickname())
-                    .createdAt(reply.getCreatedAt())
-                    .isAuthor(reply.getUser().getUserId().equals(currentUserId))
-                    .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
-                        .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                        .map(profileImages -> profileImages.getFilePath())
-                        .orElse("/image/profile/profile.png"))
-                    .likeCount(reply.getLikes().size())
-                    .isLiked(reply.getLikes().stream()
-                        .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
-                    .build()).collect(Collectors.toList()))
+                .map(reply -> convertToReplyResponseDto(reply, currentUserId))
+                .collect(Collectors.toList()))
             .isAuthor(comment.getUser().getUserId().equals(currentUserId))
-            .profileImageurl(Optional.ofNullable(comment.getUser().getProfile())
-                .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                .map(profileImages -> profileImages.getFilePath())
-                .orElse("/image/profile/profile.png"))
+            .profileImageurl(getProfileImageUrl(comment.getUser()))
             .likeCount(likeCount)
             .isLiked(isLiked)
             .build();
     }
+
+    //답글 response convert
+    private ReplyResponseDto convertToReplyResponseDto(Reply reply, Long currentUserId) {
+        return ReplyResponseDto.builder()
+            .replyId(reply.getReplyId())
+            .userId(reply.getUser().getUserId())
+            .content(reply.getContent())
+            .nickname(reply.getUser().getNickname())
+            .createdAt(reply.getCreatedAt())
+            .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+            .profileImageurl(getProfileImageUrl(reply.getUser()))
+            .likeCount(reply.getLikes().size())
+            .isLiked(reply.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
+            .build();
+    }
+
+    //프로필 이미지 response convert
+    private String getProfileImageUrl(User user) {
+        return Optional.ofNullable(user.getProfile())
+            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+            .map(profileImages -> profileImages.getFilePath())
+            .orElse("/image/profile/profile.png");
+    }
+
 }
