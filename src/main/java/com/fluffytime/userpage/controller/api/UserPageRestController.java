@@ -25,7 +25,8 @@ public class UserPageRestController {
 
     // 유저 페이지 정보 가져오기
     @GetMapping("/api/users/pages")
-    public ResponseEntity<?> userPages(@RequestParam("nickname") String nickname,
+    public ResponseEntity<UserPageInformationDto> userPages(
+        @RequestParam("nickname") String nickname,
         HttpServletRequest httpServletRequest) {
         log.info("유저페이지 정보 가져오기 api 실행");
         UserPageInformationDto userPageInformationDto = userPageService.createUserPageInformationDto(
@@ -36,7 +37,7 @@ public class UserPageRestController {
 
     // 유저 차단
     @PostMapping("/api/users/block")
-    public ResponseEntity<?> blockUser(@RequestParam("nickname") String nickname,
+    public ResponseEntity<UserBlockResponseDto> blockUser(@RequestParam("nickname") String nickname,
         HttpServletRequest httpServletRequest) {
         log.info("유저 차단");
         UserBlockResponseDto userBlockResponseDto = userPageService.userBlock(nickname,
@@ -46,7 +47,8 @@ public class UserPageRestController {
 
     // 유저 차단 해제
     @DeleteMapping("/api/users/unblock")
-    public ResponseEntity<?> unblockUser(@RequestParam("nickname") String nickname,
+    public ResponseEntity<UserBlockResponseDto> unblockUser(
+        @RequestParam("nickname") String nickname,
         HttpServletRequest httpServletRequest) {
         log.info("유저 차단 해제");
         UserBlockResponseDto userBlockResponseDto = userPageService.removeUserBlock(nickname,
@@ -56,7 +58,7 @@ public class UserPageRestController {
 
     // 유저 차단 목록 가져오기
     @GetMapping("/api/users/block/list")
-    public ResponseEntity<?> blockUserList(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<BlockUserListDto> blockUserList(HttpServletRequest httpServletRequest) {
         log.info("유저 차단 리스트 불러오기");
         BlockUserListDto blockUserListDto = userPageService.blockUserList(httpServletRequest);
         return ResponseEntity.status(HttpStatus.OK).body(blockUserListDto);
