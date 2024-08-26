@@ -1,4 +1,4 @@
-package com.fluffytime.auth.security;
+package com.fluffytime.auth.jwt.dto;
 
 import com.fluffytime.domain.User;
 import java.util.Collection;

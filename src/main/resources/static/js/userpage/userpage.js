@@ -10,6 +10,7 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
+
 const unblockComment = getElement('unblock_comment'); // 차단됨 문구
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
@@ -25,9 +26,6 @@ const userPageOverlay = document.getElementById('userPage-modal-overlay');
 const closeModalButtons = document.querySelectorAll('#block_cancel');
 const blockFollow = getElement('block_follow'); // 유저 차단
 const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단
-
-// 버튼
-const followBtn = getElement('follow_button'); // 팔로우 버튼
 
 // api  요청  함수
 function fetchUserPage(url, func) {
@@ -116,6 +114,17 @@ function renderPosts(posts) {
       postListElement.appendChild(img); // <img>를 섹션에 추가
     }
   });
+}
+
+async function checkFollowStatus() {
+  console.log("checkFollowStatus() 실행")
+  const response = await fetch(
+      '/api/follow/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 }
 
 // 초기화 함수

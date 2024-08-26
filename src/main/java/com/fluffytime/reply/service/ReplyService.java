@@ -1,15 +1,16 @@
 package com.fluffytime.reply.service;
 
+import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.common.exception.global.CommentNotFound;
 import com.fluffytime.common.exception.global.ReplyNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.Reply;
 import com.fluffytime.domain.User;
-import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.reply.dto.ReplyRequestDto;
 import com.fluffytime.reply.dto.ReplyResponseDto;
 import com.fluffytime.repository.CommentRepository;
+import com.fluffytime.repository.ReplyLikeRepository;
 import com.fluffytime.repository.ReplyRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -29,6 +30,7 @@ public class ReplyService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final ReplyLikeRepository replyLikeRepository;
 
     //답글 저장
     public void createReply(ReplyRequestDto requestDto) {
@@ -48,9 +50,25 @@ public class ReplyService {
     //답글 조회
     public List<ReplyResponseDto> getRepliesByCommentId(Long commentId, Long currentUserId) {
         List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
-        return replyList.stream()
-            .map(reply -> new ReplyResponseDto(reply, currentUserId))
-            .collect(Collectors.toList());
+        return replyList.stream().map(reply -> {
+            int likeCount = replyLikeRepository.countByReply(reply);
+            boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
+
+            return ReplyResponseDto.builder()
+                .replyId(reply.getReplyId())
+                .userId(reply.getUser().getUserId())
+                .content(reply.getContent())
+                .nickname(reply.getUser().getNickname())
+                .createdAt(reply.getCreatedAt())
+                .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+                .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                    .map(profileImages -> profileImages.getFilePath())
+                    .orElse("/image/profile/profile.png"))
+                .likeCount(likeCount)
+                .isLiked(isLiked)
+                .build();
+        }).collect(Collectors.toList());
     }
 
     //답글 수정
@@ -98,6 +116,23 @@ public class ReplyService {
     public ReplyResponseDto getReplyByReplyId(Long replyId, Long currentUserId) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);
-        return new ReplyResponseDto(reply, currentUserId);
+
+        int likeCount = replyLikeRepository.countByReply(reply);
+        boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
+
+        return ReplyResponseDto.builder()
+            .replyId(reply.getReplyId())
+            .userId(reply.getUser().getUserId())
+            .content(reply.getContent())
+            .nickname(reply.getUser().getNickname())
+            .createdAt(reply.getCreatedAt())
+            .isAuthor(reply.getUser().getUserId().equals(currentUserId))
+            .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
+                .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                .map(profileImages -> profileImages.getFilePath())
+                .orElse("/image/profile/profile.png"))
+            .likeCount(likeCount)
+            .isLiked(isLiked)
+            .build();
     }
 }

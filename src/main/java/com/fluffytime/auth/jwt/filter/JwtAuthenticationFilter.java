@@ -2,7 +2,7 @@ package com.fluffytime.auth.jwt.filter;
 
 import com.fluffytime.auth.jwt.token.JwtAuthenticationToken;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.auth.security.CustomUserDetails;
+import com.fluffytime.auth.jwt.dto.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

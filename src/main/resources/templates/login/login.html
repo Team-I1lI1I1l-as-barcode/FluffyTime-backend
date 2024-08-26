@@ -9,7 +9,6 @@
 <body>
 <div class="container">
   <h1>FluffyTime</h1>
-  <div class=""></div>
   <form id="loginForm">
     <p class="email-error error hidden"></p>
     <div class="input">
@@ -22,10 +21,30 @@
       <label for="password"></label>
       <input type="password" id="password" name="password" placeholder="패스워드를 입력해주세요.">
     </div>
+    <div class="find-info">
+      <a href="/login/find-email">이메일을 잊어버렸나요?</a>
+      <a href="/login/find-password">비밀번호를 잊어버렸나요?</a>
+    </div>
 
     <button type="submit" id="loginBtn" name="loginBtn">로그인</button>
     <div class="nav-container">
       <a class="nav-join" href="/join">회원가입</a>
+    </div>
+
+    <!-- 구분선 -->
+    <div class="divider">
+      <p></p>
+      <span>간편로그인</span>
+      <p></p>
+    </div>
+
+    <div class="social">
+      <div class="naver socialLogin">
+        <a href="/oauth2/authorization/naver"><img src="/image/login/naverLogin.png" alt="네이버로그인"></a>
+      </div>
+      <div class="google socialLogin">
+        <a href="/oauth2/authorization/google"><img src="/image/login/googleLogin.png" alt="구글로그인"></a>
+      </div>
     </div>
   </form>
 </div>

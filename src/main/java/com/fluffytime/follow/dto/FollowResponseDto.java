@@ -1,4 +1,4 @@
-package com.fluffytime.like.dto;
+package com.fluffytime.follow.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentLikeRequestDto {
-    
-    private Long userId;
+public class FollowResponseDto {
+
+    private Long followMappingId;
+    private Long followingUserId;
+    private Long followedUserId;
 }

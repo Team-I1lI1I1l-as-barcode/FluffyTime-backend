@@ -7,12 +7,14 @@
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/post/postDetail.css">
   <link rel="stylesheet" href="/css/comment/comment.css">
-  <link rel="stylesheet" href="/css/like/commentLike.css">
+  <link rel="stylesheet" href="/css/like/like.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/post/postDetail.js}" defer></script>
   <script th:src="@{/js/comment/comment.js}"></script>
   <script th:src="@{/js/like/commentLike.js}"></script>
+  <script th:src="@{/js/like/replyLike.js}"></script>
+  <script th:src="@{/js/like/postLike.js}"></script>
 </head>
 <body>
 <div class="modal" id="postModal">
@@ -43,10 +45,21 @@
         <textarea id="comment-content" placeholder="댓글 내용 적기" required></textarea>
         <button id="commentButton">작성</button> <!--postId에 댓글 달기-->
       </div>
-      <div class="bookmark-section">
-        <img id="bookmarkIcon"
-             src="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"
-             alt="북마크 아이콘" onclick="toggleBookmark()">
+      <div class="postDetail-footer-box">
+        <div class="liked-box-post">
+          <!-- 좋아요 버튼 및 유저 목록 모달을 호출하는 부분 -->
+          <span id="likeButton" class="like-button material-icons"
+                onclick="toggleLikePost(postId, this, document.getElementById('likeCountSpan'))">
+          favorite_border
+        </span>
+          <span id="likeCountSpan" class="like-count"
+                onclick="fetchUsersWhoLikedPost(postId).then(showLikeUserModalPost)">0</span>
+        </div>
+        <div class="bookmark-section">
+          <img id="bookmarkIcon"
+               src="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"
+               alt="북마크 아이콘" onclick="toggleBookmark()">
+        </div>
       </div>
 
     </div>

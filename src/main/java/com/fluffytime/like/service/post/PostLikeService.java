@@ -1,15 +1,15 @@
-package com.fluffytime.like.service;
+package com.fluffytime.like.service.post;
 
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.common.exception.global.CommentNotFound;
+import com.fluffytime.common.exception.global.PostNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
-import com.fluffytime.domain.Comment;
-import com.fluffytime.domain.CommentLike;
+import com.fluffytime.domain.Post;
+import com.fluffytime.domain.PostLike;
 import com.fluffytime.domain.User;
-import com.fluffytime.like.dto.CommentLikeRequestDto;
-import com.fluffytime.like.dto.CommentLikeResponseDto;
-import com.fluffytime.repository.CommentLikeRepository;
-import com.fluffytime.repository.CommentRepository;
+import com.fluffytime.like.dto.post.PostLikeRequestDto;
+import com.fluffytime.like.dto.post.PostLikeResponseDto;
+import com.fluffytime.repository.PostLikeRepository;
+import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,39 +22,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CommentLikeService {
+public class PostLikeService {
 
-    private final CommentRepository commentRepository;
+    private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final CommentLikeRepository commentLikeRepository;
+    private final PostLikeRepository postLikeRepository;
     private final JwtTokenizer jwtTokenizer;
 
-    //댓글 좋아요 등록/좋아요 취소
-    public CommentLikeResponseDto likeOrUnlikeComment(Long commentId,
-        CommentLikeRequestDto requestDto) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(CommentNotFound::new);
-        User user = userRepository.findById(requestDto.getUserId())
-            .orElseThrow(UserNotFound::new);
+    //게시글 좋아요 등록/취소
+    public PostLikeResponseDto likeOrUnlikePost(Long postId, PostLikeRequestDto requestDto) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
+        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(UserNotFound::new);
 
         //좋아요를 눌렀는지 안 눌렀는지 확인
-        CommentLike exisitingLike = commentLikeRepository.findByCommentAndUser(comment, user);
+        PostLike exisitingLike = postLikeRepository.findByPostAndUser(post, user);
 
         boolean isLiked = false;
         if (exisitingLike != null) {
-            commentLikeRepository.delete(exisitingLike); //좋아요 취소
+            postLikeRepository.delete(exisitingLike); //좋아요 취소
         } else {
-            CommentLike commentLike = CommentLike.builder()
-                .comment(comment)
+            PostLike postLike = PostLike.builder()
+                .post(post)
                 .user(user)
                 .build();
-            commentLikeRepository.save(commentLike); //좋아요 등록
+            postLikeRepository.save(postLike); //좋아요 등록
             isLiked = true;
         }
 
-        int likeCount = commentLikeRepository.countByComment(comment); //현재 좋아요 수
+        int likeCount = postLikeRepository.countByPost(post); //현재 좋아요 수
 
-        return CommentLikeResponseDto.builder()
+        return PostLikeResponseDto.builder()
             .userId(user.getUserId())
             .nickname(user.getNickname())
             .likeCount(likeCount)
@@ -62,19 +59,19 @@ public class CommentLikeService {
             .build();
     }
 
-    //댓글 좋아요 한 유저 목록
-    public List<CommentLikeResponseDto> getUsersWhoLikedComment(Long commentId) {
-        Comment comment = commentRepository.findById(commentId)
-            .orElseThrow(CommentNotFound::new);
+    //게시글 좋아요 한 유저 목록
+    public List<PostLikeResponseDto> getUsersWhoLikedPost(Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
 
-        return commentLikeRepository.findAllByComment(comment).stream()
-            .map(like -> CommentLikeResponseDto.builder()
+        return postLikeRepository.findAllByPost(post).stream()
+            .map(like -> PostLikeResponseDto.builder()
                 .userId(like.getUser().getUserId())
                 .nickname(like.getUser().getNickname())
-                .likeCount(commentLikeRepository.countByComment(comment))
-                .isLiked(true) //좋아요 목록이므로 항상 true
+                .likeCount(postLikeRepository.countByPost(post))
+                .isLiked(true)
                 .profileImageurl(Optional.ofNullable(like.getUser().getProfile())
-                    .map(profile -> profile.getProfileImages().getFilePath())
+                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+                    .map(profileImages -> profileImages.getFilePath())
                     .orElse("/image/profile/profile.png"))
                 .intro(like.getUser().getProfile().getIntro())
                 .build())
@@ -106,5 +103,4 @@ public class CommentLikeService {
         Optional<User> user = userRepository.findById(userId);
         return user;
     }
-
 }

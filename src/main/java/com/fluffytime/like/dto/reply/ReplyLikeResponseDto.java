@@ -1,4 +1,4 @@
-package com.fluffytime.like.dto;
+package com.fluffytime.like.dto.reply;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentLikeResponseDto {
+public class ReplyLikeResponseDto {
 
     private Long userId;
     private String nickname;
@@ -18,7 +18,7 @@ public class CommentLikeResponseDto {
     private String intro;
 
     @Builder
-    public CommentLikeResponseDto(Long userId, String nickname, int likeCount, boolean isLiked,
+    public ReplyLikeResponseDto(Long userId, String nickname, int likeCount, boolean isLiked,
         String profileImageurl, String intro) {
         this.userId = userId;
         this.nickname = nickname;

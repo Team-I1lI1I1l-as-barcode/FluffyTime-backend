@@ -65,7 +65,7 @@ async function populateGrid() {
     if (list.length === 0) {
       console.log('모든 데이터를 불러왔습니다. 더 이상 로드하지 않습니다.');
       // 플래그 설정하여 무한 스크롤을 멈춤
-      isLoading = true;  // 로드를 멈추기 위해 isLoading을 true로 유지합니다.
+      isLoading = true;  // 로드를 멈추기 위해 isLoading을 true로 유지한다.
       hideSpinner();
       return;
     }
@@ -134,34 +134,6 @@ function hideSpinner() {
   console.log('hideSpinner() 함수 실행');
 
 }
-
-// 사이드바 마이페이지 코드
-document.getElementById("mypageBtn").addEventListener('click', event => {
-  //window.location.href = "/mypage/test";
-  fetch("/api/mypage/info", {
-    method: "GET", // GET 요청
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.json().then(errorData => {
-        // 에러 메시지 포함하여 alert 호출
-        console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
-        alert('Error: ' + errorData.message);
-        window.location.href = "/";
-      });
-    }
-    return response.json();
-  })  // 서버에서 보낸 응답을 JSON 형식으로 변환
-  .then(data => {
-    window.location.href = `/mypage/${data.nickname}`;
-  })
-  .catch(error => {
-    console.log("서버 오류 발생:" + error);
-  });
-});
 
 // 페이지 로드 시작 시 그리드를 채움
 window.onload = async () => {

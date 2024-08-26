@@ -2,7 +2,10 @@ package com.fluffytime.user.service;
 
 import static com.fluffytime.domain.RoleName.ROLE_USER;
 
+import com.fluffytime.auth.oauth2.dao.SocialTempUserDao;
+import com.fluffytime.auth.oauth2.dto.SocialTempUser;
 import com.fluffytime.common.exception.global.RoleNameNotFound;
+import com.fluffytime.domain.LoginType;
 import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.Role;
 import com.fluffytime.domain.User;
@@ -15,6 +18,7 @@ import com.fluffytime.user.dto.TempUser;
 import com.fluffytime.user.dto.request.JoinRequest;
 import com.fluffytime.user.dto.response.CheckDuplicationResponse;
 import com.fluffytime.user.dto.response.JoinResponse;
+import com.fluffytime.user.dto.response.SucceedCertificationResponse;
 import com.fluffytime.user.exception.AlreadyExistsEmail;
 import com.fluffytime.user.exception.AlreadyExistsNickname;
 import com.fluffytime.user.exception.InvalidTempUser;
@@ -31,6 +35,7 @@ public class JoinService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailCertificationDao emailCertificationDao;
+    private final SocialTempUserDao socialTempUserDao;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Transactional
@@ -39,6 +44,7 @@ public class JoinService {
             .email(joinUser.getEmail())
             .password(bCryptPasswordEncoder.encode(joinUser.getPassword()))
             .nickname(joinUser.getNickname())
+            .loginType(LoginType.Regular)
             .certificationStatus(false)
             .build();
 
@@ -62,10 +68,48 @@ public class JoinService {
 
         Role role = roleRepository.findByRoleName(ROLE_USER).orElseThrow(RoleNameNotFound::new);
 
+        Profile basicProfile = new Profile("none", Long.valueOf(0), "none");
+
         User user = User.builder()
             .email(tempUser.getEmail())
             .password(tempUser.getPassword())
             .nickname(tempUser.getNickname())
+            .loginType(tempUser.getLoginType())
+            .profile(basicProfile)
+            .build();
+
+        UserRole userRole = UserRole.builder()
+            .user(user)
+            .role(role)
+            .build();
+
+        user.getUserRoles().add(userRole);
+
+        basicProfile.setUser(user);
+
+        userRepository.save(user);
+
+        emailCertificationDao.removeTempUser(email);
+
+        return JoinResponse.builder()
+            .email(user.getEmail())
+            .nickname(user.getNickname())
+            .build();
+    }
+
+    @Transactional
+    public JoinResponse socialJoin(JoinRequest joinUser) {
+
+        SocialTempUser tempUser = socialTempUserDao.getSocialTempUser(joinUser.getEmail())
+            .orElseThrow(TempUserNotFound::new);
+
+        Role role = roleRepository.findByRoleName(ROLE_USER).orElseThrow(RoleNameNotFound::new);
+
+        User user = User.builder()
+            .email(tempUser.getEmail())
+            .password(bCryptPasswordEncoder.encode(joinUser.getPassword()))
+            .nickname(joinUser.getNickname())
+            .loginType(tempUser.getLoginType())
             .build();
 
         UserRole userRole = UserRole.builder()
@@ -82,7 +126,7 @@ public class JoinService {
 
         userRepository.save(user);
 
-        emailCertificationDao.removeTempUser(email);
+        socialTempUserDao.removeSocialTempUser(joinUser.getEmail());
 
         return JoinResponse.builder()
             .email(user.getEmail())
@@ -111,6 +155,19 @@ public class JoinService {
         }
         return CheckDuplicationResponse.builder()
             .isExists(false)
+            .build();
+    }
+
+    @Transactional
+    // 인증 성공 or 실패 응답을 구현해야함
+    public SucceedCertificationResponse certificateEmail(String email) {
+        TempUser user = emailCertificationDao.getTempUser(email)
+            .orElseThrow(TempUserNotFound::new);
+        user.successCertification();
+        emailCertificationDao.saveEmailCertificationTempUser(user);
+
+        return SucceedCertificationResponse.builder()
+            .email(email)
             .build();
     }
 }

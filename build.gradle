@@ -31,11 +31,12 @@ dependencies {
     // thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     // lombok
     compileOnly 'org.projectlombok:lombok'
     // email
     implementation 'org.springframework.boot:spring-boot-starter-mail'
-    //developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.3.2'
     runtimeOnly 'com.mysql:mysql-connector-j'

@@ -1,5 +1,6 @@
 package com.fluffytime.post.controller.api;
 
+import com.fluffytime.domain.User;
 import com.fluffytime.post.dto.request.PostRequest;
 import com.fluffytime.post.dto.response.PostResponse;
 import com.fluffytime.post.service.PostService;
@@ -71,18 +72,22 @@ public class PostRestController {
 
     // 임시 게시물 목록 조회
     @GetMapping("/temp-posts/list")
-    public ResponseEntity<List<PostResponse>> getTempPosts() {
+    public ResponseEntity<List<PostResponse>> getTempPosts(HttpServletRequest httpServletRequest) {
+        User user = postService.findUserByAccessToken(httpServletRequest);
+        Long currrentUserId = user.getUserId();
         log.info("임시 게시물 목록 조회 요청 받음");
-        List<PostResponse> tempPosts = postService.getTempPosts();
+        List<PostResponse> tempPosts = postService.getTempPosts(currrentUserId);
         log.info("임시 게시물 목록 조회 성공, 개수: {}", tempPosts.size());
         return ResponseEntity.status(HttpStatus.OK).body(tempPosts);
     }
 
     // 게시물 상세 정보 조회
     @GetMapping("/detail/{id}")
-    public ResponseEntity<PostResponse> getPost(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<PostResponse> getPost(@PathVariable(name = "id") Long id, HttpServletRequest httpServletRequest) {
+        User user = postService.findUserByAccessToken(httpServletRequest);
+        Long currentUserId = user.getUserId();
         log.info("게시물 상세 정보 조회 요청 받음, ID: {}", id);
-        PostResponse postResponse = postService.getPostById(id);
+        PostResponse postResponse = postService.getPostById(id, currentUserId);
         log.info("게시물 상세 정보 조회 성공, ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).body(postResponse);
     }
@@ -93,9 +98,14 @@ public class PostRestController {
         @RequestPart(value = "post") PostRequest postRequest,
         @RequestPart(value = "files", required = false) MultipartFile[] files,
         HttpServletRequest request) {
+
+        User user = postService.findUserByAccessToken(request);
+        Long currentUserId = user.getUserId();
+
         log.info("게시물 수정 요청 받음, ID: {}", id);
 
-        PostResponse updatedPostResponse = postService.updatePost(id, postRequest, files, request);
+        PostResponse updatedPostResponse = postService.updatePost(id, postRequest, files, request,
+            currentUserId);
         log.info("게시물 수정 성공, ID: {}", updatedPostResponse.getPostId());
         return ResponseEntity.status(HttpStatus.OK).body(updatedPostResponse);
     }

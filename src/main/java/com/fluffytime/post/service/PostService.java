@@ -137,7 +137,7 @@ public class PostService {
 
     // 게시글 조회하기
     @Transactional(readOnly = true)
-    public PostResponse getPostById(Long id) {
+    public PostResponse getPostById(Long id, Long currentUserId) {
         // 게시글을 조회하고, 없으면 예외를 발생시킴
         Post post = postRepository.findById(id)
             .orElseThrow(PostNotFound::new);
@@ -157,14 +157,17 @@ public class PostService {
             )).collect(Collectors.toList()),
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            post.getLikes().size(),
+            post.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
         );
     }
 
     // 게시글 수정하기
     @Transactional
     public PostResponse updatePost(Long id, PostRequest postRequest, MultipartFile[] files,
-        HttpServletRequest request) {
+        HttpServletRequest request, Long currentUserId) {
         // 토큰을 통해 사용자 정보 추출
         User user = findUserByAccessToken(request);
 
@@ -207,7 +210,10 @@ public class PostService {
             )).collect(Collectors.toList()),
             existingPost.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             existingPost.getUpdatedAt() != null ? existingPost.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            existingPost.getLikes().size(),
+            existingPost.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
         );
     }
 
@@ -245,7 +251,7 @@ public class PostService {
 
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
-    public List<PostResponse> getTempPosts() {
+    public List<PostResponse> getTempPosts(Long currentUserId) {
         // 모든 게시글을 조회한 후, 임시 저장된 게시물만 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
@@ -266,7 +272,10 @@ public class PostService {
             )).collect(Collectors.toList()),
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            post.getLikes().size(),
+            post.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
         )).collect(Collectors.toList());
     }
 

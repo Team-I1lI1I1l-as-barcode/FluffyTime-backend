@@ -1,4 +1,6 @@
 // refresh token으로 access token 재발급 요청 보내기
+let intervalId;
+
 async function refreshAccessToken() {
   console.log("Refreshing Access Token");
   const response = await fetch('/api/auth/refreshToken', {
@@ -29,7 +31,7 @@ async function initTokenRefresh() {
   }
 
   // 주기적으로 AccessToken 갱신
-  setInterval(() => {
+  intervalId = setInterval(() => {
     const lastRefreshTime = localStorage.getItem("lastRefreshTime");
     const currentTime = new Date().getTime();
     const timeElapsed = currentTime - lastRefreshTime;
@@ -40,6 +42,10 @@ async function initTokenRefresh() {
     }
   }, 60 * 1000); // 매 1분마다 체크
 }
+
+window.addEventListener("beforeunload", () => {
+  clearInterval(intervalId);
+});
 
 // 페이지 로드 시 초기화
 console.log('Script loaded');
