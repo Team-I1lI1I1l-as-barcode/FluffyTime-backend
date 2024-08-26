@@ -39,7 +39,7 @@ public class BookmarkRestController {
     // 북마크 삭제하기
     @PostMapping("/delete/{bookmarkId}")
     public ResponseEntity<Void> deleteBookmark(
-        @PathVariable Long bookmarkId,
+        @PathVariable(name = "bookmarkId") Long bookmarkId,
         HttpServletRequest request) {
 
         log.info("북마크 삭제 요청 받음, 북마크 ID: {}", bookmarkId);
@@ -57,7 +57,8 @@ public class BookmarkRestController {
 
     // 게시물을 북마크한 사용자 조회하기
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<BookmarkResponse>> getBookmarksByPost(@PathVariable Long postId) {
+    public ResponseEntity<List<BookmarkResponse>> getBookmarksByPost(
+        @PathVariable(name = "postId") Long postId) {
         List<BookmarkResponse> bookmarkList = bookmarkService.getBookmarksByPost(postId);
         return ResponseEntity.status(HttpStatus.OK).body(bookmarkList);
     }
@@ -65,7 +66,7 @@ public class BookmarkRestController {
     // 사용자가 게시물을 북마크했는지 조회하기
     @GetMapping("/check")
     public ResponseEntity<Boolean> checkIfUserBookmarkedPost(
-        @RequestParam Long postId,
+        @RequestParam("postId") Long postId,
         HttpServletRequest request) {
 
         boolean isBookmarked = bookmarkService.checkIfUserBookmarkedPost(postId, request);
