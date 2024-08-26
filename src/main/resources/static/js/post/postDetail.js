@@ -1,6 +1,8 @@
 let currentPostId; // 현재 게시물의 ID를 저장하는 변수
 let currentImageIndex = 0;
 let imageUrls = []; // 이미지 URL 배열을 저장
+let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
+
 const imgElement = document.getElementById('profileImage');
 const nicknameElement = document.getElementById('nicknameDisplay');
 
@@ -33,23 +35,22 @@ fetch('/api/mypage/profiles/info', {
 async function loadPostData(postId) {
   console.log(`게시물 데이터 로드 시작: ${postId}`);
   try {
-    // 주어진 게시물 ID로 서버에 요청하여 게시물 데이터를 불러옴
     const response = await fetch(`/api/posts/detail/${postId}`);
-    if (!response.ok) { // 응답 상태 확인
+    if (!response.ok) {
       console.error('서버 응답 상태:', response.status);
       throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
     console.log('응답 ok!')
 
-    const postData = await response.json(); // 응답 데이터를 JSON 형태로 변환
+    const postData = await response.json();
     console.log('콘솔 불러와주세요~');
-    currentPostId = postId; // 현재 게시물 ID를 전역 변수에 저장
+    currentPostId = postId;
 
     // 게시물 내용을 화면에 설정
-    document.getElementById('postContent').innerText = postData.data.content;
+    document.getElementById('postContent').innerText = postData.content;
 
     // 이미지 URL 배열을 업데이트
-    imageUrls = postData.data.imageUrls;
+    imageUrls = postData.imageUrls;
     console.log(imageUrls);
 
     // 이미지 컨테이너 초기화 및 이미지 추가
@@ -264,18 +265,14 @@ function toggleDropdownMenu() {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('페이지 로드 완료');
 
-  // 현재 URL의 경로를 가져옴
   const path = window.location.pathname;
-
-  // 경로를 '/'로 분리하여 배열로 만듬
   const pathSegments = path.split('/');
-
-  // 배열의 마지막 요소가 postId
   const postId = pathSegments[pathSegments.length - 1];
 
   if (postId) { // postId가 존재하면
     loadPostData(postId); // 게시물 데이터를 로드
     openPostDetailModal(); // 모달을 열기
+    initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
 
     // 댓글/답글 버튼 클릭 시
     const commentButton = document.getElementById('commentButton');
@@ -301,8 +298,6 @@ function copyLinkToClipboard() {
   });
 }
 
-let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
-
 // 북마크 상태 초기화 함수
 async function initializeBookmarkState(postId) {
   try {
@@ -315,14 +310,32 @@ async function initializeBookmarkState(postId) {
       throw new Error('북마크 상태를 확인할 수 없습니다.');
     }
 
-    const bookmarkData = await response.json();
-    currentBookmarkId = bookmarkData.bookmarkId;  // 서버로부터 받은 bookmarkId 저장
-    const isBookmarked = bookmarkData.isBookmarked;
+    const isBookmarked = await response.json(); // 서버에서 Boolean 값을 반환
 
+    // 북마크 상태에 따라 아이콘 설정
     const bookmarkIcon = document.getElementById('bookmarkIcon');
     bookmarkIcon.src = isBookmarked
         ? "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg"
         : "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg";
+
+    // 북마크 상태에 따라 currentBookmarkId 관리
+    if (isBookmarked) {
+      // 서버에서 북마크 ID를 얻기 위해 추가 API 호출이 필요할 수 있습니다.
+      const bookmarkResponse = await fetch(`/api/bookmarks/post/${postId}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+
+      if (!bookmarkResponse.ok) {
+        throw new Error('북마크 ID를 가져올 수 없습니다.');
+      }
+
+      const bookmarkData = await bookmarkResponse.json();
+      currentBookmarkId = bookmarkData[0].bookmarkId; // 첫 번째 북마크의 ID를 사용
+    } else {
+      currentBookmarkId = null; // 북마크되지 않았을 경우 null로 초기화
+    }
+
   } catch (error) {
     console.error('북마크 상태 초기화 중 오류 발생:', error);
   }
@@ -331,17 +344,23 @@ async function initializeBookmarkState(postId) {
 // 북마크 토글 함수
 async function toggleBookmark() {
   try {
-    const isBookmarked = currentBookmarkId !== null;  // 북마크 여부 확인
+    const isBookmarked = currentBookmarkId !== null;
     const bookmarkIcon = document.getElementById('bookmarkIcon');
 
     if (isBookmarked) {
       // 이미 북마크된 경우, 북마크 삭제 요청
-      await fetch(`/api/bookmarks/delete/${currentBookmarkId}`, {
-        method: 'POST',
-        credentials: 'include'
-      });
-      currentBookmarkId = null;  // 북마크 ID 초기화
-      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"; // 북마크 해제 아이콘으로 변경
+      const response = await fetch(`/api/bookmarks/delete/${currentBookmarkId}`,
+          {
+            method: 'POST',
+            credentials: 'include'
+          });
+
+      if (!response.ok) {
+        throw new Error('북마크 삭제 실패: ' + response.statusText);
+      }
+
+      currentBookmarkId = null; // 북마크 ID 초기화
+      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg";
     } else {
       // 북마크되지 않은 경우, 북마크 추가 요청
       const response = await fetch(`/api/bookmarks/reg`, {
@@ -353,9 +372,13 @@ async function toggleBookmark() {
         body: JSON.stringify({postId: currentPostId})
       });
 
+      if (!response.ok) {
+        throw new Error('북마크 추가 실패: ' + response.statusText);
+      }
+
       const newBookmarkData = await response.json();
-      currentBookmarkId = newBookmarkData.bookmarkId;  // 서버로부터 받은 새 bookmarkId 저장
-      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg"; // 북마크 아이콘으로 변경
+      currentBookmarkId = newBookmarkData.bookmarkId; // 새로운 북마크 ID 저장
+      bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg";
     }
   } catch (error) {
     console.error('북마크 토글 중 오류 발생:', error);
