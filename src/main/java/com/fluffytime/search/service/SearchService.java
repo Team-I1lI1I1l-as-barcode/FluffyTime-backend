@@ -17,12 +17,12 @@ public class SearchService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<User> findMatchingUsers(SearchRequestDto searchRequestDto) {
         return userRepository.findByNicknameContaining(searchRequestDto.getQuery());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Profile> findMatchingPetName(SearchRequestDto searchRequestDto) {
         return profileRepository.findByPetNameContaining(searchRequestDto.getQuery());
     }

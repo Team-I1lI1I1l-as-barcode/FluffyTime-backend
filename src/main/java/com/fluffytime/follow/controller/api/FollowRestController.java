@@ -63,7 +63,7 @@ public class FollowRestController {
     //팔로우 여부 단 건 조회
     @GetMapping("/status")
     public ResponseEntity<Boolean> getFollowStatus(
-        @RequestParam("nickname") String nickname, HttpServletRequest httpServletRequest) {
+        @RequestParam(name = "nickname") String nickname, HttpServletRequest httpServletRequest) {
         log.info("/api/follow/status 호출됨");
 
         try {

@@ -64,7 +64,7 @@ public class FollowService {
     }
 
     // accessToken 토큰으로 사용자 찾기
-    @Transactional(readOnly = true)
+    @Transactional
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
         log.info("findByAccessToken 실행");
         String accessToken = null;

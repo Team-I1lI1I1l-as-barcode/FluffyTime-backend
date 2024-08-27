@@ -13,7 +13,7 @@ public class ExploreService {
 
     private final PostRepository postRepository;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Post> findLatestPosts() {
         return postRepository.findAllByOrderByCreatedAtDesc();
     }
