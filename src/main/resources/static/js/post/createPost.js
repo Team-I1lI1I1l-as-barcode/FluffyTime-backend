@@ -49,7 +49,6 @@ function addTag(event) {
       tagsSet.add(tag);
       tagsInputElement.value=""
       displayTagList();
-      alert("등록되었습니다.")
     } else {
       alert("등록할 수 없는 태그입니다.")
     }
@@ -188,12 +187,12 @@ function updateCharCount() {
 }
 
 // 게시물 데이터를 준비하는 함수
-function preparePostData(tempId, content, images, status) {
+function preparePostData(tempId, content, tagsSet ,status) {
   return {
     tempId: tempId, // 임시 저장된 게시물의 ID (없으면 null)
     content: content, // 게시물 내용
+    tags: Array.from(tagsSet),
     tempStatus: status, // 게시물 상태 (임시 저장 또는 최종 저장)
-    //imageUrls: images.map(image => image.url) // 이미지 URL 배열
   };
 }
 
@@ -240,7 +239,7 @@ async function saveAsTemp(event) {
     return;
   }
 
-  const postRequest = preparePostData(null, content, imagesArray, 'TEMP'); // 임시 저장 요청 데이터 준비
+  const postRequest = preparePostData(null, content, tagsSet,'TEMP'); // 임시 저장 요청 데이터 준비
 
   await submitPostData('/api/posts/temp-reg', postRequest, imagesArray); // 서버로 임시 저장 요청 전송
   alert('임시 저장되었습니다.'); // 임시 저장 완료 알림
@@ -259,8 +258,7 @@ async function submitPost(event) {
     return; // 내용이 없으면 아무것도 하지 않음
   }
 
-  const postRequest = preparePostData(currentDraftPostId, content, imagesArray,
-      'SAVE'); // 최종 제출 요청 데이터 준비
+  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,'SAVE'); // 최종 제출 요청 데이터 준비
 
   const data = await submitPostData('/api/posts/reg', postRequest, imagesArray); // 서버로 게시물 등록 요청 전송
   const postId = data?.data?.postId || data.data; // 응답에서 게시물 ID 가져오기

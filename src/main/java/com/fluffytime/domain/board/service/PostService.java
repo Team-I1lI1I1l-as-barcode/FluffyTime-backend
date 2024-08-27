@@ -40,6 +40,7 @@ public class PostService {
     private final PostImagesRepository postImagesRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
+    private final TagService tagService;
 
     // 게시글 등록하기
     @Transactional
@@ -81,6 +82,9 @@ public class PostService {
             savePostImages(files, post);
         }
 
+        // 태그 등록 로직
+        tagService.regTags(postRequest.getTags(), post);
+
         return post.getPostId();  // 생성된 게시물의 ID를 반환
     }
 
@@ -102,6 +106,9 @@ public class PostService {
             .build();
 
         postRepository.save(post);
+
+        // 태그 등록 로직
+        tagService.regTags(postRequest.getTags(), post);
 
         if (files != null && files.length > 0) {
             savePostImages(files, post);
