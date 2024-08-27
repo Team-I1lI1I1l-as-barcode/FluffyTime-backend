@@ -150,7 +150,6 @@ public class UserRestController {
     public ResponseEntity<FindEmailResponse> findEmail(
         @RequestBody @Valid FindEmailRequest findEmailRequest
     ) {
-        log.info("Dto ={}",findEmailRequest);
         return loginService.findEmail(findEmailRequest);
     }
 

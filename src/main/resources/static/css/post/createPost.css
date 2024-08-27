@@ -323,24 +323,33 @@ hr {
 
 .tag-list {
   margin-top: 10px;
+  max-height: 150px; /* 최대 높이 설정 */
+  overflow-y: auto;  /* 세로 스크롤바 추가 */
 }
 
 .tag {
   display: inline-block;
-  background-color: #e0f7fa;
-  color: #007bff;
+  align-items: center;
+  background-color: rgba(255, 204, 0, 0.2);
+  color: #7f7f7f;
   padding: 5px 10px;
   margin: 5px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 14px;
+  position: relative;
   cursor: pointer;
 }
 
-.tag:hover {
-  background-color: #b2ebf2;
-}
-
-.tag .remove-tag {
+.remove-btn {
+  background: none;
+  border: none;
+  color: #CCCCCC;
+  font-weight: bold;
   margin-left: 8px;
   cursor: pointer;
+  font-size: 14px;
+}
+
+.remove-btn:hover {
+  color: #cc0000;
 }

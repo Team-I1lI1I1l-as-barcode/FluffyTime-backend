@@ -1,6 +1,7 @@
 let currentImageIndex = 0; // 현재 선택된 이미지의 인덱스를 저장
 let imagesArray = []; // 사용자가 업로드한 이미지 파일과 URL을 저장하는 배열
 let currentDraftPostId = null; // 현재 작성 중인 게시물의 임시 저장 ID를 저장
+let tagsSet = new Set(); // 게시물 tag 배열
 
 // 여러 DOM 요소들을 가져옵니다.
 const postModalElement = document.getElementById('postModal'); // 게시물 작성 모달
@@ -16,6 +17,74 @@ const contentElement = document.getElementById('content');
 const completeContainer = document.getElementById('complete-container'); // 게시물 등록 완료 후 표시되는 사진
 const imgElement = document.getElementById('profileImage'); // 사용자 프로필 이미지
 const nicknameElement = document.getElementById('nicknameDisplay'); // 사용자 닉네임
+
+
+// 태그 관련
+const tagsInputElement = document.getElementById('tagsInput');
+const tagList = document.getElementById('tagList');
+tagsInputElement.addEventListener("keydown", addTag)
+
+// 태그 정규표현식
+// 다양한 언어 문자 허용, 숫자 허용, '_' 허용, 유니코드 문자 지원
+const tagPattern = /^[\p{L}\p{N}_]+$/u;
+
+function addTag(event) {
+  // 엔터 키의 키 코드는 13
+  if (event.key === 'Enter') {
+    if(tagsSet.size > 10) {
+      alert("태그는 10개까지만 등록 가능합니다.")
+      tagsInputElement.value=""
+      return
+    }
+
+    let tag = tagsInputElement.value
+    tag = tag.trim().replace(/^#/,"")
+
+    if(tag.length > 20) {
+      alert("태그 길이는 최대 20자까지만 가능합니다.");
+      return;
+    }
+
+    if(tagPattern.test(tag)) {
+      tagsSet.add(tag);
+      tagsInputElement.value=""
+      displayTagList();
+      alert("등록되었습니다.")
+    } else {
+      alert("등록할 수 없는 태그입니다.")
+    }
+  }
+}
+
+function displayTagList() {
+  tagList.innerHTML = ''; // 기존 태그 리스트 초기화
+  tagsSet.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag';
+
+    const tagText = document.createElement('span');
+    tagText.className = 'tag-text';
+    tagText.textContent = `#${tag}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'x';
+    removeBtn.className = 'remove-btn';
+    removeBtn.addEventListener("click", (event) => removeTag(event,tag))
+
+    tagElement.appendChild(tagText); // 태그 텍스트 추가
+    tagElement.appendChild(removeBtn); // 삭제 버튼 추가
+    tagList.appendChild(tagElement); // 태그 리스트에 추가
+  });
+}
+
+function removeTag(event, tag) {
+  event.preventDefault()
+  // 태그 배열에서 해당 태그를 제거
+  tagsSet.delete(tag);
+  console.log(tagsSet)
+  displayTagList(); // DOM 업데이트
+}
+
 
 // 프로필 정보를 ~~
 fetch('/api/mypage/profiles/info', {
@@ -358,3 +427,4 @@ function nextImage(event) {
 document.getElementById("openModalBtn").addEventListener('click', function () {
   openPostCreationModal(); // "만들기" 버튼 클릭 시 게시물 작성 모달 열기
 });
+
