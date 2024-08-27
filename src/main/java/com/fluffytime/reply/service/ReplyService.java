@@ -13,7 +13,6 @@ import com.fluffytime.repository.CommentRepository;
 import com.fluffytime.repository.ReplyLikeRepository;
 import com.fluffytime.repository.ReplyRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -50,25 +49,9 @@ public class ReplyService {
     //답글 조회
     public List<ReplyResponseDto> getRepliesByCommentId(Long commentId, Long currentUserId) {
         List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
-        return replyList.stream().map(reply -> {
-            int likeCount = replyLikeRepository.countByReply(reply);
-            boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
-
-            return ReplyResponseDto.builder()
-                .replyId(reply.getReplyId())
-                .userId(reply.getUser().getUserId())
-                .content(reply.getContent())
-                .nickname(reply.getUser().getNickname())
-                .createdAt(reply.getCreatedAt())
-                .isAuthor(reply.getUser().getUserId().equals(currentUserId))
-                .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
-                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                    .map(profileImages -> profileImages.getFilePath())
-                    .orElse("/image/profile/profile.png"))
-                .likeCount(likeCount)
-                .isLiked(isLiked)
-                .build();
-        }).collect(Collectors.toList());
+        return replyList.stream()
+            .map(reply -> convertToReplyResponseDto(reply, currentUserId))
+            .collect(Collectors.toList());
     }
 
     //답글 수정
@@ -89,16 +72,7 @@ public class ReplyService {
     //accessToken으로 사용자 찾기
     @Transactional(readOnly = true)
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        String accessToken = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
@@ -117,9 +91,11 @@ public class ReplyService {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);
 
-        int likeCount = replyLikeRepository.countByReply(reply);
-        boolean isLiked = replyLikeRepository.existsByReplyAndUserUserId(reply, currentUserId);
+        return convertToReplyResponseDto(reply, currentUserId);
+    }
 
+    //답글 response convert
+    private ReplyResponseDto convertToReplyResponseDto(Reply reply, Long currentUserId) {
         return ReplyResponseDto.builder()
             .replyId(reply.getReplyId())
             .userId(reply.getUser().getUserId())
@@ -127,12 +103,18 @@ public class ReplyService {
             .nickname(reply.getUser().getNickname())
             .createdAt(reply.getCreatedAt())
             .isAuthor(reply.getUser().getUserId().equals(currentUserId))
-            .profileImageurl(Optional.ofNullable(reply.getUser().getProfile())
-                .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                .map(profileImages -> profileImages.getFilePath())
-                .orElse("/image/profile/profile.png"))
-            .likeCount(likeCount)
-            .isLiked(isLiked)
+            .profileImageurl(getProfileImageUrl(reply.getUser()))
+            .likeCount(reply.getLikes().size())
+            .isLiked(reply.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)))
             .build();
+    }
+
+    //프로필 이미지 response convert
+    private String getProfileImageUrl(User user) {
+        return Optional.ofNullable(user.getProfile())
+            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+            .map(profileImages -> profileImages.getFilePath())
+            .orElse("/image/profile/profile.png");
     }
 }

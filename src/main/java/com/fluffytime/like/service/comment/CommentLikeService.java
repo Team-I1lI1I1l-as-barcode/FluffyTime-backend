@@ -5,13 +5,15 @@ import com.fluffytime.common.exception.global.CommentNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Comment;
 import com.fluffytime.domain.CommentLike;
+import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.User;
 import com.fluffytime.like.dto.comment.CommentLikeRequestDto;
 import com.fluffytime.like.dto.comment.CommentLikeResponseDto;
+import com.fluffytime.like.exception.LikeIsExists;
+import com.fluffytime.like.exception.NoLikeFound;
 import com.fluffytime.repository.CommentLikeRepository;
 import com.fluffytime.repository.CommentRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -31,8 +33,37 @@ public class CommentLikeService {
     private final CommentLikeRepository commentLikeRepository;
     private final JwtTokenizer jwtTokenizer;
 
-    //댓글 좋아요 등록/좋아요 취소
-    public CommentLikeResponseDto likeOrUnlikeComment(Long commentId,
+    //댓글 좋아요 등록
+    public CommentLikeResponseDto likeComment(Long commentId,
+        CommentLikeRequestDto requestDto) {
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(CommentNotFound::new);
+        User user = userRepository.findById(requestDto.getUserId())
+            .orElseThrow(UserNotFound::new);
+
+        //좋아요를 눌렀는지 안 눌렀는지 확인
+        if (commentLikeRepository.findByCommentAndUser(comment, user) != null) {
+            throw new LikeIsExists();
+        }
+
+        CommentLike commentLike = CommentLike.builder()
+            .comment(comment)
+            .user(user)
+            .build();
+        commentLikeRepository.save(commentLike);
+
+        int likeCount = commentLikeRepository.countByComment(comment); //현재 좋아요 수
+
+        return CommentLikeResponseDto.builder()
+            .userId(user.getUserId())
+            .nickname(user.getNickname())
+            .likeCount(likeCount)
+            .isLiked(true)
+            .build();
+    }
+
+    //댓글 좋아요 취소
+    public CommentLikeResponseDto unlikeComment(Long commentId,
         CommentLikeRequestDto requestDto) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
@@ -41,26 +72,19 @@ public class CommentLikeService {
 
         //좋아요를 눌렀는지 안 눌렀는지 확인
         CommentLike exisitingLike = commentLikeRepository.findByCommentAndUser(comment, user);
-
-        boolean isLiked = false;
-        if (exisitingLike != null) {
-            commentLikeRepository.delete(exisitingLike); //좋아요 취소
-        } else {
-            CommentLike commentLike = CommentLike.builder()
-                .comment(comment)
-                .user(user)
-                .build();
-            commentLikeRepository.save(commentLike); //좋아요 등록
-            isLiked = true;
+        if (exisitingLike == null) {
+            throw new NoLikeFound();
         }
 
-        int likeCount = commentLikeRepository.countByComment(comment); //현재 좋아요 수
+        commentLikeRepository.delete(exisitingLike);
+
+        int likeCount = commentLikeRepository.countByComment(comment);
 
         return CommentLikeResponseDto.builder()
             .userId(user.getUserId())
             .nickname(user.getNickname())
             .likeCount(likeCount)
-            .isLiked(isLiked)
+            .isLiked(false)
             .build();
     }
 
@@ -70,33 +94,14 @@ public class CommentLikeService {
             .orElseThrow(CommentNotFound::new);
 
         return commentLikeRepository.findAllByComment(comment).stream()
-            .map(like -> CommentLikeResponseDto.builder()
-                .userId(like.getUser().getUserId())
-                .nickname(like.getUser().getNickname())
-                .likeCount(commentLikeRepository.countByComment(comment))
-                .isLiked(true) //좋아요 목록이므로 항상 true
-                .profileImageurl(Optional.ofNullable(like.getUser().getProfile())
-                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                    .map(profileImages -> profileImages.getFilePath())
-                    .orElse("/image/profile/profile.png"))
-                .intro(like.getUser().getProfile().getIntro())
-                .build())
+            .map(like -> convertToCommentLikeResponseDto(like, comment))
             .collect(Collectors.toList());
     }
 
     //accessToken으로 사용자 찾기
     @Transactional(readOnly = true)
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        String accessToken = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
@@ -110,4 +115,26 @@ public class CommentLikeService {
         return user;
     }
 
+
+    //댓글 좋아요 response convert
+    private CommentLikeResponseDto convertToCommentLikeResponseDto(CommentLike like,
+        Comment comment) {
+        return CommentLikeResponseDto.builder()
+            .userId(like.getUser().getUserId())
+            .nickname(like.getUser().getNickname())
+            .likeCount(commentLikeRepository.countByComment(comment))
+            .isLiked(true)
+            .profileImageurl(getProfileImageUrl(like.getUser()))
+            .intro(Optional.ofNullable(like.getUser().getProfile()).map(Profile::getIntro)
+                .orElse(null))
+            .build();
+    }
+
+    //프로필 이미지 response convert
+    private String getProfileImageUrl(User user) {
+        return Optional.ofNullable(user.getProfile())
+            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+            .map(profileImages -> profileImages.getFilePath())
+            .orElse("/image/profile/profile.png");
+    }
 }

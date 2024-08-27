@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,16 +24,29 @@ public class PostLikeRestController {
     private final PostLikeService postLikeService;
     private final HttpServletRequest httpServletRequest;
 
-    //게시글 좋아요 등록/취소
+    //게시글 좋아요 등록
     @PostMapping("/post/{postId}")
-    public ResponseEntity<PostLikeResponseDto> likeOrUnlikePost(
+    public ResponseEntity<PostLikeResponseDto> likePost(
         @PathVariable(name = "postId") Long postId,
         @RequestBody PostLikeRequestDto requestDto) {
         //현재 사용자 ID
         User currentUser = postLikeService.findByAccessToken(httpServletRequest);
         requestDto.setUserId(currentUser.getUserId());
 
-        PostLikeResponseDto responseDto = postLikeService.likeOrUnlikePost(postId, requestDto);
+        PostLikeResponseDto responseDto = postLikeService.likePost(postId, requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    //게시글 좋아요 취소
+    @DeleteMapping("/post/{postId}")
+    public ResponseEntity<PostLikeResponseDto> unlikePost(
+        @PathVariable(name = "postId") Long postId,
+        @RequestBody PostLikeRequestDto requestDto) {
+        //현재 사용자 ID
+        User currentUser = postLikeService.findByAccessToken(httpServletRequest);
+        requestDto.setUserId(currentUser.getUserId());
+
+        PostLikeResponseDto responseDto = postLikeService.unlikePost(postId, requestDto);
         return ResponseEntity.ok(responseDto);
     }
 

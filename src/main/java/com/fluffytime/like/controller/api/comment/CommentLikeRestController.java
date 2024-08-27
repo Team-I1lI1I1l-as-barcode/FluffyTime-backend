@@ -9,6 +9,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,16 +26,30 @@ public class CommentLikeRestController {
     private final CommentLikeService commentLikeService;
     private final HttpServletRequest httpServletRequest;
 
-    //댓글 좋아요 등록/좋아요 취소
+    //댓글 좋아요 등록
     @PostMapping("/comment/{commentId}")
-    public ResponseEntity<CommentLikeResponseDto> likeOrUnlikeComment(
+    public ResponseEntity<CommentLikeResponseDto> likeComment(
         @PathVariable(name = "commentId") Long commentId,
         @RequestBody CommentLikeRequestDto requestDto) {
         //현재 사용자 ID
         User currentUser = commentLikeService.findByAccessToken(httpServletRequest);
         requestDto.setUserId(currentUser.getUserId());
 
-        CommentLikeResponseDto responseDto = commentLikeService.likeOrUnlikeComment(commentId,
+        CommentLikeResponseDto responseDto = commentLikeService.likeComment(commentId,
+            requestDto);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    //댓글 좋아요 취소
+    @DeleteMapping("/comment/{commentId}")
+    public ResponseEntity<CommentLikeResponseDto> unlikeComment(
+        @PathVariable(name = "commentId") Long commentId,
+        @RequestBody CommentLikeRequestDto requestDto) {
+        //현재 사용자 ID
+        User currentUser = commentLikeService.findByAccessToken(httpServletRequest);
+        requestDto.setUserId(currentUser.getUserId());
+
+        CommentLikeResponseDto responseDto = commentLikeService.unlikeComment(commentId,
             requestDto);
         return ResponseEntity.ok(responseDto);
     }

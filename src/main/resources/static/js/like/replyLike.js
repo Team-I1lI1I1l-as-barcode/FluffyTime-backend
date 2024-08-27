@@ -1,8 +1,10 @@
 //좋아요 등록/취소
 async function toggleLikeReply(replyId, likeButton, likeCountSpan) {
   try {
+    const isLiked = likeButton.classList.contains('liked');
+    const method = isLiked ? 'DELETE' : 'POST';
     const response = await fetch(`/api/likes/reply/${replyId}`, {
-      method: 'POST',
+      method: method,
       headers: {
         'Content-Type': 'application/json'
       },

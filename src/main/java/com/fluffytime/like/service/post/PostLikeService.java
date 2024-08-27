@@ -5,13 +5,15 @@ import com.fluffytime.common.exception.global.PostNotFound;
 import com.fluffytime.common.exception.global.UserNotFound;
 import com.fluffytime.domain.Post;
 import com.fluffytime.domain.PostLike;
+import com.fluffytime.domain.Profile;
 import com.fluffytime.domain.User;
 import com.fluffytime.like.dto.post.PostLikeRequestDto;
 import com.fluffytime.like.dto.post.PostLikeResponseDto;
+import com.fluffytime.like.exception.LikeIsExists;
+import com.fluffytime.like.exception.NoLikeFound;
 import com.fluffytime.repository.PostLikeRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -29,25 +31,21 @@ public class PostLikeService {
     private final PostLikeRepository postLikeRepository;
     private final JwtTokenizer jwtTokenizer;
 
-    //게시글 좋아요 등록/취소
-    public PostLikeResponseDto likeOrUnlikePost(Long postId, PostLikeRequestDto requestDto) {
+    //게시글 좋아요 등록
+    public PostLikeResponseDto likePost(Long postId, PostLikeRequestDto requestDto) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
         User user = userRepository.findById(requestDto.getUserId()).orElseThrow(UserNotFound::new);
 
         //좋아요를 눌렀는지 안 눌렀는지 확인
-        PostLike exisitingLike = postLikeRepository.findByPostAndUser(post, user);
-
-        boolean isLiked = false;
-        if (exisitingLike != null) {
-            postLikeRepository.delete(exisitingLike); //좋아요 취소
-        } else {
-            PostLike postLike = PostLike.builder()
-                .post(post)
-                .user(user)
-                .build();
-            postLikeRepository.save(postLike); //좋아요 등록
-            isLiked = true;
+        if (postLikeRepository.findByPostAndUser(post, user) != null) {
+            throw new LikeIsExists();
         }
+
+        PostLike postLike = PostLike.builder()
+            .post(post)
+            .user(user)
+            .build();
+        postLikeRepository.save(postLike); //좋아요 등록
 
         int likeCount = postLikeRepository.countByPost(post); //현재 좋아요 수
 
@@ -55,7 +53,30 @@ public class PostLikeService {
             .userId(user.getUserId())
             .nickname(user.getNickname())
             .likeCount(likeCount)
-            .isLiked(isLiked)
+            .isLiked(true)
+            .build();
+    }
+
+    //게시글 좋아요 취소
+    public PostLikeResponseDto unlikePost(Long postId, PostLikeRequestDto requestDto) {
+        Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
+        User user = userRepository.findById(requestDto.getUserId()).orElseThrow(UserNotFound::new);
+
+        //좋아요를 눌럿는지 안 눌렀는지 확인
+        PostLike exisitingLike = postLikeRepository.findByPostAndUser(post, user);
+        if (exisitingLike == null) {
+            throw new NoLikeFound();
+        }
+
+        postLikeRepository.delete(exisitingLike);
+
+        int likeCount = postLikeRepository.countByPost(post); //현재 좋아요 수
+
+        return PostLikeResponseDto.builder()
+            .userId(user.getUserId())
+            .nickname(user.getNickname())
+            .likeCount(likeCount)
+            .isLiked(false)
             .build();
     }
 
@@ -81,16 +102,7 @@ public class PostLikeService {
     //accessToken으로 사용자 찾기
     @Transactional(readOnly = true)
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        String accessToken = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
         Long userId = null;
         userId = jwtTokenizer.getUserIdFromToken(accessToken);
@@ -102,5 +114,27 @@ public class PostLikeService {
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
+    }
+
+    //게시글 좋아요 response convert
+    private PostLikeResponseDto convertToPostLikeResponseDto(PostLike like,
+        Post post) {
+        return PostLikeResponseDto.builder()
+            .userId(like.getUser().getUserId())
+            .nickname(like.getUser().getNickname())
+            .likeCount(postLikeRepository.countByPost(post))
+            .isLiked(true)
+            .profileImageurl(getProfileImageUrl(like.getUser()))
+            .intro(Optional.ofNullable(like.getUser().getProfile()).map(Profile::getIntro)
+                .orElse(null))
+            .build();
+    }
+
+    //프로필 이미지 response convert
+    private String getProfileImageUrl(User user) {
+        return Optional.ofNullable(user.getProfile())
+            .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
+            .map(profileImages -> profileImages.getFilePath())
+            .orElse("/image/profile/profile.png");
     }
 }
