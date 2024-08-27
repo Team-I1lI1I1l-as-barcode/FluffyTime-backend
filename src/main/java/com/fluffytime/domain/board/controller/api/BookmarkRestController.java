@@ -1,4 +1,4 @@
-package com.fluffytime.domain.board.controller;
+package com.fluffytime.domain.board.controller.api;
 
 import com.fluffytime.domain.board.dto.request.BookmarkRequest;
 import com.fluffytime.domain.board.dto.response.BookmarkResponse;

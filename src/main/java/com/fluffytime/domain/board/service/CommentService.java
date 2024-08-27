@@ -1,8 +1,8 @@
 package com.fluffytime.domain.board.service;
 
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.domain.board.dto.request.CommentRequestDto;
-import com.fluffytime.domain.board.dto.response.CommentResponseDto;
+import com.fluffytime.domain.board.dto.request.CommentRequest;
+import com.fluffytime.domain.board.dto.response.CommentResponse;
 import com.fluffytime.global.common.exception.global.CommentNotFound;
 import com.fluffytime.global.common.exception.global.PostNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
@@ -36,7 +36,7 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
 
     //댓글 저장
-    public void createComment(CommentRequestDto requestDto) {
+    public void createComment(CommentRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Post post = postRepository.findById(requestDto.getPostId())
@@ -51,7 +51,7 @@ public class CommentService {
     }
 
     //댓글 조회 - 게시글마다
-    public List<CommentResponseDto> getCommentByPostId(Long postId, Long currentUserId) {
+    public List<CommentResponse> getCommentByPostId(Long postId, Long currentUserId) {
         List<Comment> commentList = commentRepository.findByPostPostId(postId);
         return commentList.stream()
             .map(comment -> convertToCommentResponseDto(comment, currentUserId))
@@ -92,7 +92,7 @@ public class CommentService {
     }
 
     //댓글 ID로 댓글 조회하기 - 수정 및 삭제
-    public CommentResponseDto getCommentByCommentId(Long commentId, Long currentUserId) {
+    public CommentResponse getCommentByCommentId(Long commentId, Long currentUserId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
 
@@ -100,12 +100,12 @@ public class CommentService {
     }
 
     //댓글 response convert
-    private CommentResponseDto convertToCommentResponseDto(Comment comment, Long currentUserId) {
+    private CommentResponse convertToCommentResponseDto(Comment comment, Long currentUserId) {
         int likeCount = commentLikeRepository.countByComment(comment);
         boolean isLiked = commentLikeRepository.existsByCommentAndUserUserId(comment,
             currentUserId);
 
-        return CommentResponseDto.builder()
+        return CommentResponse.builder()
             .commentId(comment.getCommentId())
             .userId(comment.getUser().getUserId())
             .content(comment.getContent())

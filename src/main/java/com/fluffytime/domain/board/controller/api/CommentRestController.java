@@ -1,7 +1,7 @@
 package com.fluffytime.domain.board.controller.api;
 
-import com.fluffytime.domain.board.dto.request.CommentRequestDto;
-import com.fluffytime.domain.board.dto.response.CommentResponseDto;
+import com.fluffytime.domain.board.dto.request.CommentRequest;
+import com.fluffytime.domain.board.dto.response.CommentResponse;
 import com.fluffytime.domain.board.exception.NotPermissionDelete;
 import com.fluffytime.domain.board.exception.NotPermissionModify;
 import com.fluffytime.domain.board.service.CommentService;
@@ -33,7 +33,7 @@ public class CommentRestController {
     //댓글 등록
     @PostMapping("/reg")
     public ResponseEntity<Map<String, String>> createComment(
-        @Valid @RequestBody CommentRequestDto requestDto, HttpServletRequest httpServletRequest) {
+        @Valid @RequestBody CommentRequest requestDto, HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
             requestDto.setUserId(user.getUserId());
@@ -48,12 +48,12 @@ public class CommentRestController {
 
     //댓글 조회(게시글마다)
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentResponseDto>> getCommentByPostId(
+    public ResponseEntity<List<CommentResponse>> getCommentByPostId(
         @PathVariable(name = "postId") Long postId, HttpServletRequest httpServletRequest) {
 
         User user = commentService.findByAccessToken(httpServletRequest);
         Long currentUserId = user.getUserId();
-        List<CommentResponseDto> commentList = commentService.getCommentByPostId(postId,
+        List<CommentResponse> commentList = commentService.getCommentByPostId(postId,
             currentUserId);
 
         return ResponseEntity.ok(commentList);
@@ -62,12 +62,12 @@ public class CommentRestController {
     //댓글 수정
     @PutMapping("/update/{commentId}")
     public ResponseEntity<Void> updateComment(
-        @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequestDto request,
+        @PathVariable(name = "commentId") Long commentId, @RequestBody CommentRequest request,
         HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
             Long currentUserId = user.getUserId();
-            CommentResponseDto comment = commentService.getCommentByCommentId(commentId,
+            CommentResponse comment = commentService.getCommentByCommentId(commentId,
                 currentUserId);
             if (!comment.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionModify();
@@ -86,7 +86,7 @@ public class CommentRestController {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
             Long currentUserId = user.getUserId();
-            CommentResponseDto comment = commentService.getCommentByCommentId(commentId,
+            CommentResponse comment = commentService.getCommentByCommentId(commentId,
                 currentUserId);
             if (!comment.getUserId().equals(user.getUserId())) {
                 throw new NotPermissionDelete();

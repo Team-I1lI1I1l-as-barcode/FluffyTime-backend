@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor //getter + setter + 기본 생성자(NoArgsConstructor) = JSON 역직렬화
 @AllArgsConstructor
-public class CommentRequestDto {
+public class CommentRequest {
 
     private Long postId;
     private Long userId;

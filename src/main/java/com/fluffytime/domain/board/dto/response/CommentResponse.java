@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CommentResponseDto {
+public class CommentResponse {
 
     private Long commentId;
     private Long userId;
@@ -24,7 +24,7 @@ public class CommentResponseDto {
     private boolean isLiked;
 
     @Builder
-    public CommentResponseDto(Long commentId, Long userId, String content, String nickname,
+    public CommentResponse(Long commentId, Long userId, String content, String nickname,
         LocalDateTime createdAt, List<ReplyResponse> replyList, boolean isAuthor,
         String profileImageurl, int likeCount, boolean isLiked) {
         this.commentId = commentId;

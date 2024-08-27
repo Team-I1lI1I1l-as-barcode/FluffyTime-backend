@@ -1,4 +1,4 @@
-package com.fluffytime.domain.board.controller;
+package com.fluffytime.domain.board.controller.api;
 
 import com.fluffytime.domain.board.exception.NotPermissionDelete;
 import com.fluffytime.domain.board.exception.NotPermissionModify;

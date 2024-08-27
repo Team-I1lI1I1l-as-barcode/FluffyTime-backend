@@ -98,7 +98,6 @@ public class UserPageService {
             .publicStatus(profile.getPublicStatus()) // 프로필 공개 여부
             .isUserBlocked(isUserBlocked) // 해당 유저를 사용자가 차단 했는지 여부
             .build();
-
     }
 
     // 유저 페이지 정보 불러오기  메서드
