@@ -1,19 +1,19 @@
 package com.fluffytime.domain.board.service;
 
+import com.fluffytime.domain.board.dto.request.PostLikeRequest;
+import com.fluffytime.domain.board.dto.response.PostLikeResponse;
+import com.fluffytime.domain.board.entity.Post;
+import com.fluffytime.domain.board.entity.PostLike;
 import com.fluffytime.domain.board.exception.LikeIsExists;
 import com.fluffytime.domain.board.exception.NoLikeFound;
+import com.fluffytime.domain.board.repository.PostLikeRepository;
+import com.fluffytime.domain.board.repository.PostRepository;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.PostNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.domain.board.entity.Post;
-import com.fluffytime.domain.board.entity.PostLike;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.request.PostLikeRequest;
-import com.fluffytime.domain.board.dto.response.PostLikeResponse;
-import com.fluffytime.domain.board.repository.PostLikeRepository;
-import com.fluffytime.domain.board.repository.PostRepository;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -85,17 +85,7 @@ public class PostLikeService {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
 
         return postLikeRepository.findAllByPost(post).stream()
-            .map(like -> PostLikeResponse.builder()
-                .userId(like.getUser().getUserId())
-                .nickname(like.getUser().getNickname())
-                .likeCount(postLikeRepository.countByPost(post))
-                .isLiked(true)
-                .profileImageurl(Optional.ofNullable(like.getUser().getProfile())
-                    .flatMap(profile -> Optional.ofNullable(profile.getProfileImages()))
-                    .map(profileImages -> profileImages.getFilePath())
-                    .orElse("/image/profile/profile.png"))
-                .intro(like.getUser().getProfile().getIntro())
-                .build())
+            .map(like -> convertToPostLikeResponseDto(like, post))
             .collect(Collectors.toList());
     }
 
