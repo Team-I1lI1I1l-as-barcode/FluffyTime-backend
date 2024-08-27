@@ -124,7 +124,7 @@ function preparePostData(tempId, content, images, status) {
     tempId: tempId, // 임시 저장된 게시물의 ID (없으면 null)
     content: content, // 게시물 내용
     tempStatus: status, // 게시물 상태 (임시 저장 또는 최종 저장)
-    imageUrls: images.map(image => image.url) // 이미지 URL 배열
+    //imageUrls: images.map(image => image.url) // 이미지 URL 배열
   };
 }
 

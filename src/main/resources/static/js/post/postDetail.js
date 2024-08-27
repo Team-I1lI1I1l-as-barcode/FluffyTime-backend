@@ -40,17 +40,21 @@ async function loadPostData(postId) {
       console.error('서버 응답 상태:', response.status);
       throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
-    console.log('응답 ok!')
 
     const postData = await response.json();
-    console.log('콘솔 불러와주세요~');
+
+    if (!postData || !postData.content) {
+      throw new Error('게시물 데이터가 올바르지 않습니다.');
+    }
+
     currentPostId = postId;
 
     // 게시물 내용을 화면에 설정
     document.getElementById('postContent').innerText = postData.content;
 
     // 이미지 URL 배열을 업데이트
-    imageUrls = postData.imageUrls;
+    imageUrls = postData.imageUrls || []; // postData.imageUrls가 undefined일 경우 빈 배열로 초기화
+
     console.log(imageUrls);
 
     // 이미지 컨테이너 초기화 및 이미지 추가
@@ -60,7 +64,8 @@ async function loadPostData(postId) {
     toggleSlideButtons(imageUrls.length, 'prevButton', 'nextButton');
 
   } catch (error) {
-    console.error('게시물 데이터 로드 중 오류 발생:', error);
+    console.error('게시물 데이터 로드 중 오류 발생:', error.message);
+    alert('게시물 데이터를 로드하는 중 오류가 발생했습니다. 페이지를 새로고침 해주세요.');
   }
 }
 
@@ -261,6 +266,20 @@ function toggleDropdownMenu() {
       : 'block'; // 드롭다운 메뉴를 보이거나 숨김
 }
 
+// 링크를 클립보드에 복사하는 함수
+function copyLinkToClipboard() {
+  const url = window.location.href; // 현재 페이지의 URL을 가져옴
+
+  navigator.clipboard.writeText(url)
+  .then(() => {
+    alert('링크가 클립보드에 복사되었습니다.'); // 성공 메시지 표시
+  })
+  .catch(err => {
+    console.error('링크 복사 중 오류 발생:', err);
+    alert('링크 복사에 실패했습니다.'); // 오류 메시지 표시
+  });
+}
+
 // URL에서 postId를 추출하여 게시물 데이터를 로드
 document.addEventListener('DOMContentLoaded', () => {
   console.log('페이지 로드 완료');
@@ -284,23 +303,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 링크를 클립보드에 복사하는 함수
-function copyLinkToClipboard() {
-  const url = window.location.href; // 현재 페이지의 URL을 가져옴
-
-  navigator.clipboard.writeText(url)
-  .then(() => {
-    alert('링크가 클립보드에 복사되었습니다.'); // 성공 메시지 표시
-  })
-  .catch(err => {
-    console.error('링크 복사 중 오류 발생:', err);
-    alert('링크 복사에 실패했습니다.'); // 오류 메시지 표시
-  });
-}
-
 // 북마크 상태 초기화 함수
 async function initializeBookmarkState(postId) {
   try {
+    // 북마크 상태 확인 요청
     const response = await fetch(`/api/bookmarks/check?postId=${postId}`, {
       method: 'GET',
       credentials: 'include'
@@ -320,7 +326,7 @@ async function initializeBookmarkState(postId) {
 
     // 북마크 상태에 따라 currentBookmarkId 관리
     if (isBookmarked) {
-      // 서버에서 북마크 ID를 얻기 위해 추가 API 호출이 필요할 수 있습니다.
+      // 서버에서 북마크 ID를 가져오는 추가 API 호출
       const bookmarkResponse = await fetch(`/api/bookmarks/post/${postId}`, {
         method: 'GET',
         credentials: 'include'
@@ -331,13 +337,14 @@ async function initializeBookmarkState(postId) {
       }
 
       const bookmarkData = await bookmarkResponse.json();
-      currentBookmarkId = bookmarkData[0].bookmarkId; // 첫 번째 북마크의 ID를 사용
+      if (bookmarkData && bookmarkData.length > 0) {
+        currentBookmarkId = bookmarkData[0].bookmarkId; // 첫 번째 북마크의 ID를 저장
+      }
     } else {
       currentBookmarkId = null; // 북마크되지 않았을 경우 null로 초기화
     }
-
   } catch (error) {
-    console.error('북마크 상태 초기화 중 오류 발생:', error);
+    console.error('북마크 상태 초기화 중 오류 발생:', error.message);
   }
 }
 
@@ -381,6 +388,6 @@ async function toggleBookmark() {
       bookmarkIcon.src = "https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark_check/default/24px.svg";
     }
   } catch (error) {
-    console.error('북마크 토글 중 오류 발생:', error);
+    console.error('북마크 토글 중 오류 발생:', error.message);
   }
 }
