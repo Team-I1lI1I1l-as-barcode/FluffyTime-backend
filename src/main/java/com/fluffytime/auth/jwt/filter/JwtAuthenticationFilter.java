@@ -1,5 +1,10 @@
 package com.fluffytime.auth.jwt.filter;
 
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.NICKNAME;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.ROLES;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.USER_ID;
+import static com.fluffytime.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
+
 import com.fluffytime.auth.jwt.token.JwtAuthenticationToken;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.auth.jwt.dto.CustomUserDetails;
@@ -34,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {
-        String accessToken = jwtTokenizer.getTokenFromCookie(request, "accessToken");
+        String accessToken = jwtTokenizer.getTokenFromCookie(request, ACCESS_TOKEN_NAME.getName());
 
         if (StringUtils.hasText(accessToken)) {
             doAuthentication(request, accessToken);
@@ -78,8 +83,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // 클레임에서 사용자 정보 추출
         String email = claims.getSubject();
-        Long userId = claims.get("userId", Long.class);
-        String nickname = claims.get("nickname", String.class);
+        Long userId = claims.get(USER_ID.getKey(), Long.class);
+        String nickname = claims.get(NICKNAME.getKey(), String.class);
 
         // JWT에서 추출한 Claim으로 토큰에 권한 추출
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
@@ -100,7 +105,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Claims 객체에서 사용자의 권한 추출하여 리스트로 반환
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims) {
         // 클레임에서 "roles" 정보를 추출(사용자가 가지고 있는 권한 목록)
-        List<String> roles = (List<String>) claims.get("roles");
+        List<String> roles = (List<String>) claims.get(ROLES.getKey());
         // 권한 정보를 담을 리스트를 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
         // 각 역할(role)을 GrantedAuthority 객체로 변환하여 리스트에 추가

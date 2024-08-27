@@ -1,5 +1,15 @@
 package com.fluffytime.auth.jwt.service;
 
+import static com.fluffytime.auth.jwt.util.TokenCookieManager.generateTokenCookie;
+import static com.fluffytime.auth.jwt.util.TokenCookieManager.removeCookie;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.NICKNAME;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.ROLES;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.USER_ID;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY_SECOND;
+import static com.fluffytime.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
+import static com.fluffytime.auth.jwt.util.constants.TokenName.REFRESH_TOKEN_NAME;
+
 import com.fluffytime.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.auth.jwt.exception.InvalidToken;
 import com.fluffytime.auth.jwt.exception.TokenNotFound;
@@ -23,7 +33,7 @@ public class JwtService {
 
     // refresh token rotation & access token 재발급
     public ResponseEntity<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = jwtTokenizer.getTokenFromCookie(request, "refreshToken");
+        String refreshToken = jwtTokenizer.getTokenFromCookie(request, REFRESH_TOKEN_NAME.getName());
 
         if (refreshToken == null) {
             throw new TokenNotFound();
@@ -31,10 +41,10 @@ public class JwtService {
 
         Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
 
-        Long userId = Long.valueOf((Integer) claims.get("userId"));
+        Long userId = Long.valueOf((Integer) claims.get(USER_ID.getKey()));
         String email = claims.getSubject();
-        String nickname = (String) claims.get("nickname");
-        List roles = (List) claims.get("roles");
+        String nickname = (String) claims.get(NICKNAME.getKey());
+        List roles = (List) claims.get(ROLES.getKey());
 
 
         String getRefreshToken = refreshTokenDao.getRefreshToken(email);
@@ -48,11 +58,12 @@ public class JwtService {
         if (isSame) {
             String newAccessToken = jwtTokenizer.createAccessToken(userId, email, nickname,
                 roles);
-            Cookie accessTokenCookie = new Cookie("accessToken", newAccessToken);
-            accessTokenCookie.setPath("/");
-            accessTokenCookie.setHttpOnly(true);
-            accessTokenCookie.setMaxAge(Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT)
-                / 1000);
+
+            Cookie accessTokenCookie = generateTokenCookie(
+                ACCESS_TOKEN_NAME.getName(),
+                newAccessToken,
+                ACCESS_TOKEN_EXPIRY_SECOND.getExpiry()
+            );
 
             response.addCookie(accessTokenCookie);
 
@@ -60,13 +71,9 @@ public class JwtService {
         } else {
             refreshTokenDao.removeRefreshToken(email);
 
-            Cookie refreshTokenCookie = new Cookie("refreshToken", null);
-            refreshTokenCookie.setMaxAge(0);
-            refreshTokenCookie.setPath("/");
+            Cookie refreshTokenCookie = removeCookie(REFRESH_TOKEN_NAME.getName());
 
-            Cookie accessTokencookie = new Cookie("accessToken", null);
-            accessTokencookie.setMaxAge(0);
-            accessTokencookie.setPath("/");
+            Cookie accessTokencookie = removeCookie(ACCESS_TOKEN_NAME.getName());
 
             response.addCookie(refreshTokenCookie);
             response.addCookie(accessTokencookie);

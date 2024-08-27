@@ -1,5 +1,11 @@
 package com.fluffytime.auth.jwt.util;
 
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.NICKNAME;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.ROLES;
+import static com.fluffytime.auth.jwt.util.constants.TokenClaimsKey.USER_ID;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.REFRESH_TOKEN_EXPIRY;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -21,10 +27,6 @@ public class JwtTokenizer {
     private final byte[] accessSecret;
     // refreshToken에 사용될 비밀 키를 담을 배열 선언
     private final byte[] refreshSecret;
-    // accessToken 유지 시간(ms)
-    public final static Long ACCESS_TOKEN_EXPIRE_COUNT = 60 * 60 * 1000L; // 1시간
-    // refreshToken 유지 시간(ms)
-    public final static Long REFRESH_TOKEN_EXPIRE_COUNT = 7 * 24 * 60 * 60 * 1000L; // 7일
 
     // 토큰 초기와 - application.yml 에서 key값 가져오기
     public JwtTokenizer(@Value("${jwt.secretKey}") String accessSecret,
@@ -37,14 +39,14 @@ public class JwtTokenizer {
      * AccessToken 생성
      * */
     public String createAccessToken(Long id, String email, String nickname, List<String> roles) {
-        return createToken(id, email, nickname, roles, ACCESS_TOKEN_EXPIRE_COUNT, accessSecret);
+        return createToken(id, email, nickname, roles, ACCESS_TOKEN_EXPIRY.getExpiry(), accessSecret);
     }
 
     /*
      * RefreshToken 생성
      * */
     public String createRefreshToken(Long id, String email, String nickname, List<String> roles) {
-        return createToken(id, email, nickname, roles, REFRESH_TOKEN_EXPIRE_COUNT, refreshSecret);
+        return createToken(id, email, nickname, roles, REFRESH_TOKEN_EXPIRY.getExpiry(), refreshSecret);
     }
 
     // 토큰 생성 - 구분 id, 이메일, 유저명, 사용자 권한들, 유효기간, 시크릿키
@@ -53,9 +55,9 @@ public class JwtTokenizer {
         // 기본적으로 가지고 있는 claim : subject
         Claims claims = Jwts.claims().setSubject(email);
 
-        claims.put("userId", id);
-        claims.put("nickname", nickname);
-        claims.put("roles", roles);
+        claims.put(USER_ID.getKey(), id);
+        claims.put(NICKNAME.getKey(), nickname);
+        claims.put(ROLES.getKey(), roles);
 
         // JWT 생성
         return Jwts.builder()
@@ -72,7 +74,7 @@ public class JwtTokenizer {
     public Long getUserIdFromToken(String token) {
         // 토큰을 공백 기준으로 분리하여 실제 토큰 값만 추출
         Claims claims = parseAccessToken(token);
-        return Long.valueOf((Integer) claims.get("userId"));
+        return Long.valueOf((Integer) claims.get(USER_ID.getKey()));
     }
 
     /*

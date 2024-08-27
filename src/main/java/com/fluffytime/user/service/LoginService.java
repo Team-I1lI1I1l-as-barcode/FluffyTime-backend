@@ -1,5 +1,14 @@
 package com.fluffytime.user.service;
 
+import static com.fluffytime.auth.jwt.util.TokenCookieManager.generateTokenCookie;
+import static com.fluffytime.auth.jwt.util.TokenCookieManager.removeCookie;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.ACCESS_TOKEN_EXPIRY_SECOND;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.REFRESH_TOKEN_EXPIRY;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.REFRESH_TOKEN_EXPIRY_SECOND;
+import static com.fluffytime.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
+import static com.fluffytime.auth.jwt.util.constants.TokenName.REFRESH_TOKEN_NAME;
+
 import com.fluffytime.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.auth.jwt.util.JwtTokenizer;
@@ -61,17 +70,17 @@ public class LoginService {
 
         refreshTokenDao.saveRefreshToken(email, refreshToken);
 
-        Cookie accessTokenCookie = new Cookie("accessToken", accessToken);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setMaxAge(
-            Math.toIntExact(JwtTokenizer.ACCESS_TOKEN_EXPIRE_COUNT / 1000)); // 7일
+        Cookie accessTokenCookie = generateTokenCookie(
+            ACCESS_TOKEN_NAME.getName(),
+            accessToken,
+            ACCESS_TOKEN_EXPIRY_SECOND.getExpiry()
+        );
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setMaxAge(
-            Math.toIntExact(JwtTokenizer.REFRESH_TOKEN_EXPIRE_COUNT / 1000)); // 7일
+        Cookie refreshTokenCookie = generateTokenCookie(
+            REFRESH_TOKEN_NAME.getName(),
+            refreshToken,
+            REFRESH_TOKEN_EXPIRY_SECOND.getExpiry()
+        );
 
         response.addCookie(accessTokenCookie);
         response.addCookie(refreshTokenCookie);
@@ -83,7 +92,8 @@ public class LoginService {
     public ResponseEntity<Void> logoutProcess(HttpServletRequest request,
         HttpServletResponse response)
         throws IOException {
-        String refreshToken = jwtTokenizer.getTokenFromCookie(request, "refreshToken");
+
+        String refreshToken = jwtTokenizer.getTokenFromCookie(request, REFRESH_TOKEN_NAME.getName());
 
         log.info("refreshToken={}", refreshToken);
 
@@ -104,14 +114,10 @@ public class LoginService {
         refreshTokenDao.removeRefreshToken(email);
 
         //Refresh 토큰 Cookie 값 0
-        Cookie refreshTokenCookie = new Cookie("refreshToken", null);
-        refreshTokenCookie.setMaxAge(0);
-        refreshTokenCookie.setPath("/");
+        Cookie refreshTokenCookie = removeCookie(REFRESH_TOKEN_NAME.getName());
 
         //Access 토큰 Cookie 값 0
-        Cookie accessTokencookie = new Cookie("accessToken", null);
-        accessTokencookie.setMaxAge(0);
-        accessTokencookie.setPath("/");
+        Cookie accessTokencookie = removeCookie(ACCESS_TOKEN_NAME.getName());
 
         response.addCookie(refreshTokenCookie);
         response.addCookie(accessTokencookie);
@@ -119,7 +125,7 @@ public class LoginService {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ResponseEntity<FindEmailResponse> findEmail(FindEmailRequest findEmailRequest) {
         FindEmailResponse findEmailResponse = FindEmailResponse.builder()
             .email(findEmailRequest.getEmail())
@@ -128,7 +134,7 @@ public class LoginService {
         return ResponseEntity.status(HttpStatus.OK).body(findEmailResponse);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public boolean existsUserByEmail(String email) {
         return userRepository.existsUserByEmail(email);
     }
@@ -151,6 +157,7 @@ public class LoginService {
         User findUser = userRepository.findByEmail(email).orElseThrow(UserNotFound::new);
 
         findUser.setPassword(passwordEncoder.encode(password));
+
         userRepository.save(findUser);
     }
 

@@ -134,7 +134,7 @@ public class JoinService {
             .build();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CheckDuplicationResponse checkExistsEmail(
         String email) {
         boolean isExists = userRepository.findByEmail(email).isPresent();
@@ -146,7 +146,7 @@ public class JoinService {
                 .build();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public CheckDuplicationResponse checkExistsNickname(
         String nickname) {
         boolean isExists = userRepository.findByNickname(nickname).isPresent();

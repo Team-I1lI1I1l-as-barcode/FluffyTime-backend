@@ -3,7 +3,6 @@ package com.fluffytime.auth.oauth2.dto;
 import com.fluffytime.domain.LoginType;
 import jakarta.persistence.Id;
 import java.io.Serializable;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +12,7 @@ import org.springframework.data.redis.core.RedisHash;
 @RedisHash("TempUser")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor
 public class SocialTempUser implements Serializable {
 
     @Id
@@ -25,5 +24,4 @@ public class SocialTempUser implements Serializable {
         this.email = email;
         this.loginType = loginType;
     }
-
 }

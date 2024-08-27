@@ -1,6 +1,6 @@
 package com.fluffytime.auth.jwt.dao;
 
-import static com.fluffytime.auth.jwt.util.JwtTokenizer.REFRESH_TOKEN_EXPIRE_COUNT;
+import static com.fluffytime.auth.jwt.util.constants.TokenExpiry.REFRESH_TOKEN_EXPIRY_SECOND;
 
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,11 @@ public class RefreshTokenDao {
 
     // refresh token redis 저장
     public void saveRefreshToken(String email, String refreshToken) {
-        redisTemplate.opsForValue().set(keyHeader + email, refreshToken, Duration.ofSeconds(REFRESH_TOKEN_EXPIRE_COUNT/1000));
+        redisTemplate.opsForValue().set(
+            keyHeader + email,
+            refreshToken,
+            Duration.ofSeconds(REFRESH_TOKEN_EXPIRY_SECOND.getExpiry())
+        );
     }
 
     // refresh token key 값으로 불러오기
