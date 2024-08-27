@@ -12,7 +12,6 @@ import com.fluffytime.domain.User;
 import com.fluffytime.repository.BookmarkRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,15 +32,11 @@ public class BookmarkService {
 
     // JWT 토큰에서 사용자 ID 추출
     public Long findUserByAccessToken(HttpServletRequest request) {
-        String accessToken = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
+        // JwtTokenizer의 getTokenFromCookie를 사용하여 쿠키에서 accessToken 추출
+        String accessToken = jwtTokenizer.getTokenFromCookie(request, "accessToken");
+
+        if (accessToken == null) {
+            throw new UserNotFound(); // 토큰이 없으면 예외 처리
         }
 
         return jwtTokenizer.getUserIdFromToken(accessToken);

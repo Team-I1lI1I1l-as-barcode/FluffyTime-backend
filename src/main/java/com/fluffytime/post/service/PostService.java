@@ -19,7 +19,6 @@ import com.fluffytime.post.exception.UnsupportedFileFormat;
 import com.fluffytime.repository.PostImagesRepository;
 import com.fluffytime.repository.PostRepository;
 import com.fluffytime.repository.UserRepository;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -142,26 +141,7 @@ public class PostService {
         Post post = postRepository.findById(id)
             .orElseThrow(PostNotFound::new);
 
-        // Post 엔티티를 PostResponse로 변환함
-        return new PostResponse(
-            post.getPostId(),
-            post.getContent(),
-            post.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
-                image.getImageId(),
-                image.getFilename(),
-                image.getFilepath(),
-                image.getFilesize(),
-                image.getMimetype(),
-                image.getDescription(),
-                image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
-            )).collect(Collectors.toList()),
-            post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
-            post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
-            post.getLikes().size(),
-            post.getLikes().stream()
-                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
-        );
+        return convertToPostResponse(post, currentUserId);
     }
 
     // 게시글 수정하기
@@ -187,7 +167,7 @@ public class PostService {
         // 게시물 내용을 업데이트함
         existingPost.setContent(postRequest.getContent());
 
-        // 새로운 파일이 업로드된 경우 이미지를 저장함(일단은 안됨)
+        // 새로운 파일이 업로드된 경우 이미지를 저장함
         if (files != null && files.length > 0) {
             savePostImages(files, existingPost);
         }
@@ -195,26 +175,7 @@ public class PostService {
         existingPost.setUpdatedAt(LocalDateTime.now());
         postRepository.save(existingPost);
 
-        // Post 엔티티를 PostResponse로 변환하여 반환
-        return new PostResponse(
-            existingPost.getPostId(),
-            existingPost.getContent(),
-            existingPost.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
-                image.getImageId(),
-                image.getFilename(),
-                image.getFilepath(),
-                image.getFilesize(),
-                image.getMimetype(),
-                image.getDescription(),
-                image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
-            )).collect(Collectors.toList()),
-            existingPost.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
-            existingPost.getUpdatedAt() != null ? existingPost.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
-            existingPost.getLikes().size(),
-            existingPost.getLikes().stream()
-                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
-        );
+        return convertToPostResponse(existingPost, currentUserId);
     }
 
     // 게시글 삭제하기
@@ -257,8 +218,66 @@ public class PostService {
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
             .collect(Collectors.toList());
 
-        // Post 엔티티 리스트를 PostResponse 리스트로 변환하여 반환
-        return tempPosts.stream().map(post -> new PostResponse(
+        return tempPosts.stream()
+            .map(post -> convertToPostResponse(post, currentUserId))
+            .collect(Collectors.toList());
+    }
+
+    // 파일 검증 로직
+    private void validateFiles(MultipartFile[] files) {
+        if (files == null) {
+            return;
+        }
+
+        checkFileCount(files);
+        for (MultipartFile file : files) {
+            checkFileSize(file);
+            checkFileFormat(file);
+        }
+    }
+
+    private void checkFileCount(MultipartFile[] files) {
+        if (files.length > 10) {
+            throw new TooManyFiles();
+        }
+    }
+
+    private void checkFileSize(MultipartFile file) {
+        if (file.getSize() > 10485760) {
+            throw new FileSizeExceeded();
+        }
+    }
+
+    private void checkFileFormat(MultipartFile file) {
+        if (!isSupportedFormat(file.getContentType())) {
+            throw new UnsupportedFileFormat();
+        }
+    }
+
+    // 지원되는 파일 형식인지 확인
+    private boolean isSupportedFormat(String contentType) {
+        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals(
+            "image/png"));
+    }
+
+    // jwtTokenizer.getTokenFromCookie를 통해 토큰 추출
+    @Transactional
+    public User findUserByAccessToken(HttpServletRequest httpServletRequest) {
+        log.info("findUserByAccessToken 실행");
+
+        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
+
+        if (accessToken == null) {
+            throw new UserNotFound();  // 토큰이 없으면 사용자 정보를 찾을 수 없음
+        }
+
+        Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
+        return userRepository.findById(userId).orElseThrow(UserNotFound::new);
+    }
+
+    // Post 엔티티를 PostResponse로 변환하는 메소드
+    private PostResponse convertToPostResponse(Post post, Long currentUserId) {
+        return new PostResponse(
             post.getPostId(),
             post.getContent(),
             post.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
@@ -276,51 +295,6 @@ public class PostService {
             post.getLikes().size(),
             post.getLikes().stream()
                 .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
-        )).collect(Collectors.toList());
-    }
-
-    // 파일 검증 로직
-    private void validateFiles(MultipartFile[] files) {
-        if (files == null) {
-            return; // null이면 파일 검증을 할 필요가 없음
-        }
-
-        if (files.length > 10) {
-            throw new TooManyFiles();
-        }
-        for (MultipartFile file : files) {
-            if (file.getSize() > 10485760) { // 10MB 이상
-                throw new FileSizeExceeded();
-            }
-            if (!isSupportedFormat(file.getContentType())) {
-                throw new UnsupportedFileFormat();
-            }
-        }
-    }
-
-    // 지원되는 파일 형식인지 확인
-    private boolean isSupportedFormat(String contentType) {
-        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals(
-            "image/png"));
-    }
-
-    // accessToken을 통해 사용자 정보 추출
-    @Transactional(readOnly = true)
-    public User findUserByAccessToken(HttpServletRequest httpServletRequest) {
-        log.info("findUserByAccessToken 실행");
-
-        String accessToken = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("accessToken".equals(cookie.getName())) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
-        
-        Long userId = jwtTokenizer.getUserIdFromToken(accessToken);
-        return userRepository.findById(userId).orElseThrow(UserNotFound::new);
+        );
     }
 }
