@@ -2,23 +2,25 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>게시물 수정하기</title>
+  <link rel="stylesheet" href="/css/post/postEdit.css">
+  <script src="/js/post/postEdit.js"></script>
 </head>
 <body>
-<div th:fragment="createModal" class="modal" id="postModal" style="display: none;">
+<div class="modal" id="postModal" style="display: flex;">
   <div class="modal-content">
-    <button class="close-btn" onclick="closePostCreationModal()">&times;</button> <!-- 모달 닫기 버튼 -->
-    <div class="post-header">새 게시물 만들기</div>
-    <form id="postForm" class="post-content" enctype="multipart/form-data" method="post">
+    <button class="close-btn" onclick="closePostEditModal()">&times;</button> <!-- 모달 닫기 버튼 -->
+    <div class="post-header">게시물 수정하기</div>
+    <form id="postEditForm" class="post-content" enctype="multipart/form-data" method="post"
+          th:action="@{/api/posts/edit/{id}(id=${postId})}">
       <div class="post-left-content" id="leftContent">
         <div id="imagePreviewContainer">
-          <img id="imagePreview" src="/image/post/photo.jpg">
+          <!-- 이미지 미리보기 -->
         </div>
-        <p id="dragDropText">사진과 동영상을 여기에 끌어다 놓으세요</p>
         <input type="file" id="images" name="images" accept="image/*" multiple
                onchange="previewImages(event)" style="display: none;"> <!-- 이미지 파일 선택 입력 -->
-        <button type="button" class="share-button" id="shareButton"
-                onclick="document.getElementById('images').click()">이미지 선택
+        <button type="button" class="share-button" id="shareButton" style="display: none;">
+          이미지 선택
         </button>
         <button class="nav-button prev" id="prevButton" style="display: none;"
                 onclick="prevImage(event)">&#10094;
@@ -40,9 +42,9 @@
           <hr>
           <!--태그-->
           <div class="tags-container">
-            <div id="tagList" class="tag-list"></div>
             <input type="text" id="tagsInput" name="tags" class="post-textarea"
-                   placeholder="#태그 입력 후 엔터를 누르세요" maxlength="20">
+                   placeholder="#태그 입력 후 엔터를 누르세요" maxlength="10">
+            <div id="tagList" class="tag-list"></div>
           </div>
 
           <hr>
@@ -64,17 +66,16 @@
         </div>
         <hr>
         <div class="options">
-          <a href="javascript:void(0);" onclick="openDraftModal()">임시 저장 글 불러오기</a>
-          <a href="javascript:void(0);" onclick="saveAsTemp(event)">임시저장</a>
-          <a href="javascript:void(0);" onclick="submitPost(event)">공유하기</a>
+          <button type="button" onclick="submitEditPost()">수정하기</button>
         </div>
       </div>
     </form>
     <div class="complete" id="complete-container" style="display: none;">
       <img src="/image/post/complete.jpg">
-      <p>게시물 등록이 완료되었습니다!</p>
+      <p>게시물 수정이 완료되었습니다!</p>
     </div>
   </div>
 </div>
+
 </body>
 </html>
