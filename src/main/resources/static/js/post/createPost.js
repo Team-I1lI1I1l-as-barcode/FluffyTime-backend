@@ -314,6 +314,8 @@ async function loadDraft() {
     if (contentType && contentType.includes('application/json')) {
       const tempPosts = await response.json(); // JSON 응답 파싱
 
+      console.log(tempPosts)
+
       if (tempPosts.length === 0) {
         tempPostsContainer.innerHTML = '<p>임시 저장된 글이 없습니다.</p>'; // 임시 저장된 글이 없을 경우 표시
       } else {
@@ -348,6 +350,9 @@ function continueDraft(post) {
   contentElement.value = post.content; // 게시물 내용을 입력 필드에 설정
   updateCharCount(); // 글자 수 업데이트
   currentDraftPostId = post.postId; // 현재 작성 중인 게시물의 ID 설정
+  tagsSet = new Set(post.tags);
+  console.log(tagsSet)
+  displayTagList();
 
   imagePreviewContainer.innerHTML = ''; // 이미지 미리보기 초기화
 

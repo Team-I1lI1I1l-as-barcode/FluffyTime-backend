@@ -46,12 +46,9 @@
         </div>
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
-      <div id="postContent" class="content"></div><!-- 게시물 내용 컨테이너 -->
+      <div id="postContent" class="post-content"></div><!-- 게시물 내용 컨테이너 -->
+      <div id="tagList" class="tag-list"></div><!--태그 목록-->
       <div id="comment-list" class="comment-list"></div> <!-- 댓글 목록 -->
-      <div class="comment-form">
-        <textarea id="comment-content" placeholder="댓글 내용 적기" required></textarea>
-        <button id="commentButton">작성</button> <!--postId에 댓글 달기-->
-      </div>
       <div class="postDetail-footer-box">
         <div class="liked-box-post">
           <!-- 좋아요 버튼 및 유저 목록 모달을 호출하는 부분 -->
@@ -67,6 +64,10 @@
                src="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"
                alt="북마크 아이콘" onclick="toggleBookmark()">
         </div>
+      </div>
+      <div class="comment-form">
+        <textarea id="comment-content" placeholder="댓글 달기 .." required></textarea>
+        <button id="commentButton">작성</button> <!--postId에 댓글 달기-->
       </div>
 
     </div>

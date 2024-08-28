@@ -19,6 +19,8 @@ public class TagService {
 
     @Transactional
     public void regTags(List<String> tags, Post post) {
+        tagPostRepository.deleteAllByPost(post);
+
         for (String name : tags) {
             Tag tag = tagRepository.findByTagName(name);
             if (tag == null) {

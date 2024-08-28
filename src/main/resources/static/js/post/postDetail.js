@@ -2,6 +2,7 @@ let currentPostId; // 현재 게시물의 ID를 저장하는 변수
 let currentImageIndex = 0;
 let imageUrls = []; // 이미지 URL 배열을 저장
 let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
+let tagsSet = new Set();
 
 // 사용자 프로필 정보 로드
 async function loadPostData(postId) {
@@ -34,6 +35,7 @@ async function loadPostData(postId) {
     const petNameElement = document.getElementById('petNameDisplay');
     const petSexElement = document.getElementById('petSexDisplay');
     const petAgeElement = document.getElementById('petAgeDisplay');
+    const tagList = document.getElementById('tagList');
 
     // 닉네임 설정
     nicknameElement.textContent = postData.nickname || '닉네임 없음';
@@ -57,6 +59,32 @@ async function loadPostData(postId) {
     // 이미지가 한 장일 경우 슬라이드 버튼을 숨김
     toggleSlideButtons(imageUrls.length, 'prevButton', 'nextButton');
 
+    // 태그 보여주기
+    if(postData.tags.length === 0) {
+      const noneTagElement = document.createElement('span');
+      noneTagElement.className = 'noneTag';
+      noneTagElement.innerText="태그 없음"
+      tagList.appendChild(noneTagElement); // 태그 리스트에 추가
+    } else {
+      tagsSet = new Set(postData.tags)
+      displayTagList()
+    }
+
+    function displayTagList() {
+      tagList.innerHTML = ''; // 기존 태그 리스트 초기화
+      tagsSet.forEach(tag => {
+        const tagElement = document.createElement('span');
+        tagElement.className = 'tag';
+
+        const tagText = document.createElement('span');
+        tagText.className = 'tag-text';
+        tagText.textContent = `#${tag}`;
+
+        tagElement.appendChild(tagText); // 태그 텍스트 추가
+        tagList.appendChild(tagElement); // 태그 리스트에 추가
+      });
+    }
+
     // 댓글 기능 상태에 따라 댓글 섹션과 댓글 작성 폼을 설정
     const commentSection = document.getElementById('comment-list');
     const commentForm = document.querySelector('.comment-form');
@@ -68,7 +96,7 @@ async function loadPostData(postId) {
       commentToggleButton.textContent = '댓글 기능 설정';
     } else {
       commentSection.style.display = 'block';
-      commentForm.style.display = 'block'; // 댓글 작성 폼 보이기 추가
+      commentForm.style.display = 'flex'; // 댓글 작성 폼 보이기 추가
       commentToggleButton.textContent = '댓글 기능 해제';
     }
     console.log(`초기화 후 comment section display 상태: ${commentSection.style.display}`);
