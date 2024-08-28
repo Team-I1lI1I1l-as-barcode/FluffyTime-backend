@@ -25,6 +25,7 @@ import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,10 +95,26 @@ public class PostService {
     @Transactional
     public Long createTempPost(PostRequest postRequest, MultipartFile[] files,
         HttpServletRequest request) {
-        // 업로드된 파일들의 유효성을 검증함
-        validateFiles(files);
 
         User user = findUserByAccessToken(request);
+
+        // 현재 사용자의 임시 저장 글 개수를 확인
+        List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus
+            (user.getUserId(), TempStatus.TEMP);
+
+        if (tempPosts.size() >= 20) {
+            // 가장 오래된 임시 저장 글을 삭제
+            Post oldestTempPost = tempPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt))
+                .findFirst()
+                .orElseThrow(PostNotFound::new);
+
+            postRepository.delete(oldestTempPost);
+            log.info("오래된 임시 저장 글 삭제, ID: {}", oldestTempPost.getPostId());
+        }
+
+        // 업로드된 파일들의 유효성을 검증함
+        validateFiles(files);
 
         // 임시 게시물을 생성함
         Post post = Post.builder()
@@ -221,15 +238,15 @@ public class PostService {
 
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
-    public List<PostResponse> getTempPosts(Long currentUserId) {
-        // 모든 게시글을 조회한 후, 임시 저장된 게시물만 필터링함
+   public List<PostResponse> getTempPosts(Long currentUserId) {
+        // 현재 사용자 ID와 임시 저장 글의 사용자 ID를 비교하여 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
-            .filter(post -> post.getTempStatus() == TempStatus.TEMP)
-            .collect(toList());
+            .filter(post -> post.getTempStatus() == TempStatus.TEMP && post.getUser().getUserId().equals(currentUserId))
+            .collect(Collectors.toList());
 
         return tempPosts.stream()
             .map(post -> convertToPostResponse(post, currentUserId))
-            .collect(toList());
+            .collect(Collectors.toList());
     }
 
     // 파일 검증 로직
