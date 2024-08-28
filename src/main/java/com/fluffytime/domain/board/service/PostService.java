@@ -1,5 +1,7 @@
 package com.fluffytime.domain.board.service;
 
+import static java.util.stream.Collectors.toList;
+
 import com.fluffytime.domain.board.exception.PostNotInTempStatus;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
@@ -24,7 +26,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -224,11 +225,11 @@ public class PostService {
         // 모든 게시글을 조회한 후, 임시 저장된 게시물만 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
             .filter(post -> post.getTempStatus() == TempStatus.TEMP)
-            .collect(Collectors.toList());
+            .collect(toList());
 
         return tempPosts.stream()
             .map(post -> convertToPostResponse(post, currentUserId))
-            .collect(Collectors.toList());
+            .collect(toList());
     }
 
     // 파일 검증 로직
@@ -295,6 +296,10 @@ public class PostService {
         String petSex = profile != null ? profile.getPetSex() : null;
         Long petAge = profile != null ? profile.getPetAge() : null;
 
+        // 해당 Post가 가지고 있는 태그 목록
+//        List<TagsResponse> tagsResponse = convertFromTagsToTagsResponse(post);
+        List<String> tags = convertToTagsName(post);
+
         return new PostResponse(
             post.getPostId(),
             post.getContent(),
@@ -306,7 +311,8 @@ public class PostService {
                 image.getMimetype(),
                 image.getDescription(),
                 image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
-            )).collect(Collectors.toList()),
+            )).collect(toList()),
+            tags,
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
             post.getUpdatedAt() != null ? post.getUpdatedAt().format(DateTimeFormatter.ISO_DATE_TIME) : null,
             post.getLikes().size(),
@@ -343,5 +349,18 @@ public class PostService {
         return post.getUser().getUserId().equals(user.getUserId());
     }
 
+/*    public List<TagsResponse> convertFromTagsToTagsResponse(Post post) {
+        return post.getTagPosts().stream().map(tagPost -> {
+            Long tagId = tagPost.getTag().getTagId();
+            String tagName = tagPost.getTag().getTagName();
+            return new TagsResponse(tagId, tagName);
+            }
+        ).toList();
+    }*/
+
+    public List<String> convertToTagsName(Post post) {
+        return post.getTagPosts().stream()
+            .map(tagPost -> tagPost.getTag().getTagName()).toList();
+    }
 
 }
