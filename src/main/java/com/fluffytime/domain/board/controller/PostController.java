@@ -14,7 +14,6 @@ public class PostController {
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable(name = "id") Long id, Model model) {
         model.addAttribute("postId", id);
-
         return "post/postDetail";
     }
 
@@ -22,7 +21,6 @@ public class PostController {
     @GetMapping("/edit/{id}")
     public String showEditPage(@PathVariable(name = "id") Long id, Model model) {
         model.addAttribute("postId", id);
-
         return "post/postEdit";
     }
 }
