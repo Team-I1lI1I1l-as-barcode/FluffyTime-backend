@@ -1,0 +1,51 @@
+.notification-title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.notification-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 2rem 0 0 0;
+}
+
+/* 알림을 감싸는 박스 스타일 */
+.notification-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border: 1px solid #C7C7C7;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.notificaiton-content-container {
+  display: flex; /* Flexbox 활성화 */
+  align-items: center; /* 세로 정렬 중앙에 배치 */
+  gap: 10px; /* 요소 간 간격 조정 (선택적) */
+}
+
+.profile-image {
+  width: 40px; /* 프로필 이미지 크기 조정 */
+  height: 40px; /* 프로필 이미지 크기 조정 */
+  border-radius: 50%; /* 프로필 이미지를 원형으로 만듬 */
+}
+
+.notification-content {
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+}
+
+/* 삭제 버튼 스타일 */
+.delete-button {
+  background: none;
+  color: #ff4d4d;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.delete-button:hover {
+  color: #ff1a1a;
+}

@@ -1,6 +1,7 @@
 package com.fluffytime.domain.board.entity;
 
 import com.fluffytime.domain.board.entity.enums.TempStatus;
+import com.fluffytime.domain.notification.entity.Notification;
 import com.fluffytime.domain.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -82,6 +83,13 @@ public class Post {
         orphanRemoval = true
     )
     private List<PostLike> likes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Notification> notifications = new ArrayList<>();
 
     @Column(name = "comments_disabled", nullable = false)
     private boolean commentsDisabled = false;
