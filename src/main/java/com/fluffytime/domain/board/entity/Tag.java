@@ -31,9 +31,9 @@ public class Tag {
     private String tagName;
 
     @OneToMany(
-        mappedBy = "tag",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
+        mappedBy = "tag"
+//        cascade = CascadeType.ALL,
+//        orphanRemoval = true
     )
     private List<TagPost> tagPosts = new ArrayList<>();
 

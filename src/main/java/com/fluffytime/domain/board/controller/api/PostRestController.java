@@ -1,5 +1,6 @@
 package com.fluffytime.domain.board.controller.api;
 
+import com.fluffytime.domain.board.service.TagService;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.board.dto.request.PostRequest;
 import com.fluffytime.domain.board.dto.response.PostResponse;

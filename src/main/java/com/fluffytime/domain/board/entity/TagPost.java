@@ -14,10 +14,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Entity
 @Getter
 @Setter
 @Table(name = "tag_post")
-@Entity
 @NoArgsConstructor
 public class TagPost {
 
