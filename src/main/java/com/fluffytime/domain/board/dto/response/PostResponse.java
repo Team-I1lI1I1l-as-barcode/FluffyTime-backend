@@ -12,6 +12,8 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     private Long postId;
     private String content;
     private List<ImageResponse> imageUrls;
+//    private List<TagsResponse> tags;
+    private List<String> tags;
     private String createdAt;
     private String updatedAt;
     private int likeCount;
@@ -37,4 +39,12 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
         private String description;
         private String uploadDate;
     }
+
+/*    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class TagsResponse {
+        private Long tagId;
+        private String tagName;
+    }*/
 }
