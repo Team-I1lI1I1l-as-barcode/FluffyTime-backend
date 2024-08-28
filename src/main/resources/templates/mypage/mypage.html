@@ -5,6 +5,7 @@
   <title>마이페이지</title>
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/mypage/mypage.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
   <script th:src="@{/js/post/createPost.js}" defer></script>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
@@ -42,8 +43,8 @@
           </button>
           <div id="profile_information_user">
             <p>게시물 <span id="posts_count"></span></p>
-            <p>팔로워 0 <span id="follower_count"></span></p>
-            <p> 팔로우 0 <span id="follow_count"></span></p>
+            <p>팔로워 <span id="follower_count"></span></p>
+            <p>팔로우 <span id="follow_count"></span></p>
           </div>
           <div id="profile_information_pet">
             <p id="pet_name"></p>
