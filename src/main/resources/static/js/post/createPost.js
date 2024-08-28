@@ -167,7 +167,12 @@ async function saveAsTemp(event) {
 
   const content = contentElement.value; // 게시물 내용 가져오기
   if (!content) {
-    alert('내용을 입력하세요.'); // 내용이 없을 경우 경고 왜냐믄 내용 입력 안 하면 등록이 안됨
+    alert('내용을 입력하세요.'); // 내용이 없을 경우 경고
+    return;
+  }
+
+  if (imagesArray.length === 0) {
+    alert('사진을 등록하세요.'); // 이미지가 없을 경우 경고
     return;
   }
 
@@ -187,7 +192,13 @@ async function submitPost(event) {
 
   const content = contentElement.value; // 게시물 내용 가져오기
   if (!content) {
-    return; // 내용이 없으면 아무것도 하지 않음
+    alert('내용을 입력하세요.'); // 내용이 없으면 경고 창 띄우고 종료
+    return;
+  }
+
+  if (imagesArray.length === 0) {
+    alert('사진을 등록하세요.'); // 이미지가 없을 경우 경고 창 띄우고 종료
+    return;
   }
 
   const postRequest = preparePostData(currentDraftPostId, content, imagesArray,
@@ -267,8 +278,6 @@ async function loadDraft() {
           tempPostsContainer.appendChild(postElement); // 컨테이너에 글 추가
         });
       }
-
-      tempPostsContainer.style.display = 'flex'; // 임시 저장된 글 리스트 표시
     }
   } catch (error) {
     console.error('임시 저장된 글 목록을 불러오는 중 오류 발생:', error);
@@ -307,7 +316,18 @@ function displayImages() {
     const img = document.createElement('img'); // 이미지 요소 생성
     img.src = imagesArray[currentImageIndex].url; // 이미지 소스 설정
     img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
+
+    // 이미지가 미리보기 영역을 꽉 채우도록 스타일 적용
     img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
+    img.style.width = '100%'; // 이미지 너비를 100%로 설정
+    img.style.height = '100%'; // 이미지 높이를 100%로 설정
+
+    imagePreviewContainer.style.display = 'flex'; // 컨테이너를 flex로 설정
+    imagePreviewContainer.style.alignItems = 'center'; // 수직 가운데 정렬
+    imagePreviewContainer.style.justifyContent = 'center'; // 수평 가운데 정렬
+    imagePreviewContainer.style.width = '100%'; // 컨테이너 너비 100%
+    imagePreviewContainer.style.height = '100%'; // 컨테이너 높이 100%
+
     imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
 
     prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부

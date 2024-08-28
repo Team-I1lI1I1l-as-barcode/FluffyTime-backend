@@ -5,7 +5,9 @@ import com.fluffytime.domain.board.dto.request.PostRequest;
 import com.fluffytime.domain.board.dto.response.PostResponse;
 import com.fluffytime.domain.board.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -115,9 +117,27 @@ public class PostRestController {
     public ResponseEntity<Void> deletePost(@PathVariable(name = "id") Long id,
         HttpServletRequest request) {
         log.info("게시물 삭제 요청 받음, ID: {}", id);
-
         postService.deletePost(id, request);
         log.info("게시물 삭제 성공, ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    // 댓글 기능 설정
+    @PostMapping("/toggle-comments/{id}")
+    public ResponseEntity<Void> toggleComments(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        postService.toggleComments(id, user);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    //현재 사용자가 게시물의 작성자인지 확인
+    @GetMapping("/is-author/{id}")
+    public ResponseEntity<Map<String, Boolean>> isAuthor(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        boolean isAuthor = postService.checkIfUserIsAuthor(id, user);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isAuthor", isAuthor);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 }

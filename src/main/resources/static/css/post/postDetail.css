@@ -171,6 +171,10 @@ body {
   color: red;
 }
 
+.dropdown-menu a.report {
+  color: red;
+}
+
 .edit-modal {
   display: none;
 }
@@ -197,24 +201,51 @@ body {
 .profile {
   display: flex;
   align-items: center;
-  margin-bottom: 5px; /* 하단 간격을 줄임 */
-  margin-top: 5px; /* 상단 간격을 줄임 */
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 .profile img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 20px; /* 이미지와 닉네임 사이 간격 */
+  margin-right: 20px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+#petInfo {
+  font-size: 14px;
+  color: #666; /* 펫 정보는 약간 연한 색으로 표시 */
+}
+
+#nicknameDisplay {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .post-header {
-  margin-bottom: 10px; /* 프로필 위쪽의 간격을 줄임 */
+  margin-bottom: 10px;
 }
 
 .post-content {
-  padding-top: 5px; /* 프로필 아래쪽의 간격을 줄임 */
+  padding-top: 5px;
   padding-bottom: 5px;
+}
+
+#petInfo span {
+  margin-right: 5px; /* 각 요소 사이에 5px 간격 추가 */
+}
+
+#petInfo span:last-child {
+  margin-right: 0; /* 마지막 요소는 간격을 추가하지 않음 */
+}
+
+#petSexDisplay {
+  font-weight: 900; /* 성별 텍스트를 매우 진하고 두껍게 표시 */
 }
 
 /*북마크*/

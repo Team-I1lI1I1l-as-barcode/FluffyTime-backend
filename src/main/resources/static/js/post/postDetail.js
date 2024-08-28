@@ -3,47 +3,23 @@ let currentImageIndex = 0;
 let imageUrls = []; // 이미지 URL 배열을 저장
 let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
 
-const imgElement = document.getElementById('profileImage');
-const nicknameElement = document.getElementById('nicknameDisplay');
-
 // 사용자 프로필 정보 로드
-fetch('/api/mypage/profiles/info', {
-  method: 'GET',
-  credentials: 'include',
-})
-.then(response => response.json())
-.then(data => {
-  const profileImageUrl = data.fileUrl;
-  const nickname = data.nickname;
-
-  // 닉네임이 존재하면 설정, 없으면 "닉네임 없음"으로 표시
-  if (nickname) {
-    nicknameElement.textContent = nickname;
-  } else {
-    nicknameElement.textContent = '닉네임 없음';
-  }
-
-  // 프로필 이미지가 존재하면 설정, 없으면 기본 이미지로 설정
-  if (profileImageUrl) {
-    imgElement.src = profileImageUrl;
-  } else {
-    imgElement.src = '/image/profile/profile.png';
-  }
-});
-
-// 게시물 데이터를 서버에서 불러와 화면에 로드하는 함수
 async function loadPostData(postId) {
   console.log(`게시물 데이터 로드 시작: ${postId}`);
   try {
     const response = await fetch(`/api/posts/detail/${postId}`);
+    console.log('API 호출 성공');
+
     if (!response.ok) {
       console.error('서버 응답 상태:', response.status);
       throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
 
     const postData = await response.json();
+    console.log('API로부터 받은 데이터:', postData);
 
     if (!postData || !postData.content) {
+      console.error('postData가 비어 있거나 유효하지 않습니다.');
       throw new Error('게시물 데이터가 올바르지 않습니다.');
     }
 
@@ -52,16 +28,50 @@ async function loadPostData(postId) {
     // 게시물 내용을 화면에 설정
     document.getElementById('postContent').innerText = postData.content;
 
+    // 사용자 정보 설정
+    const nicknameElement = document.getElementById('nicknameDisplay');
+    const profileImageElement = document.getElementById('profileImage');
+    const petNameElement = document.getElementById('petNameDisplay');
+    const petSexElement = document.getElementById('petSexDisplay');
+    const petAgeElement = document.getElementById('petAgeDisplay');
+
+    // 닉네임 설정
+    nicknameElement.textContent = postData.nickname || '닉네임 없음';
+
+    // 프로필 이미지 설정 (없으면 기본 이미지 사용)
+    profileImageElement.src = postData.profileImageurl || '/image/profile/profile.png';
+
+    // 펫 정보 설정 (없으면 공백으로 설정)
+    petNameElement.textContent = postData.petName || '';
+    petSexElement.textContent = postData.petSex || '';
+    petAgeElement.textContent = postData.petAge !== null ? postData.petAge : '';
+
     // 이미지 URL 배열을 업데이트
     imageUrls = postData.imageUrls || []; // postData.imageUrls가 undefined일 경우 빈 배열로 초기화
 
     console.log(imageUrls);
 
-    // 이미지 컨테이너 초기화 및 이미지 추가
+    // 이미지 컨테이너 업데이트 및 이미지 추가
     updateImageContainer('imageContainer', imageUrls);
 
     // 이미지가 한 장일 경우 슬라이드 버튼을 숨김
     toggleSlideButtons(imageUrls.length, 'prevButton', 'nextButton');
+
+    // 댓글 기능 상태에 따라 댓글 섹션과 댓글 작성 폼을 설정
+    const commentSection = document.getElementById('comment-list');
+    const commentForm = document.querySelector('.comment-form');
+    const commentToggleButton = document.querySelector('.dropdown-menu a.comment-toggle');
+
+    if (postData.commentsDisabled) {
+      commentSection.style.display = 'none';
+      commentForm.style.display = 'none'; // 댓글 작성 폼 숨기기 추가
+      commentToggleButton.textContent = '댓글 기능 설정';
+    } else {
+      commentSection.style.display = 'block';
+      commentForm.style.display = 'block'; // 댓글 작성 폼 보이기 추가
+      commentToggleButton.textContent = '댓글 기능 해제';
+    }
+    console.log(`초기화 후 comment section display 상태: ${commentSection.style.display}`);
 
   } catch (error) {
     console.error('게시물 데이터 로드 중 오류 발생:', error.message);
@@ -107,8 +117,7 @@ function prevImage(event) {
   console.log('이전 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
     // 현재 인덱스가 0이면 마지막 이미지로, 아니면 이전 이미지로 이동
-    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
-        : currentImageIndex - 1;
+    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1;
     showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
   }
 }
@@ -119,8 +128,7 @@ function nextImage(event) {
   console.log('다음 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
     // 현재 인덱스가 마지막이면 첫 번째 이미지로, 아니면 다음 이미지로 이동
-    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
-        : currentImageIndex + 1;
+    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1;
     showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
   }
 }
@@ -136,8 +144,7 @@ function toggleSlideButtons(length, prevBtnId, nextBtnId) {
 function openEditModal() {
   console.log('수정 모달 열기');
   document.getElementById('editModal').style.display = 'flex'; // 수정 모달을 보이게 설정
-  document.getElementById('editContent').value = document.getElementById(
-      'postContent').innerText; // 현재 게시물 내용을 수정 필드에 설정
+  document.getElementById('editContent').value = document.getElementById('postContent').innerText; // 현재 게시물 내용을 수정 필드에 설정
 
   // 이미지 인덱스를 초기화
   currentImageIndex = 0;
@@ -164,8 +171,7 @@ async function submitEdit() {
 
   // 수정된 게시물 데이터를 FormData 객체에 추가
   const formData = new FormData();
-  formData.append('post', new Blob([JSON.stringify({content: editedContent})],
-      {type: 'application/json'}));
+  formData.append('post', new Blob([JSON.stringify({ content: editedContent })], { type: 'application/json' }));
 
   try {
     // 서버에 수정된 게시물 데이터를 전송
@@ -228,8 +234,7 @@ function prevEditImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
   console.log('이전 수정 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
-        : currentImageIndex - 1; // 이전 이미지로 이동
+    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1; // 이전 이미지로 이동
     showImage(currentImageIndex, 'editImagePreviewContainer'); // 이미지를 업데이트
   }
 }
@@ -239,8 +244,7 @@ function nextEditImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
   console.log('다음 수정 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
-        : currentImageIndex + 1; // 다음 이미지로 이동
+    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1; // 다음 이미지로 이동
     showImage(currentImageIndex, 'editImagePreviewContainer'); // 이미지를 업데이트
   }
 }
@@ -262,8 +266,7 @@ function closePostDetailModal() {
 function toggleDropdownMenu() {
   console.log('드롭다운 메뉴 토글');
   const dropdownMenu = document.getElementById('dropdownMenu');
-  dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none'
-      : 'block'; // 드롭다운 메뉴를 보이거나 숨김
+  dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block'; // 드롭다운 메뉴를 보이거나 숨김
 }
 
 // 링크를 클립보드에 복사하는 함수
@@ -278,32 +281,47 @@ function copyLinkToClipboard() {
     console.error('링크 복사 중 오류 발생:', err);
     alert('링크 복사에 실패했습니다.'); // 오류 메시지 표시
   });
+  toggleDropdownMenu();
 }
 
-// URL에서 postId를 추출하여 게시물 데이터를 로드
-document.addEventListener('DOMContentLoaded', () => {
+// 페이지 로드 시 댓글 상태를 확인하여 초기 설정
+document.addEventListener('DOMContentLoaded', async () => {
   console.log('페이지 로드 완료');
 
   const path = window.location.pathname;
   const pathSegments = path.split('/');
   const postId = pathSegments[pathSegments.length - 1];
 
-  if (postId) { // postId가 존재하면
+  if (postId && !isNaN(postId)) {
+    currentPostId = postId; // currentPostId를 설정
     loadPostData(postId); // 게시물 데이터를 로드
     openPostDetailModal(); // 모달을 열기
     initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
 
+    const isAuthor = await checkIfUserIsAuthor(postId);
+
+    if (isAuthor) {
+      // 작성자인 경우 숨겨진 메뉴 항목을 표시
+      document.querySelector('.delete').style.display = 'block';
+      document.querySelector('.edit').style.display = 'block';
+      document.querySelector('.like-hide').style.display = 'block';
+      document.querySelector('.comment-toggle').style.display = 'block';
+      document.querySelector('.report').style.display = 'none'; // 작성자인 경우 신고 숨김
+    } else {
+      document.querySelector('.report').style.display = 'block'; // 작성자가 아닌 경우 신고 표시
+    }
+
     // 댓글/답글 버튼 클릭 시
     const commentButton = document.getElementById('commentButton');
     commentButton.onclick = function () {
-      postComment(postId); // 댓글 작성 함수 호출
-    }
+      postComment(postId);
+    };
   } else {
-    console.error('URL에서 postId를 찾을 수 없습니다.'); // postId가 없을 경우 오류 메시지 표시
+    console.error('URL에서 postId를 찾을 수 없습니다.');
   }
 });
 
-// 북마크 상태 초기화 함수
+// 북마크 상태 업데이트 함수
 async function initializeBookmarkState(postId) {
   try {
     // 북마크 상태 확인 요청
@@ -356,11 +374,10 @@ async function toggleBookmark() {
 
     if (isBookmarked) {
       // 이미 북마크된 경우, 북마크 삭제 요청
-      const response = await fetch(`/api/bookmarks/delete/${currentBookmarkId}`,
-          {
-            method: 'POST',
-            credentials: 'include'
-          });
+      const response = await fetch(`/api/bookmarks/delete/${currentBookmarkId}`, {
+        method: 'POST',
+        credentials: 'include'
+      });
 
       if (!response.ok) {
         throw new Error('북마크 삭제 실패: ' + response.statusText);
@@ -376,7 +393,7 @@ async function toggleBookmark() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({postId: currentPostId})
+        body: JSON.stringify({ postId: currentPostId })
       });
 
       if (!response.ok) {
@@ -389,5 +406,65 @@ async function toggleBookmark() {
     }
   } catch (error) {
     console.error('북마크 토글 중 오류 발생:', error.message);
+  }
+}
+
+// 댓글 기능 토글 함수
+async function toggleComments() {
+  try {
+    const response = await fetch(`/api/posts/toggle-comments/${currentPostId}`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('댓글 기능을 토글하는 중 문제가 발생했습니다.');
+    }
+
+    // 댓글 기능 상태를 확인하여 UI를 업데이트
+    const commentSection = document.getElementById('comment-list');
+    const commentForm = document.querySelector('.comment-form'); // 댓글 작성 폼
+    const commentToggleButtons = document.querySelectorAll('.dropdown-menu a.comment-toggle');
+
+    // 현재 상태를 체크하여 토글
+    commentToggleButtons.forEach(button => {
+      if (commentSection.style.display === 'none' && commentForm.style.display === 'none') {
+        commentSection.style.display = 'block';
+        commentForm.style.display = 'block'; // 댓글 작성 폼 보이기
+        if (button.innerText.trim() === '댓글 기능 설정') {
+          button.innerText = '댓글 기능 해제';
+        }
+      } else {
+        commentSection.style.display = 'none';
+        commentForm.style.display = 'none'; // 댓글 작성 폼 숨기기
+        if (button.innerText.trim() === '댓글 기능 해제') {
+          button.innerText = '댓글 기능 설정';
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('댓글 기능 토글 중 오류 발생:', error.message);
+    alert('댓글 기능을 토글하는 중 오류가 발생했습니다.');
+  }
+}
+
+// 작성자 여부 확인 함수
+async function checkIfUserIsAuthor(postId) {
+  try {
+    const response = await fetch(`/api/posts/is-author/${postId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('작성자 확인에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    return data.isAuthor; // 서버에서 반환된 true/false 값
+  } catch (error) {
+    console.error('작성자 확인 중 오류 발생:', error);
+    return false;
   }
 }

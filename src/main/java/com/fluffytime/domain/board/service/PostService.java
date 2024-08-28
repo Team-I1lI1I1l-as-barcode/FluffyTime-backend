@@ -1,6 +1,7 @@
 package com.fluffytime.domain.board.service;
 
 import com.fluffytime.domain.board.exception.PostNotInTempStatus;
+import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.PostNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
@@ -277,6 +278,16 @@ public class PostService {
 
     // Post 엔티티를 PostResponse로 변환하는 메소드
     private PostResponse convertToPostResponse(Post post, Long currentUserId) {
+        // 작성자(User) 정보 가져오기
+        User author = post.getUser();
+        Profile profile = author.getProfile(); // 작성자의 프로필 정보 가져오기
+
+        // Profile이 존재할 경우에만 관련 정보를 가져옴
+        String profileImageUrl = profile != null && profile.getProfileImages() != null ? profile.getProfileImages().getFilePath() : null;
+        String petName = profile != null ? profile.getPetName() : null;
+        String petSex = profile != null ? profile.getPetSex() : null;
+        Long petAge = profile != null ? profile.getPetAge() : null;
+
         return new PostResponse(
             post.getPostId(),
             post.getContent(),
@@ -290,11 +301,40 @@ public class PostService {
                 image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
             )).collect(Collectors.toList()),
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
-            post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            post.getUpdatedAt() != null ? post.getUpdatedAt().format(DateTimeFormatter.ISO_DATE_TIME) : null,
             post.getLikes().size(),
-            post.getLikes().stream()
-                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
+            post.getLikes().stream().anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
+            post.isCommentsDisabled(),
+            author.getNickname(),        // 작성자 닉네임
+            profileImageUrl,             // 프로필 이미지 URL
+            petName,                     // 반려동물 이름
+            petSex,                      // 반려동물 성별
+            petAge                       // 반려동물 나이
         );
     }
+
+    @Transactional
+    public void toggleComments(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFound::new);
+
+        // 요청한 사용자가 게시글 작성자인지 확인
+        if (!post.getUser().getUserId().equals(user.getUserId())) {
+            throw new UserNotFound(); // 권한이 없으면 UserNotFound 예외 발생
+        }
+
+        // 댓글 기능 상태를 토글
+        post.setCommentsDisabled(!post.isCommentsDisabled());
+        postRepository.save(post);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkIfUserIsAuthor(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFound::new);
+
+        return post.getUser().getUserId().equals(user.getUserId());
+    }
+
+
 }
