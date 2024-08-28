@@ -34,8 +34,15 @@
     <div class="right-content">
       <div class="header">
         <div class="profile">
-          <img id="profileImage" src="" alt="사용자의 프로필 이미지">
-          <span id="nicknameDisplay"></span>
+          <img id="profileImage" src="/image/profile/profile.png" alt="사용자의 프로필 이미지"> <!-- 기본 이미지 -->
+          <div class="profile-info">
+            <span id="nicknameDisplay"></span>
+            <div id="petInfo">
+              <span id="petNameDisplay"></span>
+              <span id="petSexDisplay"></span>
+              <span id="petAgeDisplay"></span>살
+            </div>
+          </div>
         </div>
         <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
       </div>
@@ -67,11 +74,13 @@
 </div>
 
 <div class="dropdown-menu" id="dropdownMenu"> <!-- 드롭다운 메뉴 -->
-  <a href="javascript:void(0);" class="delete" onclick="deletePost()">삭제</a>
-  <a href="javascript:void(0);" onclick="openEditModal()">수정</a>
-  <a href="javascript:void(0);">다른 사람에게 좋아요 수 숨기기</a>
-  <a href="javascript:void(0);" onclick="toggleComments()">댓글 기능 해제</a>
-  <a href="javascript:void(0);" onclick="copyLinkToClipboard()">링크 복사</a>
+  <a href="javascript:void(0);" class="delete" style="display:none;" onclick="deletePost()">삭제</a>
+  <a href="javascript:void(0);" class="edit" style="display:none;" onclick="openEditModal()">수정</a>
+  <a href="javascript:void(0);" class="like-hide" style="display:none;">다른 사람에게 좋아요 수 숨기기</a>
+  <a href="javascript:void(0);" class="comment-toggle" style="display:none;" onclick="toggleComments()">댓글 기능 해제</a>
+
+  <a href="javascript:void(0);" class="report" style="display: none;">신고</a>
+  <a href="javascript:void(0);" class="copy-link" onclick="copyLinkToClipboard()">링크 복사</a>
   <a href="javascript:void(0);" onclick="toggleDropdownMenu()">취소</a>
 </div>
 

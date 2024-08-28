@@ -17,6 +17,14 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     private String updatedAt;
     private int likeCount;
     private boolean isLiked;
+    private boolean commentsDisabled;
+
+    //작성자 정보
+    private String nickname;
+    private String profileImageurl;
+    private String petName;
+    private String petSex;
+    private Long petAge;
 
     @Getter
     @Setter
