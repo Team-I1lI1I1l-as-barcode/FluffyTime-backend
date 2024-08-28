@@ -1,20 +1,21 @@
 package com.fluffytime.domain.board.service;
 
-import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.domain.board.dto.request.CommentRequest;
 import com.fluffytime.domain.board.dto.response.CommentResponse;
-import com.fluffytime.global.common.exception.global.CommentNotFound;
-import com.fluffytime.global.common.exception.global.PostNotFound;
-import com.fluffytime.global.common.exception.global.UserNotFound;
+import com.fluffytime.domain.board.dto.response.ReplyResponse;
 import com.fluffytime.domain.board.entity.Comment;
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.board.entity.Reply;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.response.ReplyResponse;
 import com.fluffytime.domain.board.repository.CommentLikeRepository;
 import com.fluffytime.domain.board.repository.CommentRepository;
 import com.fluffytime.domain.board.repository.PostRepository;
+import com.fluffytime.domain.notification.service.NotificationService;
+import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
+import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.global.common.exception.global.CommentNotFound;
+import com.fluffytime.global.common.exception.global.PostNotFound;
+import com.fluffytime.global.common.exception.global.UserNotFound;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
     private final CommentLikeRepository commentLikeRepository;
+    private final NotificationService notificationService;
 
     //댓글 저장
     public void createComment(CommentRequest requestDto) {
@@ -48,6 +50,9 @@ public class CommentService {
             .post(post)
             .build();
         commentRepository.save(comment);
+
+        // 알림 생성 및 전송
+        notificationService.createCommentsNotification(post, comment.getUser());
     }
 
     //댓글 조회 - 게시글마다
