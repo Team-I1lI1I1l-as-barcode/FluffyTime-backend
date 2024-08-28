@@ -1,4 +1,4 @@
-.modal, .draft-modal {
+.modal {
   display: none;
   position: fixed;
   top: 0;
@@ -352,4 +352,21 @@ hr {
 
 .remove-btn:hover {
   color: #cc0000;
+}
+
+.modal-content .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content .header h3 {
+  margin: 20px;
+}
+
+#tempPostsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
