@@ -49,9 +49,6 @@ public class Post {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "comments_disabled", nullable = false)
-    private boolean commentsDisabled = false; //댓글 기능 해제
-
     @OneToMany(
         mappedBy = "post",
         cascade = CascadeType.ALL,
@@ -94,15 +91,17 @@ public class Post {
     )
     private List<Notification> notifications = new ArrayList<>();
 
+    @Column(name = "comments_disabled", nullable = false)
+    private boolean commentsDisabled = false;
+
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
-        LocalDateTime updatedAt, TempStatus tempStatus, User user, boolean commentsDisabled) {
+        LocalDateTime updatedAt, TempStatus tempStatus, User user) {
         this.postId = postId;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.tempStatus = tempStatus;
         this.user = user;
-        this.commentsDisabled = commentsDisabled;
     }
 }

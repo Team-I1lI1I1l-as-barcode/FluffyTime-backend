@@ -1,6 +1,7 @@
 let currentImageIndex = 0; // 현재 선택된 이미지의 인덱스를 저장
 let imagesArray = []; // 사용자가 업로드한 이미지 파일과 URL을 저장하는 배열
 let currentDraftPostId = null; // 현재 작성 중인 게시물의 임시 저장 ID를 저장
+let tagsSet = new Set(); // 게시물 tag 배열
 
 // 여러 DOM 요소들을 가져옵니다.
 const postModalElement = document.getElementById('postModal'); // 게시물 작성 모달
@@ -16,6 +17,73 @@ const contentElement = document.getElementById('content');
 const completeContainer = document.getElementById('complete-container'); // 게시물 등록 완료 후 표시되는 사진
 const imgElement = document.getElementById('profileImage'); // 사용자 프로필 이미지
 const nicknameElement = document.getElementById('nicknameDisplay'); // 사용자 닉네임
+
+
+// 태그 관련
+const tagsInputElement = document.getElementById('tagsInput');
+const tagList = document.getElementById('tagList');
+tagsInputElement.addEventListener("keydown", addTag)
+
+// 태그 정규표현식
+// 다양한 언어 문자 허용, 숫자 허용, '_' 허용, 유니코드 문자 지원
+const tagPattern = /^[\p{L}\p{N}_]+$/u;
+
+function addTag(event) {
+  // 엔터 키의 키 코드는 13
+  if (event.key === 'Enter') {
+    if(tagsSet.size > 10) {
+      alert("태그는 10개까지만 등록 가능합니다.")
+      tagsInputElement.value=""
+      return
+    }
+
+    let tag = tagsInputElement.value
+    tag = tag.trim().replace(/^#/,"")
+
+    if(tag.length > 20) {
+      alert("태그 길이는 최대 20자까지만 가능합니다.");
+      return;
+    }
+
+    if(tagPattern.test(tag)) {
+      tagsSet.add(tag);
+      tagsInputElement.value=""
+      displayTagList();
+    } else {
+      alert("등록할 수 없는 태그입니다.")
+    }
+  }
+}
+
+function displayTagList() {
+  tagList.innerHTML = ''; // 기존 태그 리스트 초기화
+  tagsSet.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag';
+
+    const tagText = document.createElement('span');
+    tagText.className = 'tag-text';
+    tagText.textContent = `#${tag}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'x';
+    removeBtn.className = 'remove-btn';
+    removeBtn.addEventListener("click", (event) => removeTag(event,tag))
+
+    tagElement.appendChild(tagText); // 태그 텍스트 추가
+    tagElement.appendChild(removeBtn); // 삭제 버튼 추가
+    tagList.appendChild(tagElement); // 태그 리스트에 추가
+  });
+}
+
+function removeTag(event, tag) {
+  event.preventDefault()
+  // 태그 배열에서 해당 태그를 제거
+  tagsSet.delete(tag);
+  console.log(tagsSet)
+  displayTagList(); // DOM 업데이트
+}
+
 
 // 프로필 정보를 ~~
 fetch('/api/mypage/profiles/info', {
@@ -103,15 +171,6 @@ function previewImages(event) {
   }
 }
 
-// 선택된 이미지를 화면에 표시하는 함수
-function displayImage(url) {
-  const img = document.createElement('img'); // 이미지 요소 생성
-  img.src = url; // 이미지 소스 설정
-  img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
-  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
-  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
-}
-
 // 글자 수를 업데이트하는 함수
 function updateCharCount() {
   const content = contentElement.value; // 입력된 내용 가져오기
@@ -119,12 +178,12 @@ function updateCharCount() {
 }
 
 // 게시물 데이터를 준비하는 함수
-function preparePostData(tempId, content, images, status) {
+function preparePostData(tempId, content, tagsSet ,status) {
   return {
     tempId: tempId, // 임시 저장된 게시물의 ID (없으면 null)
     content: content, // 게시물 내용
+    tags: Array.from(tagsSet),
     tempStatus: status, // 게시물 상태 (임시 저장 또는 최종 저장)
-    //imageUrls: images.map(image => image.url) // 이미지 URL 배열
   };
 }
 
@@ -167,11 +226,16 @@ async function saveAsTemp(event) {
 
   const content = contentElement.value; // 게시물 내용 가져오기
   if (!content) {
-    alert('내용을 입력하세요.'); // 내용이 없을 경우 경고 왜냐믄 내용 입력 안 하면 등록이 안됨
+    alert('내용을 입력하세요.'); // 내용이 없을 경우 경고
     return;
   }
 
-  const postRequest = preparePostData(null, content, imagesArray, 'TEMP'); // 임시 저장 요청 데이터 준비
+  if (imagesArray.length === 0) {
+    alert('사진을 등록하세요.'); // 이미지가 없을 경우 경고
+    return;
+  }
+
+  const postRequest = preparePostData(null, content, tagsSet,'TEMP'); // 임시 저장 요청 데이터 준비
 
   await submitPostData('/api/posts/temp-reg', postRequest, imagesArray); // 서버로 임시 저장 요청 전송
   alert('임시 저장되었습니다.'); // 임시 저장 완료 알림
@@ -187,11 +251,16 @@ async function submitPost(event) {
 
   const content = contentElement.value; // 게시물 내용 가져오기
   if (!content) {
-    return; // 내용이 없으면 아무것도 하지 않음
+    alert('내용을 입력하세요.'); // 내용이 없으면 경고 창 띄우고 종료
+    return;
   }
 
-  const postRequest = preparePostData(currentDraftPostId, content, imagesArray,
-      'SAVE'); // 최종 제출 요청 데이터 준비
+  if (imagesArray.length === 0) {
+    alert('사진을 등록하세요.'); // 이미지가 없을 경우 경고 창 띄우고 종료
+    return;
+  }
+
+  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,'SAVE'); // 최종 제출 요청 데이터 준비
 
   const data = await submitPostData('/api/posts/reg', postRequest, imagesArray); // 서버로 게시물 등록 요청 전송
   const postId = data?.data?.postId || data.data; // 응답에서 게시물 ID 가져오기
@@ -245,6 +314,8 @@ async function loadDraft() {
     if (contentType && contentType.includes('application/json')) {
       const tempPosts = await response.json(); // JSON 응답 파싱
 
+      console.log(tempPosts)
+
       if (tempPosts.length === 0) {
         tempPostsContainer.innerHTML = '<p>임시 저장된 글이 없습니다.</p>'; // 임시 저장된 글이 없을 경우 표시
       } else {
@@ -267,8 +338,6 @@ async function loadDraft() {
           tempPostsContainer.appendChild(postElement); // 컨테이너에 글 추가
         });
       }
-
-      tempPostsContainer.style.display = 'flex'; // 임시 저장된 글 리스트 표시
     }
   } catch (error) {
     console.error('임시 저장된 글 목록을 불러오는 중 오류 발생:', error);
@@ -281,6 +350,9 @@ function continueDraft(post) {
   contentElement.value = post.content; // 게시물 내용을 입력 필드에 설정
   updateCharCount(); // 글자 수 업데이트
   currentDraftPostId = post.postId; // 현재 작성 중인 게시물의 ID 설정
+  tagsSet = new Set(post.tags);
+  console.log(tagsSet)
+  displayTagList();
 
   imagePreviewContainer.innerHTML = ''; // 이미지 미리보기 초기화
 
@@ -299,6 +371,15 @@ function continueDraft(post) {
   openPostCreationModal(); // 게시물 작성 모달 열기
 }
 
+// 선택된 이미지를 화면에 표시하는 함수
+function displayImage(url) {
+  const img = document.createElement('img'); // 이미지 요소 생성
+  img.src = url; // 이미지 소스 설정
+  img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
+  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
+  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
+}
+
 // 현재 이미지를 화면에 표시하는 함수
 function displayImages() {
   imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
@@ -307,7 +388,10 @@ function displayImages() {
     const img = document.createElement('img'); // 이미지 요소 생성
     img.src = imagesArray[currentImageIndex].url; // 이미지 소스 설정
     img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
+
     img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
+
+    leftContent.classList.add('fullscreen'); // 왼쪽 컨텐츠 영역을 전체 화면 모드로 전환
     imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
 
     prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부
@@ -358,3 +442,4 @@ function nextImage(event) {
 document.getElementById("openModalBtn").addEventListener('click', function () {
   openPostCreationModal(); // "만들기" 버튼 클릭 시 게시물 작성 모달 열기
 });
+

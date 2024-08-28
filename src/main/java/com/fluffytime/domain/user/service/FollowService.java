@@ -1,15 +1,20 @@
 package com.fluffytime.domain.user.service;
 
 import com.fluffytime.domain.user.dto.request.FollowRequest;
-import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.global.common.exception.global.UserNotFound;
+import com.fluffytime.domain.user.dto.response.FollowCountResponse;
+import com.fluffytime.domain.user.dto.response.FollowListResponse;
 import com.fluffytime.domain.user.entity.Follow;
 import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.exception.FollowNotFound;
 import com.fluffytime.domain.user.repository.FollowRepository;
 import com.fluffytime.domain.user.repository.UserRepository;
+import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.global.common.exception.global.UserNotFound;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -57,7 +62,7 @@ public class FollowService {
         Follow follow = followRepository.findByFollowingUserUserIdAndFollowedUserUserId(
                 followRequest.getFollowingId(),
                 findUserByNickname(followRequest.getFollowedUserNickname()).getUserId())
-            .orElseThrow(UserNotFound::new);//TODO FollowNotFound로 바꾸기
+            .orElseThrow(FollowNotFound::new);
 
         // 팔로우 관계 삭제
         followRepository.delete(follow);
@@ -97,5 +102,35 @@ public class FollowService {
         Optional<User> user = userRepository.findByNickname(nickname);
 
         return user.orElseThrow(UserNotFound::new);
+    }
+
+    // 팔로워 및 팔로잉 수 조회 메서드
+    public FollowCountResponse getFollowCounts(String nickname) {
+
+        User user = userRepository.findByNickname(nickname)
+            .orElseThrow(UserNotFound::new);
+
+        int followerCount = followRepository.countByFollowedUser(user);
+        int followingCount = followRepository.countByFollowingUser(user);
+
+        return new FollowCountResponse(followerCount, followingCount);
+    }
+
+    // 팔로워 목록 조회 메서드
+    public List<FollowListResponse> findFollowersByUserId(Long userId) {
+        List<Follow> followers = followRepository.findByFollowedUserUserId(userId);
+
+        return followers.stream()
+            .map(follow -> new FollowListResponse(follow.getFollowingUser().getNickname()))
+            .collect(Collectors.toList());
+    }
+
+    // 팔로잉 목록 조회 메서드
+    public List<FollowListResponse> findFollowingsByUserId(Long userId) {
+        List<Follow> followings = followRepository.findByFollowingUserUserId(userId);
+
+        return followings.stream()
+            .map(follow -> new FollowListResponse(follow.getFollowedUser().getNickname()))
+            .collect(Collectors.toList());
     }
 }

@@ -11,7 +11,7 @@
   z-index: 2;
 }
 
-.modal-content, .draft-modal-content {
+.modal-content {
   background-color: #ffffff;
   width: 70%;
   max-width: 1200px;
@@ -217,16 +217,18 @@ input:checked + .slider:before {
   margin-top: auto;
 }
 
-.options a {
-  color: #fcd21d;
-  margin-bottom: 10px;
+.options button {
+  background-color: #fcd21d;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
   text-decoration: none;
-  font-size: 14px;
+  display: inline-block;
+  font-size: 16px;
   cursor: pointer;
-}
-
-.options a:hover {
-  color: #f0b90b;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 .close-btn {
@@ -261,112 +263,17 @@ hr {
   transform: translateX(-20px);
 }
 
-.temp-posts {
+#imagePreviewContainer {
   display: flex;
-  flex-direction: column; /* 세로로 정렬 */
+  justify-content: center;
   align-items: center;
-  margin-top: 20px;
-  width: 100%; /* 부모 요소의 너비에 맞추기 */
-}
-
-.temp-post {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 10px;
-  border-radius: 4px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  width: 80%;
-}
-
-.post-details {
-  display: flex;
-  flex-direction: row; /* 가로로 정렬 */
-  justify-content: space-between;
   width: 100%;
-  align-items: center;
+  height: 100%;
+  overflow: hidden; /* 이미지가 컨테이너를 벗어나지 않도록 함 */
 }
 
-.post-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  word-break: break-all;
-}
-
-.post-date {
-  margin-left: 10px;
-  white-space: nowrap;
-}
-
-.delete-link {
-  color: red;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.delete-link:hover {
-  text-decoration: underline;
-}
-
-#complete-container {
-  display: none; /* 기본적으로 숨겨두기 */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
-  text-align: center; /* 텍스트 가운데 정렬 */
-}
-
-.tag-list {
-  margin-top: 10px;
-  max-height: 150px; /* 최대 높이 설정 */
-  overflow-y: auto;  /* 세로 스크롤바 추가 */
-}
-
-.tag {
-  display: inline-block;
-  align-items: center;
-  background-color: rgba(255, 204, 0, 0.2);
-  color: #7f7f7f;
-  padding: 5px 10px;
-  margin: 5px;
-  border-radius: 10px;
-  font-size: 14px;
-  position: relative;
-  cursor: pointer;
-}
-
-.remove-btn {
-  background: none;
-  border: none;
-  color: #CCCCCC;
-  font-weight: bold;
-  margin-left: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.remove-btn:hover {
-  color: #cc0000;
-}
-
-.modal-content .header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content .header h3 {
-  margin: 20px;
-}
-
-#tempPostsContainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+#imagePreviewContainer img {
+  width: 100%;  /* 이미지를 가로로 꽉 채움 */
+  height: 100%; /* 이미지를 세로로 꽉 채움 */
+  object-fit: cover; /* 이미지 비율을 유지하며, 컨테이너에 맞게 잘라서 표시 */
 }

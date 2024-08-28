@@ -1,6 +1,9 @@
 package com.fluffytime.domain.board.service;
 
+import static java.util.stream.Collectors.toList;
+
 import com.fluffytime.domain.board.exception.PostNotInTempStatus;
+import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.PostNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
@@ -22,8 +25,8 @@ import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -40,6 +43,7 @@ public class PostService {
     private final PostImagesRepository postImagesRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
+    private final TagService tagService;
 
     // 게시글 등록하기
     @Transactional
@@ -81,6 +85,9 @@ public class PostService {
             savePostImages(files, post);
         }
 
+        // 태그 등록 로직
+        tagService.regTags(postRequest.getTags(), post);
+
         return post.getPostId();  // 생성된 게시물의 ID를 반환
     }
 
@@ -88,10 +95,26 @@ public class PostService {
     @Transactional
     public Long createTempPost(PostRequest postRequest, MultipartFile[] files,
         HttpServletRequest request) {
-        // 업로드된 파일들의 유효성을 검증함
-        validateFiles(files);
 
         User user = findUserByAccessToken(request);
+
+        // 현재 사용자의 임시 저장 글 개수를 확인
+        List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus
+            (user.getUserId(), TempStatus.TEMP);
+
+        if (tempPosts.size() >= 20) {
+            // 가장 오래된 임시 저장 글을 삭제
+            Post oldestTempPost = tempPosts.stream()
+                .sorted(Comparator.comparing(Post::getCreatedAt))
+                .findFirst()
+                .orElseThrow(PostNotFound::new);
+
+            postRepository.delete(oldestTempPost);
+            log.info("오래된 임시 저장 글 삭제, ID: {}", oldestTempPost.getPostId());
+        }
+
+        // 업로드된 파일들의 유효성을 검증함
+        validateFiles(files);
 
         // 임시 게시물을 생성함
         Post post = Post.builder()
@@ -102,6 +125,9 @@ public class PostService {
             .build();
 
         postRepository.save(post);
+
+        // 태그 등록 로직
+        tagService.regTags(postRequest.getTags(), post);
 
         if (files != null && files.length > 0) {
             savePostImages(files, post);
@@ -212,10 +238,10 @@ public class PostService {
 
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
-    public List<PostResponse> getTempPosts(Long currentUserId) {
-        // 모든 게시글을 조회한 후, 임시 저장된 게시물만 필터링함
+   public List<PostResponse> getTempPosts(Long currentUserId) {
+        // 현재 사용자 ID와 임시 저장 글의 사용자 ID를 비교하여 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
-            .filter(post -> post.getTempStatus() == TempStatus.TEMP)
+            .filter(post -> post.getTempStatus() == TempStatus.TEMP && post.getUser().getUserId().equals(currentUserId))
             .collect(Collectors.toList());
 
         return tempPosts.stream()
@@ -277,6 +303,20 @@ public class PostService {
 
     // Post 엔티티를 PostResponse로 변환하는 메소드
     private PostResponse convertToPostResponse(Post post, Long currentUserId) {
+        // 작성자(User) 정보 가져오기
+        User author = post.getUser();
+        Profile profile = author.getProfile(); // 작성자의 프로필 정보 가져오기
+
+        // Profile이 존재할 경우에만 관련 정보를 가져옴
+        String profileImageUrl = profile != null && profile.getProfileImages() != null ? profile.getProfileImages().getFilePath() : null;
+        String petName = profile != null ? profile.getPetName() : null;
+        String petSex = profile != null ? profile.getPetSex() : null;
+        Long petAge = profile != null ? profile.getPetAge() : null;
+
+        // 해당 Post가 가지고 있는 태그 목록
+//        List<TagsResponse> tagsResponse = convertFromTagsToTagsResponse(post);
+        List<String> tags = convertToTagsName(post);
+
         return new PostResponse(
             post.getPostId(),
             post.getContent(),
@@ -288,13 +328,56 @@ public class PostService {
                 image.getMimetype(),
                 image.getDescription(),
                 image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
-            )).collect(Collectors.toList()),
+            )).collect(toList()),
+            tags,
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
-            post.getUpdatedAt() != null ? post.getUpdatedAt()
-                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            post.getUpdatedAt() != null ? post.getUpdatedAt().format(DateTimeFormatter.ISO_DATE_TIME) : null,
             post.getLikes().size(),
-            post.getLikes().stream()
-                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId))
+            post.getLikes().stream().anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
+            post.isCommentsDisabled(),
+            author.getNickname(),        // 작성자 닉네임
+            profileImageUrl,             // 프로필 이미지 URL
+            petName,                     // 반려동물 이름
+            petSex,                      // 반려동물 성별
+            petAge                       // 반려동물 나이
         );
     }
+
+    @Transactional
+    public void toggleComments(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFound::new);
+
+        // 요청한 사용자가 게시글 작성자인지 확인
+        if (!post.getUser().getUserId().equals(user.getUserId())) {
+            throw new UserNotFound(); // 권한이 없으면 UserNotFound 예외 발생
+        }
+
+        // 댓글 기능 상태를 토글
+        post.setCommentsDisabled(!post.isCommentsDisabled());
+        postRepository.save(post);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkIfUserIsAuthor(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFound::new);
+
+        return post.getUser().getUserId().equals(user.getUserId());
+    }
+
+/*    public List<TagsResponse> convertFromTagsToTagsResponse(Post post) {
+        return post.getTagPosts().stream().map(tagPost -> {
+            Long tagId = tagPost.getTag().getTagId();
+            String tagName = tagPost.getTag().getTagName();
+            return new TagsResponse(tagId, tagName);
+            }
+        ).toList();
+    }*/
+
+    public List<String> convertToTagsName(Post post) {
+        return post.getTagPosts().stream()
+            .map(tagPost -> tagPost.getTag().getTagName()).toList();
+    }
+
 }
