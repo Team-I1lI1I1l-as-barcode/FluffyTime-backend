@@ -43,8 +43,13 @@ async function loadPostData(postId) {
 
     // 펫 정보 설정 (없으면 공백으로 설정)
     petNameElement.textContent = postData.petName || '';
-    petSexElement.textContent = postData.petSex || '';
-    petAgeElement.textContent = postData.petAge !== null ? postData.petAge : '';
+    petSexElement.textContent = postData.petSex && postData.petSex !== 'none' ? postData.petSex : '';
+    if (postData.petAge) {
+      petAgeElement.textContent = postData.petAge;
+      document.getElementById('petAgeWrapper').style.display = 'inline';  // "살" 텍스트 포함 영역 보이기
+    } else {
+      document.getElementById('petAgeWrapper').style.display = 'none';  // "살" 텍스트 포함 영역 숨기기
+    }
 
     // 이미지 URL 배열을 업데이트
     imageUrls = postData.imageUrls || []; // postData.imageUrls가 undefined일 경우 빈 배열로 초기화
@@ -140,115 +145,6 @@ function toggleSlideButtons(length, prevBtnId, nextBtnId) {
   document.getElementById(nextBtnId).style.display = displayValue; // 다음 버튼
 }
 
-// 수정 모달을 여는 함수
-function openEditModal() {
-  console.log('수정 모달 열기');
-  document.getElementById('editModal').style.display = 'flex'; // 수정 모달을 보이게 설정
-  document.getElementById('editContent').value = document.getElementById('postContent').innerText; // 현재 게시물 내용을 수정 필드에 설정
-
-  // 이미지 인덱스를 초기화
-  currentImageIndex = 0;
-
-  // 이미지 컨테이너를 업데이트
-  updateImageContainer('editImagePreviewContainer', imageUrls);
-
-  // 슬라이드 버튼을 토글
-  toggleSlideButtons(imageUrls.length, 'prevEditButton', 'nextEditButton');
-
-  toggleDropdownMenu(); // 드롭다운 메뉴를 닫음
-}
-
-// 수정 모달을 닫는 함수
-function closeEditModal() {
-  console.log('수정 모달 닫기');
-  document.getElementById('editModal').style.display = 'none'; // 수정 모달을 숨김
-}
-
-// 게시물을 수정하는 함수
-async function submitEdit() {
-  console.log('게시물 수정 시작');
-  const editedContent = document.getElementById('editContent').value; // 수정된 게시물 내용을 가져옴
-
-  // 수정된 게시물 데이터를 FormData 객체에 추가
-  const formData = new FormData();
-  formData.append('post', new Blob([JSON.stringify({ content: editedContent })], { type: 'application/json' }));
-
-  try {
-    // 서버에 수정된 게시물 데이터를 전송
-    const response = await fetch(`/api/posts/edit/${currentPostId}`, {
-      method: 'POST',
-      body: formData,
-      credentials: 'include'  // 인증 정보를 포함하여 요청을 보냄
-    });
-
-    if (!response.ok) { // 응답 상태가 정상인지 확인
-      const errorData = await response.json();
-      throw new Error(errorData.message || '게시물 수정 실패');
-    }
-
-    console.log('게시물 수정 완료');
-
-    // 화면에 수정된 게시물 내용을 업데이트
-    document.getElementById('postContent').innerText = editedContent;
-
-    alert('게시물이 수정되었습니다.'); // 성공 메시지 표시
-    closeEditModal(); // 수정 모달을 닫음
-  } catch (error) {
-    console.error('게시물 수정 중 오류 발생:', error);
-    alert(error.message || '게시물 수정에 실패했습니다.'); // 오류 메시지 표시
-  }
-}
-
-// 게시물을 삭제하는 함수
-async function deletePost() {
-  console.log('게시물 삭제 시작');
-  if (currentPostId) { // 현재 게시물 ID가 있는지 확인
-    try {
-      // 서버에 게시물 삭제 요청을 보냄
-      const response = await fetch(`/api/posts/delete/${currentPostId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) { // 응답 상태가 정상인지 확인
-        const errorData = await response.json();
-        throw new Error(errorData.message || '게시물 삭제 실패');
-      }
-
-      console.log('게시물 삭제 완료');
-      alert('게시물이 삭제되었습니다.'); // 성공 메시지 표시
-      window.location.href = '/'; // 메인 페이지로 이동
-    } catch (error) {
-      console.error('게시물 삭제 중 오류 발생:', error);
-      alert(error.message || '게시물 삭제에 실패했습니다.'); // 오류 메시지 표시
-    }
-  } else {
-    console.error('URL에서 postId를 찾을 수 없습니다.'); // 게시물 ID가 없을 경우 오류 메시지 표시
-  }
-}
-
-// 이전 수정 이미지를 표시하는 함수
-function prevEditImage(event) {
-  event.preventDefault(); // 기본 이벤트 동작을 방지
-  console.log('이전 수정 이미지 표시');
-  if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1; // 이전 이미지로 이동
-    showImage(currentImageIndex, 'editImagePreviewContainer'); // 이미지를 업데이트
-  }
-}
-
-// 다음 수정 이미지를 표시하는 함수
-function nextEditImage(event) {
-  event.preventDefault(); // 기본 이벤트 동작을 방지
-  console.log('다음 수정 이미지 표시');
-  if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1; // 다음 이미지로 이동
-    showImage(currentImageIndex, 'editImagePreviewContainer'); // 이미지를 업데이트
-  }
-}
-
 // 모달을 여는 함수
 function openPostDetailModal() {
   console.log('모달 열기');
@@ -303,7 +199,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (isAuthor) {
       // 작성자인 경우 숨겨진 메뉴 항목을 표시
       document.querySelector('.delete').style.display = 'block';
-      document.querySelector('.edit').style.display = 'block';
+      document.querySelector('.edit').style.display = 'block'; // 수정 버튼 표시
       document.querySelector('.like-hide').style.display = 'block';
       document.querySelector('.comment-toggle').style.display = 'block';
       document.querySelector('.report').style.display = 'none'; // 작성자인 경우 신고 숨김
@@ -468,3 +364,45 @@ async function checkIfUserIsAuthor(postId) {
     return false;
   }
 }
+
+// 게시물 수정 페이지로 이동하는 함수
+function editPost() {
+  window.location.href = `/posts/edit/${currentPostId}`;
+}
+
+// 페이지 로드 시 댓글 상태를 확인하여 초기 설정
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('페이지 로드 완료');
+
+  const path = window.location.pathname;
+  const pathSegments = path.split('/');
+  const postId = pathSegments[pathSegments.length - 1];
+
+  if (postId && !isNaN(postId)) {
+    currentPostId = postId; // currentPostId를 설정
+    loadPostData(postId); // 게시물 데이터를 로드
+    openPostDetailModal(); // 모달을 열기
+    initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
+
+    const isAuthor = await checkIfUserIsAuthor(postId);
+
+    if (isAuthor) {
+      // 작성자인 경우 숨겨진 메뉴 항목을 표시
+      document.querySelector('.delete').style.display = 'block';
+      document.querySelector('.edit').style.display = 'block'; // 수정 버튼 표시
+      document.querySelector('.like-hide').style.display = 'block';
+      document.querySelector('.comment-toggle').style.display = 'block';
+      document.querySelector('.report').style.display = 'none'; // 작성자인 경우 신고 숨김
+    } else {
+      document.querySelector('.report').style.display = 'block'; // 작성자가 아닌 경우 신고 표시
+    }
+
+    // 댓글/답글 버튼 클릭 시
+    const commentButton = document.getElementById('commentButton');
+    commentButton.onclick = function () {
+      postComment(postId);
+    };
+  } else {
+    console.error('URL에서 postId를 찾을 수 없습니다.');
+  }
+});

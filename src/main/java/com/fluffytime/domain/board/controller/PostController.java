@@ -13,8 +13,16 @@ public class PostController {
     // 게시물 상세보기 화면
     @GetMapping("/detail/{id}")
     public String postDetailView(@PathVariable(name = "id") Long id, Model model) {
-        model.addAttribute("postId", id); // 모델에 게시물 ID 추가
+        model.addAttribute("postId", id);
 
         return "post/postDetail";
+    }
+
+    // 게시물 수정 화면
+    @GetMapping("/edit/{id}")
+    public String showEditPage(@PathVariable(name = "id") Long id, Model model) {
+        model.addAttribute("postId", id);
+
+        return "post/postEdit";
     }
 }
