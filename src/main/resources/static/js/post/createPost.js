@@ -171,15 +171,6 @@ function previewImages(event) {
   }
 }
 
-// 선택된 이미지를 화면에 표시하는 함수
-function displayImage(url) {
-  const img = document.createElement('img'); // 이미지 요소 생성
-  img.src = url; // 이미지 소스 설정
-  img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
-  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
-  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
-}
-
 // 글자 수를 업데이트하는 함수
 function updateCharCount() {
   const content = contentElement.value; // 입력된 내용 가져오기
@@ -375,6 +366,15 @@ function continueDraft(post) {
   openPostCreationModal(); // 게시물 작성 모달 열기
 }
 
+// 선택된 이미지를 화면에 표시하는 함수
+function displayImage(url) {
+  const img = document.createElement('img'); // 이미지 요소 생성
+  img.src = url; // 이미지 소스 설정
+  img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
+  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
+  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
+}
+
 // 현재 이미지를 화면에 표시하는 함수
 function displayImages() {
   imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
@@ -384,17 +384,9 @@ function displayImages() {
     img.src = imagesArray[currentImageIndex].url; // 이미지 소스 설정
     img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
 
-    // 이미지가 미리보기 영역을 꽉 채우도록 스타일 적용
     img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
-    img.style.width = '100%'; // 이미지 너비를 100%로 설정
-    img.style.height = '100%'; // 이미지 높이를 100%로 설정
 
-    imagePreviewContainer.style.display = 'flex'; // 컨테이너를 flex로 설정
-    imagePreviewContainer.style.alignItems = 'center'; // 수직 가운데 정렬
-    imagePreviewContainer.style.justifyContent = 'center'; // 수평 가운데 정렬
-    imagePreviewContainer.style.width = '100%'; // 컨테이너 너비 100%
-    imagePreviewContainer.style.height = '100%'; // 컨테이너 높이 100%
-
+    leftContent.classList.add('fullscreen'); // 왼쪽 컨텐츠 영역을 전체 화면 모드로 전환
     imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
 
     prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부
