@@ -45,7 +45,7 @@
       </div>
 
       <!-- 팔로워 리스트를 보여줄 모달 -->
-      <div id="follow-modal" class="follow-modal">
+      <div id="followerList-modal" class="follow-modal">
         <div class="follow-modal-content">
           <span class="follow-close">&times;</span>
           <h2>팔로워 목록</h2>
@@ -53,6 +53,14 @@
         </div>
       </div>
 
+      <!-- 팔로잉 리스트를 보여줄 모달 -->
+      <div id="followingList-modal" class="follow-modal">
+        <div class="follow-modal-content">
+          <span class="follow-close">&times;</span>
+          <h2>팔로잉 목록</h2>
+          <ul id="followingList"></ul>
+        </div>
+      </div>
 
       <div id="profile_container">
         <!-- 이미지 미리보기 및 출력 영역 -->
@@ -70,8 +78,8 @@
 
           <div id="profile_information_user">
             <p>게시물 <span id="posts_count"></span></p>
-            <p>팔로워 <span id="follower_count"></span></p>
-            <p>팔로우 <span id="follow_count"></span></p>
+            <p id="follower_list_modal">팔로워 <span id="follower_count"></span></p>
+            <p id="following_list_modal">팔로우 <span id="follow_count"></span></p>
           </div>
           <div id="profile_information_pet">
             <p id="pet_name"></p>

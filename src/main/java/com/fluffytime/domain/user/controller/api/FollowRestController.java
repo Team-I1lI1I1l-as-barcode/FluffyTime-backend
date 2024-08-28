@@ -2,10 +2,12 @@ package com.fluffytime.domain.user.controller.api;
 
 import com.fluffytime.domain.user.dto.request.FollowRequest;
 import com.fluffytime.domain.user.dto.response.FollowCountResponse;
+import com.fluffytime.domain.user.dto.response.FollowListResponse;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.service.FollowService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -90,6 +92,46 @@ public class FollowRestController {
         try {
             FollowCountResponse followCountResponse = followService.getFollowCounts(nickname);
             return ResponseEntity.status(HttpStatus.OK).body(followCountResponse);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    //팔로워 목록 조회
+    @GetMapping("/search/followers/{nickname}")
+    public ResponseEntity<List<FollowListResponse>> findFollowers(
+        @PathVariable(name = "nickname") String nickname) {
+        log.info("/api/follow/search/followers/{} 호출됨", nickname);
+
+        try {
+            User user = followService.findUserByNickname(nickname);
+
+            // 유저의 팔로워 목록 가져오기
+            List<FollowListResponse> followListResponses = followService.findFollowersByUserId(
+                user.getUserId());
+
+            return ResponseEntity.status(HttpStatus.OK).body(followListResponses);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+
+    }
+
+    //팔로잉 목록 조회
+    @GetMapping("/search/followings/{nickname}")
+    public ResponseEntity<List<FollowListResponse>> findFollowings(
+        @PathVariable(name = "nickname") String nickname) {
+        log.info("/api/follow/search/followings/{} 호출됨", nickname);
+
+        try {
+            User user = followService.findUserByNickname(nickname);
+
+            // 유저의 팔로워 목록 가져오기
+            List<FollowListResponse> followListResponses = followService.findFollowingsByUserId(
+                user.getUserId());
+
+            return ResponseEntity.status(HttpStatus.OK).body(followListResponses);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
