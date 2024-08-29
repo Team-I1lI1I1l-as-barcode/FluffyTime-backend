@@ -12,9 +12,9 @@ import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.UserNotFound;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -96,7 +96,7 @@ public class FollowService {
         return user;
     }
 
-
+    //닉네임으로 사용자 조회
     @Transactional
     public User findUserByNickname(String nickname) {
         Optional<User> user = userRepository.findByNickname(nickname);
@@ -119,18 +119,69 @@ public class FollowService {
     // 팔로워 목록 조회 메서드
     public List<FollowListResponse> findFollowersByUserId(Long userId) {
         List<Follow> followers = followRepository.findByFollowedUserUserId(userId);
+        List<FollowListResponse> followListResponses = new ArrayList<>();
 
-        return followers.stream()
-            .map(follow -> new FollowListResponse(follow.getFollowingUser().getNickname()))
-            .collect(Collectors.toList());
+        for (Follow follow : followers) {
+            User followingUser = follow.getFollowingUser();
+            String profileImageUrl = "https://via.placeholder.com/150";
+            if (followingUser.getProfile().getProfileImages() != null
+                && followingUser.getProfile().getProfileImages().getFilePath() != null) {
+                profileImageUrl = followingUser.getProfile().getProfileImages().getFilePath();
+            }
+
+            String intro = "자기 소개 없음";
+            if (followingUser.getProfile().getIntro() != null && !followingUser.getProfile()
+                .getIntro().isEmpty()) {
+                intro = followingUser.getProfile().getIntro();
+
+                // intro가 15자를 넘으면 잘라내고 "..."을 붙여줌
+                if (intro.length() > 15) {
+                    intro = intro.substring(0, 15) + "...";
+                }
+            }
+
+            FollowListResponse response = new FollowListResponse(
+                followingUser.getNickname(),
+                profileImageUrl, // 프로필 사진 URL
+                intro // 한줄 소개
+            );
+            followListResponses.add(response);
+        }
+
+        return followListResponses;
     }
 
     // 팔로잉 목록 조회 메서드
     public List<FollowListResponse> findFollowingsByUserId(Long userId) {
         List<Follow> followings = followRepository.findByFollowingUserUserId(userId);
+        List<FollowListResponse> followListResponses = new ArrayList<>();
 
-        return followings.stream()
-            .map(follow -> new FollowListResponse(follow.getFollowedUser().getNickname()))
-            .collect(Collectors.toList());
+        for (Follow follow : followings) {
+            User followedUser = follow.getFollowedUser();
+            String profileImageUrl = "https://via.placeholder.com/150";
+            if (followedUser.getProfile().getProfileImages() != null
+                && followedUser.getProfile().getProfileImages().getFilePath() != null) {
+                profileImageUrl = followedUser.getProfile().getProfileImages().getFilePath();
+            }
+
+            String intro = "자기 소개 없음";
+            if (followedUser.getProfile().getIntro() != null && !followedUser.getProfile()
+                .getIntro().isEmpty()) {
+                intro = followedUser.getProfile().getIntro();
+
+                if (intro.length() > 15) {
+                    intro = intro.substring(0, 15) + "...";
+                }
+            }
+
+            FollowListResponse response = new FollowListResponse(
+                followedUser.getNickname(),
+                profileImageUrl, // 프로필 사진 URL
+                intro // 한줄 소개
+            );
+            followListResponses.add(response);
+        }
+
+        return followListResponses;
     }
 }

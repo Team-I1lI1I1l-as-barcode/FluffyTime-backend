@@ -106,7 +106,7 @@ public class FollowRestController {
         try {
             User user = followService.findUserByNickname(nickname);
 
-            // 유저의 팔로워 목록 가져오기
+            // 대상 유저의 팔로워 목록 가져오기
             List<FollowListResponse> followListResponses = followService.findFollowersByUserId(
                 user.getUserId());
 
@@ -114,8 +114,6 @@ public class FollowRestController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-
     }
 
     //팔로잉 목록 조회
@@ -127,7 +125,7 @@ public class FollowRestController {
         try {
             User user = followService.findUserByNickname(nickname);
 
-            // 유저의 팔로워 목록 가져오기
+            // 대상 유저의 팔로잉 목록 가져오기
             List<FollowListResponse> followListResponses = followService.findFollowingsByUserId(
                 user.getUserId());
 
