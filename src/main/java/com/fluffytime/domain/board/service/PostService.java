@@ -81,9 +81,9 @@ public class PostService {
         postRepository.save(post);
         }
 
-        // 이미지 저장 로직
+        // 파일 저장 로직
         if (files != null && files.length > 0) {
-            savePostImages(files, post);
+            savePostFiles(files, post);
         }
 
         // 태그 등록 로직
@@ -131,17 +131,17 @@ public class PostService {
         tagService.regTags(postRequest.getTags(), post);
 
         if (files != null && files.length > 0) {
-            savePostImages(files, post);
+            savePostFiles(files, post);
         }
 
         return post.getPostId(); // 생성된 임시 게시물의 ID를 반환
     }
 
     // 이미지 파일 저장 로직
-    private void savePostImages(MultipartFile[] files, Post post) {
+    private void savePostFiles(MultipartFile[] files, Post post) {
         for (MultipartFile file : files) {
             try {
-                // 이미지를 S3에 업로드하고 URL을 가져옴
+                // 파일을 S3에 업로드하고 URL을 가져옴
                 String fileName = s3Service.uploadFile(file);
                 String fileUrl = s3Service.getFileUrl(fileName);
 
@@ -150,7 +150,7 @@ public class PostService {
                     .filename(fileName)
                     .filepath(fileUrl)
                     .filesize(file.getSize())
-                    .mimetype(file.getContentType())
+                    .mimetype(file.getContentType())  // 이미지 또는 동영상의 MIME 타입 저장
                     .post(post)
                     .build();
 
@@ -196,7 +196,7 @@ public class PostService {
 
         // 새로운 파일이 업로드된 경우 이미지를 저장함
         if (files != null && files.length > 0) {
-            savePostImages(files, existingPost);
+            savePostFiles(files, existingPost);
         }
 
         existingPost.setUpdatedAt(LocalDateTime.now());
@@ -274,7 +274,8 @@ public class PostService {
     }
 
     private void checkFileSize(MultipartFile file) {
-        if (file.getSize() > 10485760) {
+        long maxSize = file.getContentType().startsWith("video/") ? 104857600 : 10485760; // 동영상은 100MB, 이미지는 10MB
+        if (file.getSize() > maxSize) {
             throw new FileSizeExceeded();
         }
     }
@@ -287,8 +288,12 @@ public class PostService {
 
     // 지원되는 파일 형식인지 확인
     private boolean isSupportedFormat(String contentType) {
-        return contentType != null && (contentType.equals("image/jpeg") || contentType.equals(
-            "image/png"));
+        return contentType != null && (
+            contentType.equals("image/jpeg") ||
+                contentType.equals("image/png") ||
+                contentType.equals("video/mp4") ||  // MP4 동영상 파일 허용
+                contentType.equals("video/mpeg")    // MPEG 동영상 파일 허용
+        );
     }
 
     // jwtTokenizer.getTokenFromCookie를 통해 토큰 추출

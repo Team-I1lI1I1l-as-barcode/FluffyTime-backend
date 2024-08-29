@@ -84,7 +84,6 @@ function removeTag(event, tag) {
   displayTagList(); // DOM 업데이트
 }
 
-
 // 프로필 정보를 ~~
 fetch('/api/mypage/profiles/info', {
   method: 'GET',
@@ -132,7 +131,7 @@ function closeDraftModal() {
   draftModalElement.style.display = 'none'; // 임시 저장 모달을 화면에서 숨김
 }
 
-// 이미지 미리보기 및 파일 처리 함수
+// 이미지 및 동영상 미리보기 및 파일 처리 함수
 function previewImages(event) {
   const files = event.target.files; // 사용자가 선택한 파일들
   imagePreviewContainer.innerHTML = ''; // 기존 미리보기를 초기화
@@ -140,7 +139,7 @@ function previewImages(event) {
 
   // 파일 개수 제한 확인
   if (files.length > 10) {
-    alert('이미지는 최대 10장까지 업로드할 수 있습니다.');
+    alert('이미지와 동영상은 최대 10개까지 업로드할 수 있습니다.');
     event.target.value = ''; // 파일 입력 초기화
     return;
   }
@@ -149,15 +148,28 @@ function previewImages(event) {
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const reader = new FileReader(); // 파일을 읽기 위한 FileReader 객체 생성
+
     reader.onload = function (e) { // 파일 읽기가 완료되면 실행
-      imagesArray.push({
-        file: file, // 파일 객체 저장
-        url: e.target.result, // 파일의 Data URL 저장 (미리보기에 사용)
-      });
-      if (i === 0) { // 첫 번째 파일이면 미리보기 화면에 표시
-        displayImage(e.target.result);
+      if (file.type.startsWith('image/')) {
+        imagesArray.push({
+          file: file, // 파일 객체 저장
+          url: e.target.result, // 파일의 Data URL 저장 (미리보기에 사용)
+          type: 'image', // 파일 타입을 저장
+        });
+      } else if (file.type.startsWith('video/')) {
+        imagesArray.push({
+          file: file, // 파일 객체 저장
+          url: e.target.result, // 파일의 Data URL 저장 (미리보기에 사용)
+          type: 'video', // 파일 타입을 저장
+        });
+      }
+
+      // 첫 번째 파일이면 미리보기 화면에 표시
+      if (i === 0) {
+        displayMedia(imagesArray[0]);
       }
     };
+
     reader.readAsDataURL(file); // 파일을 Data URL 형식으로 읽음
   }
 
@@ -168,6 +180,61 @@ function previewImages(event) {
     leftContent.classList.add('fullscreen'); // 왼쪽 컨텐츠 영역을 전체 화면 모드로 전환
     prevButton.style.display = files.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부
     nextButton.style.display = files.length > 1 ? 'block' : 'none'; // 다음 버튼 표시 여부
+  }
+}
+
+// 선택된 미디어(이미지 또는 동영상)를 화면에 표시하는 함수
+function displayMedia(media) {
+  const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+  imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
+
+  if (media.type === 'image') {
+    const img = document.createElement('img'); // 이미지 요소 생성
+    img.src = media.url;                       // 이미지의 소스 설정
+    img.style.objectFit = 'cover';             // 이미지가 컨테이너에 맞도록 설정
+    img.style.width = '100%';                  // 이미지의 너비를 100%로 설정
+    img.style.height = '100%';                 // 이미지의 높이를 100%로 설정
+    img.style.aspectRatio = '1/1';             // 이미지의 비율을 1:1로 설정
+    imagePreviewContainer.appendChild(img);    // 이미지 요소를 미리보기 컨테이너에 추가
+  } else if (media.type === 'video') {
+    const video = document.createElement('video'); // 비디오 요소 생성
+    video.src = media.url;                          // 비디오의 소스 설정
+    video.controls = true;                          // 비디오 컨트롤 표시
+    video.style.objectFit = 'cover';                // 비디오가 컨테이너에 맞도록 설정
+    video.style.width = '100%';                     // 비디오의 너비를 100%로 설정
+    video.style.height = '100%';                    // 비디오의 높이를 100%로 설정
+    video.style.aspectRatio = '1/1';                // 비디오의 비율을 1:1로 설정
+    video.style.position = 'absolute';              // 비디오를 컨테이너의 상단에 고정
+    video.style.top = '0';                          // 비디오의 상단을 컨테이너 상단에 맞춤
+    video.style.left = '0';                         // 비디오의 왼쪽을 컨테이너 왼쪽에 맞춤
+    imagePreviewContainer.appendChild(video);       // 비디오 요소를 미리보기 컨테이너에 추가
+  }
+}
+
+// 현재 미디어(이미지 또는 동영상)를 화면에 표시하는 함수
+function displayImages() {
+  if (imagesArray.length > 0) {
+    displayMedia(imagesArray[currentImageIndex]);
+    prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부
+    nextButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 다음 버튼 표시 여부
+  }
+}
+
+// 이전 미디어 보기 함수
+function prevImage(event) {
+  event.preventDefault(); // 기본 동작 방지
+  if (imagesArray.length > 1) {
+    currentImageIndex = currentImageIndex === 0 ? imagesArray.length - 1 : currentImageIndex - 1; // 현재 이미지 인덱스 업데이트
+    displayImages(); // 업데이트된 미디어 표시
+  }
+}
+
+// 다음 미디어 보기 함수
+function nextImage(event) {
+  event.preventDefault(); // 기본 동작 방지
+  if (imagesArray.length > 1) {
+    currentImageIndex = currentImageIndex === imagesArray.length - 1 ? 0 : currentImageIndex + 1; // 현재 이미지 인덱스 업데이트
+    displayImages(); // 업데이트된 미디어 표시
   }
 }
 
@@ -369,34 +436,6 @@ function continueDraft(post) {
 
   closeDraftModal(); // 임시 저장 모달 닫기
   openPostCreationModal(); // 게시물 작성 모달 열기
-}
-
-// 선택된 이미지를 화면에 표시하는 함수
-function displayImage(url) {
-  const img = document.createElement('img'); // 이미지 요소 생성
-  img.src = url; // 이미지 소스 설정
-  img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
-  img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
-  imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
-}
-
-// 현재 이미지를 화면에 표시하는 함수
-function displayImages() {
-  imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
-
-  if (imagesArray.length > 0) {
-    const img = document.createElement('img'); // 이미지 요소 생성
-    img.src = imagesArray[currentImageIndex].url; // 이미지 소스 설정
-    img.classList.add('photo'); // 이미지에 스타일 적용을 위한 클래스 추가
-
-    img.style.objectFit = 'cover'; // 이미지가 컨테이너에 맞게 크기 조정
-
-    leftContent.classList.add('fullscreen'); // 왼쪽 컨텐츠 영역을 전체 화면 모드로 전환
-    imagePreviewContainer.appendChild(img); // 이미지 요소를 미리보기 컨테이너에 추가
-
-    prevButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 이전 버튼 표시 여부
-    nextButton.style.display = imagesArray.length > 1 ? 'block' : 'none'; // 다음 버튼 표시 여부
-  }
 }
 
 // 임시 저장된 글을 삭제하는 함수
