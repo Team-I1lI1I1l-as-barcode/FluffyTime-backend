@@ -93,8 +93,6 @@ public class LoginService {
 
         String refreshToken = jwtTokenizer.getTokenFromCookie(request, REFRESH_TOKEN_NAME.getName());
 
-        log.info("refreshToken={}", refreshToken);
-
         if (refreshToken == null) {
             throw new TokenNotFound();
         }
