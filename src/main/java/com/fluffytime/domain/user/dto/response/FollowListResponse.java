@@ -12,4 +12,7 @@ import lombok.Setter;
 public class FollowListResponse {
 
     private String nickname;
+    private String profileImageUrl;
+    private String intro;
+
 }

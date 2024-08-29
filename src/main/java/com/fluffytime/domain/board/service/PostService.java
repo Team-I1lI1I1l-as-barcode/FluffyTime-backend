@@ -2,26 +2,26 @@ package com.fluffytime.domain.board.service;
 
 import static java.util.stream.Collectors.toList;
 
-import com.fluffytime.domain.board.exception.PostNotInTempStatus;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.global.common.exception.global.PostNotFound;
-import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.global.config.aws.S3Service;
+import com.fluffytime.domain.board.dto.request.PostRequest;
+import com.fluffytime.domain.board.dto.response.PostResponse;
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.board.entity.PostImages;
 import com.fluffytime.domain.board.entity.enums.TempStatus;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.request.PostRequest;
-import com.fluffytime.domain.board.dto.response.PostResponse;
 import com.fluffytime.domain.board.exception.ContentLengthExceeded;
 import com.fluffytime.domain.board.exception.FileSizeExceeded;
 import com.fluffytime.domain.board.exception.FileUploadFailed;
+import com.fluffytime.domain.board.exception.PostNotInTempStatus;
 import com.fluffytime.domain.board.exception.TooManyFiles;
 import com.fluffytime.domain.board.exception.UnsupportedFileFormat;
 import com.fluffytime.domain.board.repository.PostImagesRepository;
 import com.fluffytime.domain.board.repository.PostRepository;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
+import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.global.common.exception.global.PostNotFound;
+import com.fluffytime.global.common.exception.global.UserNotFound;
+import com.fluffytime.global.config.aws.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -242,10 +242,11 @@ public class PostService {
 
     // 임시 게시글 목록 조회하기
     @Transactional(readOnly = true)
-   public List<PostResponse> getTempPosts(Long currentUserId) {
+    public List<PostResponse> getTempPosts(Long currentUserId) {
         // 현재 사용자 ID와 임시 저장 글의 사용자 ID를 비교하여 필터링함
         List<Post> tempPosts = postRepository.findAll().stream()
-            .filter(post -> post.getTempStatus() == TempStatus.TEMP && post.getUser().getUserId().equals(currentUserId))
+            .filter(post -> post.getTempStatus() == TempStatus.TEMP && post.getUser().getUserId()
+                .equals(currentUserId))
             .collect(Collectors.toList());
 
         return tempPosts.stream()
@@ -312,7 +313,9 @@ public class PostService {
         Profile profile = author.getProfile(); // 작성자의 프로필 정보 가져오기
 
         // Profile이 존재할 경우에만 관련 정보를 가져옴
-        String profileImageUrl = profile != null && profile.getProfileImages() != null ? profile.getProfileImages().getFilePath() : null;
+        String profileImageUrl =
+            profile != null && profile.getProfileImages() != null ? profile.getProfileImages()
+                .getFilePath() : null;
         String petName = profile != null ? profile.getPetName() : null;
         String petSex = profile != null ? profile.getPetSex() : null;
         Long petAge = profile != null ? profile.getPetAge() : null;
@@ -335,9 +338,11 @@ public class PostService {
             )).collect(toList()),
             tags,
             post.getCreatedAt().format(DateTimeFormatter.ISO_DATE_TIME),
-            post.getUpdatedAt() != null ? post.getUpdatedAt().format(DateTimeFormatter.ISO_DATE_TIME) : null,
+            post.getUpdatedAt() != null ? post.getUpdatedAt()
+                .format(DateTimeFormatter.ISO_DATE_TIME) : null,
             post.getLikes().size(),
-            post.getLikes().stream().anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
+            post.getLikes().stream()
+                .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
             post.isCommentsDisabled(),
             author.getNickname(),        // 작성자 닉네임
             profileImageUrl,             // 프로필 이미지 URL
