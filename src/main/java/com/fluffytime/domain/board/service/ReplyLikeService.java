@@ -1,19 +1,20 @@
 package com.fluffytime.domain.board.service;
 
+import com.fluffytime.domain.board.dto.request.ReplyLikeRequest;
 import com.fluffytime.domain.board.dto.response.ReplyLikeResponse;
+import com.fluffytime.domain.board.entity.Reply;
+import com.fluffytime.domain.board.entity.ReplyLike;
 import com.fluffytime.domain.board.exception.LikeIsExists;
 import com.fluffytime.domain.board.exception.NoLikeFound;
+import com.fluffytime.domain.board.repository.ReplyLikeRepository;
+import com.fluffytime.domain.board.repository.ReplyRepository;
+import com.fluffytime.domain.notification.service.NotificationService;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.ReplyNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.domain.board.entity.Reply;
-import com.fluffytime.domain.board.entity.ReplyLike;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.request.ReplyLikeRequest;
-import com.fluffytime.domain.board.repository.ReplyLikeRepository;
-import com.fluffytime.domain.board.repository.ReplyRepository;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class ReplyLikeService {
     private final UserRepository userRepository;
     private final ReplyLikeRepository replyLikeRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final NotificationService notificationService;
 
     //답글 좋아요 등록
     public ReplyLikeResponse likeReply(Long replyId, ReplyLikeRequest requestDto) {
@@ -51,6 +53,9 @@ public class ReplyLikeService {
             .user(user)
             .build();
         replyLikeRepository.save(replyLike);
+
+        // 알림 생성 및 전송
+        notificationService.createLikesNotification(reply, replyLike.getUser());
 
         int likeCount = replyLikeRepository.countByReply(reply); //현재 좋아요 수
 

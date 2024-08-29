@@ -15,14 +15,18 @@ public class NotificationRequest {
     private String type;
     private Long userId;
     private Long postId;
+    private Long commentId;
+    private Long replyId;
 
     @Builder
     public NotificationRequest(String message, boolean isRead, String type, Long userId,
-        Long postId) {
+        Long postId, Long commentId, Long replyId) {
         this.message = message;
         this.isRead = isRead;
         this.type = type;
         this.userId = userId;
         this.postId = postId;
+        this.commentId = commentId;
+        this.replyId = replyId;
     }
 }
