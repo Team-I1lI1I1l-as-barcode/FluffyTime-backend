@@ -1,3 +1,5 @@
+let eventSource = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
   console.log("Page loaded, initializing...");
 
@@ -52,8 +54,13 @@ function connectSSE(userId) {
     return;
   }
 
-  const eventSource = new EventSource(
-      `/api/notifications/stream?userId=${userId}`);
+  if (eventSource) {
+    console.log(
+        "SSE connection already exists, closing previous connection...");
+    eventSource.close();
+  }
+
+  eventSource = new EventSource(`/api/notifications/stream?userId=${userId}`);
 
   eventSource.onopen = () => console.log("SSE connection opened");
 
@@ -72,6 +79,11 @@ function connectSSE(userId) {
   eventSource.addEventListener('connect', event => {
     console.log("SSE connected:", event.data);
   });
+
+  eventSource.onclose = () => {
+    console.log("SSE connection closed");
+    eventSource = null; // 연결이 닫힌 후에는 eventSource를 null로 설정하여 추적 초기화
+  };
 }
 
 function createNotificationElement(notification) {
