@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>게시물 작성하기</title>
 </head>
 <body>
 <div th:fragment="createModal" class="modal" id="postModal" style="display: none;">
@@ -15,8 +15,8 @@
           <img id="imagePreview" src="/image/post/photo.jpg">
         </div>
         <p id="dragDropText">사진과 동영상을 여기에 끌어다 놓으세요</p>
-        <input type="file" id="images" name="images" accept="image/*" multiple
-               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 파일 선택 입력 -->
+        <input type="file" id="images" name="images" accept="image/*,video/*" multiple
+               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 및 동영상 파일 선택 입력 -->
         <button type="button" class="share-button" id="shareButton"
                 onclick="document.getElementById('images').click()">이미지 선택
         </button>

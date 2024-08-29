@@ -112,66 +112,81 @@ function displayTagList() {
   });
 }
 
-// 이미지 컨테이너를 업데이트하는 함수
+// 이미지 및 동영상 컨테이너를 업데이트하는 함수
 function updateImageContainer(containerId, urls) {
   const container = document.getElementById(containerId); // 컨테이너 요소를 가져옴
-  container.innerHTML = ''; // 기존의 이미지를 초기화
+  container.innerHTML = ''; // 기존의 미디어를 초기화
 
-  urls.forEach((imageObj, index) => { // 각 이미지 URL에 대해 반복
-    const img = document.createElement('img'); // 새로운 이미지 요소 생성
-    img.src = imageObj.filepath; // 이미지 경로를 설정
-    img.alt = `image ${index + 1}`; // 이미지의 alt 속성을 설정
-    img.style.display = index === 0 ? 'block' : 'none'; // 첫 번째 이미지만 보이도록 설정
-    img.className = index === 0 ? 'active' : ''; // 첫 번째 이미지를 활성화 상태로 설정
-    img.style.width = '100%'; // 이미지가 컨테이너에 꽉 차도록 설정
-    img.style.height = '100%'; // 이미지가 컨테이너에 꽉 차도록 설정
-    img.style.objectFit = 'cover'; // 이미지를 컨테이너에 맞게 자름
-    img.onerror = () => { // 이미지 로드 실패 시 처리
-      console.error('이미지 로드 실패:', imageObj.filepath);
-      img.parentElement.removeChild(img); // 이미지 요소를 제거
+  // 각 파일 URL에 대해 반복 처리
+  urls.forEach((fileObj, index) => {
+    let mediaElement;
+    const fileExtension = fileObj.filepath.split('.').pop().toLowerCase(); // 파일 확장자 추출
+
+    // 파일 확장자에 따라 img 또는 video 요소를 생성
+    if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'webm') {
+      mediaElement = document.createElement('video'); // 동영상 요소 생성
+      mediaElement.controls = true; // 동영상 컨트롤러 표시
+      mediaElement.classList.add('video-preview'); // .video-preview 클래스 추가
+    } else {
+      mediaElement = document.createElement('img'); // 이미지 요소 생성
+    }
+
+    mediaElement.src = fileObj.filepath; // 파일 경로 설정
+    mediaElement.alt = `media ${index + 1}`; // 미디어의 alt 속성을 설정
+    mediaElement.style.display = index === 0 ? 'block' : 'none'; // 첫 번째 미디어만 보이도록 설정
+    mediaElement.className = index === 0 ? 'active' : ''; // 첫 번째 미디어를 활성화 상태로 설정
+    mediaElement.style.width = '100%'; // 미디어가 컨테이너에 꽉 차도록 설정
+    mediaElement.style.height = '100%'; // 미디어가 컨테이너에 꽉 차도록 설정
+    mediaElement.style.objectFit = 'cover'; // 미디어를 컨테이너에 맞게 자름
+    mediaElement.style.aspectRatio = '1/1'; // 미디어를 1:1 비율로 설정
+
+    // 미디어 로드 실패 시 처리
+    mediaElement.onerror = () => {
+      console.error('미디어 로드 실패:', fileObj.filepath);
+      mediaElement.parentElement.removeChild(mediaElement); // 미디어 요소를 제거
     };
-    container.appendChild(img); // 이미지 요소를 컨테이너에 추가
+
+    container.appendChild(mediaElement); // 미디어 요소를 컨테이너에 추가
   });
 }
 
-// 현재 인덱스에 해당하는 이미지를 표시하는 함수
-function showImage(index, containerId) {
-  console.log(`이미지 표시: ${index}`);
-  const images = document.querySelectorAll(`#${containerId} img`); // 컨테이너 내의 모든 이미지 요소를 가져옴
-  images.forEach((img, idx) => {
-    img.style.display = idx === index ? 'block' : 'none'; // 현재 인덱스의 이미지만 표시
-    img.className = idx === index ? 'active' : ''; // 활성화된 이미지에 클래스를 추가
-  });
-}
-
-// 이전 이미지를 표시하는 함수
+// 이전 미디어를 표시하는 함수
 function prevImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
-  console.log('이전 이미지 표시');
-  if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    // 현재 인덱스가 0이면 마지막 이미지로, 아니면 이전 이미지로 이동
+  console.log('이전 미디어 표시');
+  if (imageUrls.length > 1) { // 미디어가 여러 개일 때만 작동
     currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1;
-    showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
+    showImage(currentImageIndex, 'imageContainer'); // 미디어를 업데이트
   }
 }
 
-// 다음 이미지를 표시하는 함수
+// 다음 미디어를 표시하는 함수
 function nextImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
-  console.log('다음 이미지 표시');
-  if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
-    // 현재 인덱스가 마지막이면 첫 번째 이미지로, 아니면 다음 이미지로 이동
+  console.log('다음 미디어 표시');
+  if (imageUrls.length > 1) { // 미디어가 여러 개일 때만 작동
     currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1;
-    showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
+    showImage(currentImageIndex, 'imageContainer'); // 미디어를 업데이트
   }
+}
+
+// 현재 인덱스에 해당하는 미디어를 표시하는 함수
+function showImage(index, containerId) {
+  console.log(`미디어 표시: ${index}`);
+  const mediaElements = document.querySelectorAll(`#${containerId} img, #${containerId} video`); // 컨테이너 내의 모든 미디어 요소를 가져옴
+  mediaElements.forEach((media, idx) => {
+    media.style.display = idx === index ? 'block' : 'none'; // 현재 인덱스의 미디어만 표시
+    media.className = idx === index ? 'active' : ''; // 활성화된 미디어에 클래스를 추가
+  });
 }
 
 // 슬라이드 버튼을 표시하거나 숨기는 함수
 function toggleSlideButtons(length, prevBtnId, nextBtnId) {
-  const displayValue = length > 1 ? 'block' : 'none'; // 이미지가 여러 장이면 버튼을 보임
+  const displayValue = length > 1 ? 'block' : 'none'; // 미디어가 여러 개일 때 버튼을 보임
   document.getElementById(prevBtnId).style.display = displayValue; // 이전 버튼
   document.getElementById(nextBtnId).style.display = displayValue; // 다음 버튼
 }
+
 
 // 모달을 여는 함수
 function openPostDetailModal() {

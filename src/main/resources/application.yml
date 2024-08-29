@@ -35,6 +35,11 @@ spring:
       password: ${REDIS_PASSWORD}
       timeout: 5000
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
 #oauth2
 #registration
   security:
