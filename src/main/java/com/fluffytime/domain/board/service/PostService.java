@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,7 +78,7 @@ public class PostService {
                 .createdAt(LocalDateTime.now())
                 .tempStatus(TempStatus.SAVE)  // 새로 생성되는 게시물은 최종 등록 상태로 설정
                 .build();
-            postRepository.save(post);
+        postRepository.save(post);
         }
 
         // 이미지 저장 로직
@@ -200,6 +201,9 @@ public class PostService {
 
         existingPost.setUpdatedAt(LocalDateTime.now());
         postRepository.save(existingPost);
+
+        // 태그 등록 로직
+        tagService.regTags(postRequest.getTags(), existingPost);
 
         return convertToPostResponse(existingPost, currentUserId);
     }
