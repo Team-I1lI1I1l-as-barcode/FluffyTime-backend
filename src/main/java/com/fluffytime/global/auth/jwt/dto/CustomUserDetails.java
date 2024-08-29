@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 // 사용자의 세부 정보 구현
+@Slf4j
 @Getter
 public class CustomUserDetails implements UserDetails {
 
@@ -24,6 +26,7 @@ public class CustomUserDetails implements UserDetails {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
+        log.info("users authories1={}",roles);
         this.authorities = roles.stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
@@ -34,6 +37,8 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.nickname = user.getNickname();
+        List<String> users = getRoles(user);
+        log.info("users authories2={}",users);
         this.authorities = getRoles(user).stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());

@@ -1,5 +1,8 @@
 package com.fluffytime.global.config;
 
+import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_ADMIN;
+import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_USER;
+
 import com.fluffytime.global.auth.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.global.auth.jwt.filter.JwtAuthenticationFilter;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
@@ -47,6 +50,9 @@ public class SecurityConfig {
                     "/image/**",
                     "/favicon.ico"
                 ).permitAll()
+                .requestMatchers(
+                    "/admin"
+                ).hasRole(ROLE_ADMIN.getNoneHeaderName())
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new JwtAuthenticationFilter(jwtTokenizer),
