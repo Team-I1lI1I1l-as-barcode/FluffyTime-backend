@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -139,7 +140,7 @@ public class NotificationService {
             if (targetUser.getUserId().equals(likeAuthor.getUserId())) {
                 return;
             }
-            
+
             type = "replyLike";
             reply = replyTarget;
         } else {
@@ -172,6 +173,7 @@ public class NotificationService {
     }
 
     //모든 알림 조회
+    @Cacheable(value = "notifications", key = "#requestDto.userId")
     @Transactional(readOnly = true)
     public List<NotificationResponse> getAllNotifications(NotificationRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
