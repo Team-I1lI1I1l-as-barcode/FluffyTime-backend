@@ -185,7 +185,6 @@ function previewImages(event) {
 
 // 선택된 미디어(이미지 또는 동영상)를 화면에 표시하는 함수
 function displayMedia(media) {
-  const imagePreviewContainer = document.getElementById('imagePreviewContainer');
   imagePreviewContainer.innerHTML = ''; // 기존 미리보기 초기화
 
   if (media.type === 'image') {
@@ -194,7 +193,9 @@ function displayMedia(media) {
     img.style.objectFit = 'cover';             // 이미지가 컨테이너에 맞도록 설정
     img.style.width = '100%';                  // 이미지의 너비를 100%로 설정
     img.style.height = '100%';                 // 이미지의 높이를 100%로 설정
-    img.style.aspectRatio = '1/1';             // 이미지의 비율을 1:1로 설정
+    img.style.position = 'absolute';           // 이미지의 위치를 절대 위치로 설정
+    img.style.top = '0';                       // 이미지의 상단을 컨테이너 상단에 맞춤
+    img.style.left = '0';                      // 이미지의 왼쪽을 컨테이너 왼쪽에 맞춤
     imagePreviewContainer.appendChild(img);    // 이미지 요소를 미리보기 컨테이너에 추가
   } else if (media.type === 'video') {
     const video = document.createElement('video'); // 비디오 요소 생성
@@ -203,8 +204,7 @@ function displayMedia(media) {
     video.style.objectFit = 'cover';                // 비디오가 컨테이너에 맞도록 설정
     video.style.width = '100%';                     // 비디오의 너비를 100%로 설정
     video.style.height = '100%';                    // 비디오의 높이를 100%로 설정
-    video.style.aspectRatio = '1/1';                // 비디오의 비율을 1:1로 설정
-    video.style.position = 'absolute';              // 비디오를 컨테이너의 상단에 고정
+    video.style.position = 'absolute';              // 비디오의 위치를 절대 위치로 설정
     video.style.top = '0';                          // 비디오의 상단을 컨테이너 상단에 맞춤
     video.style.left = '0';                         // 비디오의 왼쪽을 컨테이너 왼쪽에 맞춤
     imagePreviewContainer.appendChild(video);       // 비디오 요소를 미리보기 컨테이너에 추가
@@ -302,7 +302,7 @@ async function saveAsTemp(event) {
     return;
   }
 
-  const postRequest = preparePostData(null, content, tagsSet,'TEMP'); // 임시 저장 요청 데이터 준비
+  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,'TEMP'); // 임시 저장 요청 데이터 준비
 
   await submitPostData('/api/posts/temp-reg', postRequest, imagesArray); // 서버로 임시 저장 요청 전송
   alert('임시 저장되었습니다.'); // 임시 저장 완료 알림
@@ -381,7 +381,8 @@ async function loadDraft() {
     if (contentType && contentType.includes('application/json')) {
       const tempPosts = await response.json(); // JSON 응답 파싱
 
-      console.log(tempPosts)
+      // 임시 저장된 글이 있으면 날짜를 기준으로 내림차순으로 정렬
+      tempPosts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       if (tempPosts.length === 0) {
         tempPostsContainer.innerHTML = '<p>임시 저장된 글이 없습니다.</p>'; // 임시 저장된 글이 없을 경우 표시
@@ -418,17 +419,15 @@ function continueDraft(post) {
   updateCharCount(); // 글자 수 업데이트
   currentDraftPostId = post.postId; // 현재 작성 중인 게시물의 ID 설정
   tagsSet = new Set(post.tags);
-  console.log(tagsSet)
-  displayTagList();
-
-  imagePreviewContainer.innerHTML = ''; // 이미지 미리보기 초기화
+  displayTagList(); // 태그 리스트 표시
 
   imagesArray = post.imageUrls.map(image => ({
-    url: image.filepath, // 이미지 URL 배열로 변환
-    filename: image.filename,
+    url: image.filepath, // 이미지 URL을 설정
+    type: image.mimetype.startsWith('image/') ? 'image' : 'video', // 파일 타입을 이미지 또는 비디오로 설정
+    file: null, // 임시 저장된 글에서는 원본 파일 객체가 없으므로 null로 설정
   }));
 
-  displayImages(); // 이미지 미리보기 업데이트
+  displayImages(); // 이미지 및 동영상 미리보기 표시
 
   document.getElementById('images').disabled = true; // 이미지 입력 비활성화
   shareButton.style.display = 'none'; // 이미지 선택 버튼 숨기기
