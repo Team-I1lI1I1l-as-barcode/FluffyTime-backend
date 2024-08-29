@@ -1,6 +1,4 @@
-//일단 정적 페이지에 대한 팔로우만.. ex)userpage, mypage
-
-// 버튼 클릭 후 api 호출 함수
+// 팔로우버튼 클릭 api 호출 함수
 async function toggleFollow(button, action, targetUserNickname) {
   console.log("팔로우/언팔로우 api 호출");
   const url = action === "add" ? "/api/follow/add" : "/api/follow/remove";
@@ -123,12 +121,12 @@ window.onclick = function (event) {
   const followerModal = document.getElementById('followerList-modal');
   const followingModal = document.getElementById('followingList-modal');
 
-  // 팔로워 모달이 열려 있고, 클릭한 대상이 팔로워 모달인 경우 모달을 닫기
+  // 팔로워 모달이 열려 있고, 클릭했던 대상이 팔로워 모달인 경우 모달 닫기
   if (followerModal && event.target === followerModal) {
     closeModal(followerModal);
   }
 
-  // 팔로잉 모달이 열려 있고, 클릭한 대상이 팔로잉 모달인 경우 모달을 닫기
+  // 팔로잉 모달이 열려 있고, 클릭했던 대상이 팔로잉 모달인 경우 모달 닫기
   if (followingModal && event.target === followingModal) {
     closeModal(followingModal);
   }
@@ -372,36 +370,42 @@ async function fetchFollowingList(nickname) {
 
 // 페이지 로드 시 이벤트 핸들러 설정
 document.addEventListener("DOMContentLoaded", async function () {
-  // 경로를 '/'로 분리하여 배열로 만들고 마지막 요소인 유저 닉네임을 얻는다
+  //비동기 팔로우 버튼이 있는 페이지들
+  const asynchronousPages = ['userpages', 'mypage'];
+  // 경로를 '/'로 분리하여 배열로 만들고, userpage||mypage 인지 검증하고 맞는 경우 마지막 요소인 유저 닉네임을 얻는다.
   const path = window.location.pathname;
-  const pathSegments = path.split('/');// 동적 생성 팔로우는 더 고려해봐야 함..
-  const targetUserNickname = pathSegments[pathSegments.length - 1];
+  const pathSegments = path.split('/');
 
-  //  팔로우 버튼 팔로우 상태를 확인하고 상태를 화면에 적용
-  const followButton = document.querySelector(".follow_button");
-  if (followButton) {
+  if (asynchronousPages.includes(pathSegments[pathSegments.length - 2])) {
+
+    const targetUserNickname = pathSegments[pathSegments.length - 1];
+
+    // 팔로우 상태를 확인하고 상태를 화면에 적용
+    const followButton = document.querySelector(".follow_button");
     await checkFollowStatus(followButton, targetUserNickname);
-  }
-  //팔로우,팔로잉 유저 수를 업데이트
-  await updateFollowCounts(targetUserNickname);
+    //팔로우,팔로잉 유저 수를 업데이트
+    await updateFollowCounts(targetUserNickname);
 
-  // 정적으로 생성된 팔로우 버튼에 대한 이벤트 핸들러
-  document.body.addEventListener("click", handleFollowButtonClick);
+    // 정적으로 생성된(화면에 무조건 있는) 팔로우 버튼에 대한 이벤트 핸들러
+    document.body.addEventListener("click", handleFollowButtonClick);
 
-  // 팔로워 목록 불러오기 클릭 이벤트
-  const followerText = document.querySelector("#follower_list_modal");
-  if (followerText) {
-    followerText.addEventListener("click", async function () {
-      await fetchFollowerList(targetUserNickname);
-    });
-  }
+    // 팔로워 목록 불러오기 클릭 이벤트
+    const followerText = document.querySelector("#follower_list_modal");
+    if (followerText) {
+      followerText.addEventListener("click", async function () {
+        await fetchFollowerList(targetUserNickname);
+      });
+    }
 
-  // 팔로잉 목록 불러오기 클릭 이벤트
-  const followingText = document.querySelector("#following_list_modal");
-  if (followingText) {
-    followingText.addEventListener("click", async function () {
-      await fetchFollowingList(targetUserNickname);
-    });
+    // 팔로잉 목록 불러오기 클릭 이벤트
+    const followingText = document.querySelector("#following_list_modal");
+    if (followingText) {
+      followingText.addEventListener("click", async function () {
+        await fetchFollowingList(targetUserNickname);
+      });
+    }
+  } else {
+    console.log("이 페이지에는 팔로우 버튼이 아직 없습니다.")
   }
 
 });
