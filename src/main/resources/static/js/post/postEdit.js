@@ -1,6 +1,14 @@
 let currentPostId = null; // 현재 게시물의 ID를 저장하는 변수
 let currentImageIndex = 0; // 현재 이미지 인덱스를 저장하는 변수
 let imagesArray = []; // 업로드된 이미지 파일과 URL을 저장하는 배열
+let tagsSet = new Set();
+const tagsInputElement = document.getElementById('tagsInput');
+const tagList = document.getElementById('tagList');
+
+tagsInputElement.addEventListener("keydown", addTag)
+// 태그 정규표현식
+// 다양한 언어 문자 허용, 숫자 허용, '_' 허용, 유니코드 문자 지원
+const tagPattern = /^[\p{L}\p{N}_]+$/u;
 
 // 페이지 로드 시 게시물 데이터를 불러와서 폼에 채우는 함수
 async function loadEditPostData(postId) {
@@ -19,6 +27,10 @@ async function loadEditPostData(postId) {
     document.getElementById('profileImage').src = postData.profileImageurl || '/image/profile/profile.png';
     document.getElementById('charCount').textContent = `${postData.content.length} / 2200`;
 
+    // 태그 보여주기
+    tagsSet = new Set(postData.tags)
+    displayTagList()
+
     // 이미지 URL 배열을 업데이트
     imagesArray = postData.imageUrls || [];
     updateImageContainer('imagePreviewContainer', imagesArray);
@@ -27,6 +39,62 @@ async function loadEditPostData(postId) {
     console.error('게시물 수정 데이터 로드 중 오류 발생:', error.message);
     alert('게시물 데이터를 로드하는 중 오류가 발생했습니다.');
   }
+}
+
+function addTag(event) {
+  // 엔터 키의 키 코드는 13
+  if (event.key === 'Enter') {
+    if(tagsSet.size > 10) {
+      alert("태그는 10개까지만 등록 가능합니다.")
+      tagsInputElement.value=""
+      return
+    }
+
+    let tag = tagsInputElement.value
+    tag = tag.trim().replace(/^#/,"")
+
+    if(tag.length > 20) {
+      alert("태그 길이는 최대 20자까지만 가능합니다.");
+      return;
+    }
+
+    if(tagPattern.test(tag)) {
+      tagsSet.add(tag);
+      tagsInputElement.value=""
+      displayTagList();
+    } else {
+      alert("등록할 수 없는 태그입니다.")
+    }
+  }
+}
+
+function displayTagList() {
+  tagList.innerHTML = ''; // 기존 태그 리스트 초기화
+  tagsSet.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag';
+
+    const tagText = document.createElement('span');
+    tagText.className = 'tag-text';
+    tagText.textContent = `#${tag}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.textContent = 'x';
+    removeBtn.className = 'remove-btn';
+    removeBtn.addEventListener("click", (event) => removeTag(event,tag))
+
+    tagElement.appendChild(tagText); // 태그 텍스트 추가
+    tagElement.appendChild(removeBtn); // 삭제 버튼 추가
+    tagList.appendChild(tagElement); // 태그 리스트에 추가
+  });
+}
+
+function removeTag(event, tag) {
+  event.preventDefault()
+  // 태그 배열에서 해당 태그를 제거
+  tagsSet.delete(tag);
+  console.log(tagsSet)
+  displayTagList(); // DOM 업데이트
 }
 
 // 이미지 미리보기 및 파일 처리 함수
@@ -132,7 +200,7 @@ async function submitEditPost() {
   const content = document.getElementById('content').value;
 
   const formData = new FormData();
-  formData.append('post', new Blob([JSON.stringify({ content: content })], { type: 'application/json' }));
+  formData.append('post', new Blob([JSON.stringify({ content: content, tags: Array.from(tagsSet) })], { type: 'application/json' }));
 
   imagesArray.forEach(imageObj => {
     if (imageObj.file) {

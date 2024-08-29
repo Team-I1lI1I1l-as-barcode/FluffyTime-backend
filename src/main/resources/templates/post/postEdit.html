@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>게시물 수정하기</title>
   <link rel="stylesheet" href="/css/post/postEdit.css">
-  <script src="/js/post/postEdit.js"></script>
 </head>
 <body>
 <div class="modal" id="postModal" style="display: flex;">
@@ -42,9 +41,9 @@
           <hr>
           <!--태그-->
           <div class="tags-container">
+            <div id="tagList" class="tag-list"></div>
             <input type="text" id="tagsInput" name="tags" class="post-textarea"
                    placeholder="#태그 입력 후 엔터를 누르세요" maxlength="10">
-            <div id="tagList" class="tag-list"></div>
           </div>
 
           <hr>
@@ -76,6 +75,6 @@
     </div>
   </div>
 </div>
-
 </body>
+<script src="/js/post/postEdit.js"></script>
 </html>

@@ -75,21 +75,6 @@ async function loadPostData(postId) {
       displayTagList()
     }
 
-    function displayTagList() {
-      tagList.innerHTML = ''; // 기존 태그 리스트 초기화
-      tagsSet.forEach(tag => {
-        const tagElement = document.createElement('span');
-        tagElement.className = 'tag';
-
-        const tagText = document.createElement('span');
-        tagText.className = 'tag-text';
-        tagText.textContent = `#${tag}`;
-
-        tagElement.appendChild(tagText); // 태그 텍스트 추가
-        tagList.appendChild(tagElement); // 태그 리스트에 추가
-      });
-    }
-
     // 댓글 기능 상태에 따라 댓글 섹션과 댓글 작성 폼을 설정
     const commentSection = document.getElementById('comment-list');
     const commentForm = document.querySelector('.comment-form');
@@ -110,6 +95,21 @@ async function loadPostData(postId) {
     console.error('게시물 데이터 로드 중 오류 발생:', error.message);
     alert('게시물 데이터를 로드하는 중 오류가 발생했습니다. 페이지를 새로고침 해주세요.');
   }
+}
+
+function displayTagList() {
+  tagList.innerHTML = ''; // 기존 태그 리스트 초기화
+  tagsSet.forEach(tag => {
+    const tagElement = document.createElement('span');
+    tagElement.className = 'tag';
+
+    const tagText = document.createElement('span');
+    tagText.className = 'tag-text';
+    tagText.textContent = `#${tag}`;
+
+    tagElement.appendChild(tagText); // 태그 텍스트 추가
+    tagList.appendChild(tagElement); // 태그 리스트에 추가
+  });
 }
 
 // 이미지 컨테이너를 업데이트하는 함수
@@ -207,43 +207,6 @@ function copyLinkToClipboard() {
   });
   toggleDropdownMenu();
 }
-
-// 페이지 로드 시 댓글 상태를 확인하여 초기 설정
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('페이지 로드 완료');
-
-  const path = window.location.pathname;
-  const pathSegments = path.split('/');
-  const postId = pathSegments[pathSegments.length - 1];
-
-  if (postId && !isNaN(postId)) {
-    currentPostId = postId; // currentPostId를 설정
-    loadPostData(postId); // 게시물 데이터를 로드
-    openPostDetailModal(); // 모달을 열기
-    initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
-
-    const isAuthor = await checkIfUserIsAuthor(postId);
-
-    if (isAuthor) {
-      // 작성자인 경우 숨겨진 메뉴 항목을 표시
-      document.querySelector('.delete').style.display = 'block';
-      document.querySelector('.edit').style.display = 'block'; // 수정 버튼 표시
-      document.querySelector('.like-hide').style.display = 'block';
-      document.querySelector('.comment-toggle').style.display = 'block';
-      document.querySelector('.report').style.display = 'none'; // 작성자인 경우 신고 숨김
-    } else {
-      document.querySelector('.report').style.display = 'block'; // 작성자가 아닌 경우 신고 표시
-    }
-
-    // 댓글/답글 버튼 클릭 시
-    const commentButton = document.getElementById('commentButton');
-    commentButton.onclick = function () {
-      postComment(postId);
-    };
-  } else {
-    console.error('URL에서 postId를 찾을 수 없습니다.');
-  }
-});
 
 // 북마크 상태 업데이트 함수
 async function initializeBookmarkState(postId) {
@@ -370,6 +333,36 @@ async function toggleComments() {
   } catch (error) {
     console.error('댓글 기능 토글 중 오류 발생:', error.message);
     alert('댓글 기능을 토글하는 중 오류가 발생했습니다.');
+  }
+}
+
+// 게시물을 삭제하는 함수
+async function deletePost() {
+  console.log('게시물 삭제 시작');
+  if (currentPostId) { // 현재 게시물 ID가 있는지 확인
+    try {
+      // 서버에 게시물 삭제 요청을 보냄
+      const response = await fetch(`/api/posts/delete/${currentPostId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) { // 응답 상태가 정상인지 확인
+        const errorData = await response.json();
+        throw new Error(errorData.message || '게시물 삭제 실패');
+      }
+
+      console.log('게시물 삭제 완료');
+      alert('게시물이 삭제되었습니다.'); // 성공 메시지 표시
+      window.location.href = '/'; // 메인 페이지로 이동
+    } catch (error) {
+      console.error('게시물 삭제 중 오류 발생:', error);
+      alert(error.message || '게시물 삭제에 실패했습니다.'); // 오류 메시지 표시
+    }
+  } else {
+    console.error('URL에서 postId를 찾을 수 없습니다.'); // 게시물 ID가 없을 경우 오류 메시지 표시
   }
 }
 
