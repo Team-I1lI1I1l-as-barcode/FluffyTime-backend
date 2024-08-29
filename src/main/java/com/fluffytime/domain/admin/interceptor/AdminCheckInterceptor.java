@@ -1,4 +1,4 @@
-package com.fluffytime.domain.user.interceptor;
+package com.fluffytime.domain.admin.interceptor;
 
 import static com.fluffytime.global.auth.jwt.util.constants.TokenClaimsKey.ROLES;
 import static com.fluffytime.global.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
@@ -14,8 +14,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 @RequiredArgsConstructor
-public class LoginCheckInterceptor implements HandlerInterceptor {
-
+public class AdminCheckInterceptor implements HandlerInterceptor {
     private final JwtTokenizer jwtTokenizer;
 
     @Override
@@ -28,8 +27,19 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        log.info("이미 로그인된 사용자입니다. 해당 페이지에 접근할 수 없습니다.");
-        response.sendRedirect("/");
-        return false;
+        Claims claims = jwtTokenizer.parseAccessToken(accessToken);
+
+        List<String> roles = claims.get(ROLES.getKey(), List.class); // 권한 정보 추출
+
+        if (roles != null && roles.contains("ROLE_ADMIN")) {
+            log.info("관리자 권한 확인: 응답 헤더에 ROLE_ADMIN 여부를 추가");
+
+            // 응답 헤더에 ROLE_ADMIN 여부를 추가
+            response.addHeader("Is-Admin", "true");
+            return true; // ROLE_ADMIN 권한이 있을 경우 요청을 계속 진행
+        }
+
+        response.addHeader("Is-Admin", "false");
+        return true; // ROLE_ADMIN 권한이 있을 경우 요청을 계속 진행
     }
 }
