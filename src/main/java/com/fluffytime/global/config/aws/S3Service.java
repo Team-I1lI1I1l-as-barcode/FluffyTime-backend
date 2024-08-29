@@ -1,5 +1,6 @@
 package com.fluffytime.global.config.aws;
 
+import com.fluffytime.domain.board.exception.FileUploadFailed;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -91,13 +92,13 @@ public class S3Service {
             s3Client.completeMultipartUpload(completeMultipartUploadRequest);
 
             // 업로드 성공 시 로그 출력 및 업로드된 파일의 이름 반환
-            log.info("Large file uploaded successfully: {}", fileName);
+            log.info("파일 업로드 성공: {}", fileName);
             return fileName;
         } catch (IOException e) {
             // 업로드 도중 예외가 발생하면 로그 출력 및 업로드 중단 요청
-            log.error("Failed to upload large file: {}", fileName, e);
+            log.error("파일 업로드 실패: {}", fileName, e);
             s3Client.abortMultipartUpload(a -> a.bucket(bucketName).key(fileName).uploadId(uploadId));
-            throw new RuntimeException("Failed to upload large file", e);
+            throw new FileUploadFailed();
         }
     }
 

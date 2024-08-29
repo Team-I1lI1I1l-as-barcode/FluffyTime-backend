@@ -54,7 +54,7 @@ public class PostRestController {
     // 임시 게시물 등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files,
+        @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("임시 게시물 등록 요청 받음: {}", postRequest);
 

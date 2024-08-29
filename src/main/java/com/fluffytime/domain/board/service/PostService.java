@@ -98,34 +98,42 @@ public class PostService {
         HttpServletRequest request) {
 
         User user = findUserByAccessToken(request);
+        Post post;
 
-        // 현재 사용자의 임시 저장 글 개수를 확인
-        List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus
-            (user.getUserId(), TempStatus.TEMP);
-
-        if (tempPosts.size() >= 20) {
-            // 가장 오래된 임시 저장 글을 삭제
-            Post oldestTempPost = tempPosts.stream()
-                .sorted(Comparator.comparing(Post::getCreatedAt))
-                .findFirst()
+        // 임시 저장된 글이 있는 경우 해당 글을 업데이트
+        if (postRequest.getTempId() != null) {
+            // 기존 임시 저장된 글을 가져옴
+            post = postRepository.findById(postRequest.getTempId())
                 .orElseThrow(PostNotFound::new);
 
-            postRepository.delete(oldestTempPost);
-            log.info("오래된 임시 저장 글 삭제, ID: {}", oldestTempPost.getPostId());
+            // 게시물 내용 업데이트
+            post.setContent(postRequest.getContent());
+            post.setUpdatedAt(LocalDateTime.now());
+        } else {
+            // 현재 사용자의 임시 저장 글 개수를 확인
+            List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus(user.getUserId(), TempStatus.TEMP);
+
+            if (tempPosts.size() >= 20) {
+                // 가장 오래된 임시 저장 글을 삭제
+                Post oldestTempPost = tempPosts.stream()
+                    .sorted(Comparator.comparing(Post::getCreatedAt))
+                    .findFirst()
+                    .orElseThrow(PostNotFound::new);
+
+                postRepository.delete(oldestTempPost);
+                log.info("오래된 임시 저장 글 삭제, ID: {}", oldestTempPost.getPostId());
+            }
+
+            // 새로운 임시 게시물을 생성함
+            post = Post.builder()
+                .user(user)
+                .content(postRequest.getContent())
+                .createdAt(LocalDateTime.now())
+                .tempStatus(TempStatus.TEMP)
+                .build();
+
+            postRepository.save(post);
         }
-
-        // 업로드된 파일들의 유효성을 검증함
-        validateFiles(files);
-
-        // 임시 게시물을 생성함
-        Post post = Post.builder()
-            .user(user)
-            .content(postRequest.getContent())
-            .createdAt(LocalDateTime.now())
-            .tempStatus(TempStatus.TEMP)
-            .build();
-
-        postRepository.save(post);
 
         // 태그 등록 로직
         tagService.regTags(postRequest.getTags(), post);
