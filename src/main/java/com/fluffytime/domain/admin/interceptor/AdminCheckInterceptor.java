@@ -32,7 +32,6 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
         List<String> roles = claims.get(ROLES.getKey(), List.class); // 권한 정보 추출
 
         if (roles != null && roles.contains("ROLE_ADMIN")) {
-            log.info("관리자 권한 확인: 응답 헤더에 ROLE_ADMIN 여부를 추가");
 
             // 응답 헤더에 ROLE_ADMIN 여부를 추가
             response.addHeader("Is-Admin", "true");

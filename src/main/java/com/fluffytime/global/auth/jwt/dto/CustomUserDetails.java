@@ -26,7 +26,6 @@ public class CustomUserDetails implements UserDetails {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        log.info("users authories1={}",roles);
         this.authorities = roles.stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
@@ -37,8 +36,6 @@ public class CustomUserDetails implements UserDetails {
         this.email = user.getEmail();
         this.password = user.getPassword();
         this.nickname = user.getNickname();
-        List<String> users = getRoles(user);
-        log.info("users authories2={}",users);
         this.authorities = getRoles(user).stream()
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());

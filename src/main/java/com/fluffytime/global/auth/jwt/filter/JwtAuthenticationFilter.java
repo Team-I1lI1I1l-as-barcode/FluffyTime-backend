@@ -101,12 +101,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // SecurityContextHolder에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        Collection<? extends GrantedAuthority> authorities1 = authentication.getAuthorities();
-        for (GrantedAuthority authority : authorities1) {
-            // 로그 추가
-            log.info("Authentication after setting SecurityContext: {}", authority.getAuthority());
-        }
     }
 
     // Claims 객체에서 사용자의 권한 추출하여 리스트로 반환
