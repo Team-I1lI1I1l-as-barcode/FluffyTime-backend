@@ -1,5 +1,6 @@
 package com.fluffytime.domain.board.entity;
 
+import com.fluffytime.domain.notification.entity.Notification;
 import com.fluffytime.domain.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -67,6 +68,13 @@ public class Comment {
         orphanRemoval = true
     )
     private List<CommentLike> likes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "comment",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Notification> notifications = new ArrayList<>();
 
     @Builder
     public Comment(String content, User user, Post post) {

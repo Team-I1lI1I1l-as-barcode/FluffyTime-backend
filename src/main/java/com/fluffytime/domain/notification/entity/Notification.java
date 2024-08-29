@@ -1,6 +1,8 @@
 package com.fluffytime.domain.notification.entity;
 
+import com.fluffytime.domain.board.entity.Comment;
 import com.fluffytime.domain.board.entity.Post;
+import com.fluffytime.domain.board.entity.Reply;
 import com.fluffytime.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,9 +44,6 @@ public class Notification {
     @Column(name = "notification_type")
     private String type;
 
-    @Column(name = "profile_img")
-    private String profileImageurl;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -53,18 +52,27 @@ public class Notification {
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    private Comment comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_id")
+    private Reply reply;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Builder
     public Notification(String message, boolean isRead, User user, Post post, String type,
-        String profileImageurl) {
+        Comment comment, Reply reply) {
         this.message = message;
         this.isRead = isRead;
         this.user = user;
         this.post = post;
+        this.comment = comment;
+        this.reply = reply;
         this.type = type;
-        this.profileImageurl = profileImageurl;
     }
 }
