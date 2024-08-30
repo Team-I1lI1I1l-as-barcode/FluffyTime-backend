@@ -6,6 +6,7 @@ import com.fluffytime.domain.user.dto.response.FollowListResponse;
 import com.fluffytime.domain.user.entity.Follow;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.exception.FollowNotFound;
+import com.fluffytime.domain.user.exception.SelfFollowRequest;
 import com.fluffytime.domain.user.repository.FollowRepository;
 import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
@@ -45,6 +46,11 @@ public class FollowService {
         User followedUser = userRepository.findByNickname(
                 followRequest.getFollowedUserNickname())
             .orElseThrow(UserNotFound::new);
+
+        //본인을 팔로우하는것을 막음
+        if (followedUser == followingUser) {
+            throw new SelfFollowRequest();
+        }
 
         // Follow 엔티티로 변환
         Follow follow = new Follow();
@@ -117,7 +123,7 @@ public class FollowService {
     }
 
     // 팔로워 목록 조회 메서드
-    public List<FollowListResponse> findFollowersByUserId(Long userId) {
+    public List<FollowListResponse> findFollowersByUserId(Long userId, Long myUserId) {
         List<Follow> followers = followRepository.findByFollowedUserUserId(userId);
         List<FollowListResponse> followListResponses = new ArrayList<>();
 
@@ -141,6 +147,8 @@ public class FollowService {
             }
 
             FollowListResponse response = new FollowListResponse(
+                myUserId,
+                followingUser.getUserId(),
                 followingUser.getNickname(),
                 profileImageUrl, // 프로필 사진 URL
                 intro // 한줄 소개
@@ -152,7 +160,7 @@ public class FollowService {
     }
 
     // 팔로잉 목록 조회 메서드
-    public List<FollowListResponse> findFollowingsByUserId(Long userId) {
+    public List<FollowListResponse> findFollowingsByUserId(Long userId, Long myUserId) {
         List<Follow> followings = followRepository.findByFollowingUserUserId(userId);
         List<FollowListResponse> followListResponses = new ArrayList<>();
 
@@ -175,6 +183,8 @@ public class FollowService {
             }
 
             FollowListResponse response = new FollowListResponse(
+                myUserId,
+                followedUser.getUserId(),
                 followedUser.getNickname(),
                 profileImageUrl, // 프로필 사진 URL
                 intro // 한줄 소개

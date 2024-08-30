@@ -1,7 +1,7 @@
 .follow-modal {
   display: none; /* 기본적으로 숨김 */
   position: fixed;
-  z-index: 1;
+  z-index: 2;
   left: 0;
   top: 0;
   width: 100%;
@@ -42,6 +42,7 @@
 .follow-modal-content ul {
   list-style: none;
   padding: 0;
+  margin-top: 10px;
 }
 
 .follow-modal-content li {
@@ -50,6 +51,7 @@
   display: flex;
   align-items: center;
   gap: 15px;
+  justify-content: space-between;
 }
 
 .follow-modal-content li img {
@@ -71,4 +73,19 @@
 
 .linkBox {
   display: flex;
+}
+
+/* 팔로우 버튼 */
+.follow_button {
+  background-color: var(--primary-color);
+  color: black;
+  border: none;
+  border-radius: 5px;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.8em; /* 버튼의 폰트 사이즈 조정 */
+}
+
+#follow_button:hover {
+  background-color: #e6b800; /* Primary color를 조금 어둡게 */
 }
