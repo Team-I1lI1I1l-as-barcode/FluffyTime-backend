@@ -51,7 +51,8 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .requestMatchers(
-                    "/admin"
+                    "/api/admin/**",
+                    "/admin/**"
                 ).hasRole(ROLE_ADMIN.getNoneHeaderName())
                 .anyRequest().authenticated()
             )

@@ -1,0 +1,75 @@
+@import url('../common/adminStyles.css');
+@import url('../common/sidebar.css');
+
+h2 {
+  font-family: "Sansita One", sans-serif;
+  font-size: 1.5em;
+  font-weight: 800;
+  font-style: normal;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 1rem 0;
+}
+
+h3 {
+  font-family: "Sansita One", sans-serif;
+  font-size: 1.5em;
+  font-weight: 800;
+  font-style: normal;
+  display: inline-block;
+  box-sizing: border-box;
+  padding-bottom: 1rem;
+}
+
+.header {
+  width: 80%;
+}
+
+/*사용자 통계 박스 css*/
+/*컨텐츠 통계 박스 css*/
+
+.user-statistics-container,
+.contents-statistics-container
+{
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding: 1rem;
+  margin: 1rem 0;
+  width: 80%;
+  box-sizing: border-box;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.1); /* 기본 그림자 */
+}
+
+.user-statistics-container .chart-container,
+.contents-statistics-container .chart-container
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 70%;
+  margin-right: 1.5rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+}
+
+.user-statistics-container .notice-container,
+.contents-statistics-container .notice-container
+{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 30%;
+  margin-left: 1.5rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+
+
+

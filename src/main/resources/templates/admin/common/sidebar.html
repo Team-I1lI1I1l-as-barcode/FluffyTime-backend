@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<aside class="sidebar" th:fragment="sidebar">
+  <h2>FluffyTime</h2>
+  <ul>
+    <li>
+      <a href="/admin">통계</a>
+    </li>
+    <li>
+      <a href="/admin/user">사용자 관리</a>
+    </li>
+    <li>
+      <a href="">콘텐츠 관리</a>
+    </li>
+    <li>
+      <a href="">보안 및 권한</a>
+    </li>
+    <li>
+      <a href="">알림</a>
+    </li>
+  </ul>
+  <div class="home">
+    <span class="material-symbols-rounded">home</span>
+    <a href="/">홈으로</a>
+  </div>
+  <div class="logout">
+    <span class="material-symbols-rounded">logout</span>
+    <a id="logout">로그아웃</a>
+  </div>
+</aside>
+</body>
+</html>
