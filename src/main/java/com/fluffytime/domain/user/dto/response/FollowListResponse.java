@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class FollowListResponse {
 
+    private Long myUserId;
+    private Long targetUserId;
     private String nickname;
     private String profileImageUrl;
     private String intro;
