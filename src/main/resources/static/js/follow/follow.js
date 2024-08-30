@@ -87,16 +87,11 @@ async function updateFollowCounts(nickname) {
 }
 
 // 팔로우 버튼 클릭 이벤트 핸들러
-async function handleFollowButtonClick(event) {
+async function handleFollowButtonClick(event, targetUserNickname) {
   const button = event.target.closest(".follow_button");
   if (!button) {
     return;
   } // 클릭된 요소가 팔로우 버튼이 아니면 무시
-
-  // 경로를 '/'로 분리하여 배열로 만들고 마지막 요소인 유저 닉네임을 얻는다
-  const path = window.location.pathname;
-  const pathSegments = path.split('/');
-  const targetUserNickname = pathSegments[pathSegments.length - 1];
 
   const action = button.dataset.action || "add"; // 초기 액션은 "add"
 
@@ -220,7 +215,7 @@ async function fetchList(type, nickname) {
         // 팔로우 버튼에 이벤트 핸들러 추가
         followButton.addEventListener('click', async (event) => {
           event.stopPropagation(); // 부모의 클릭 이벤트가 발생하지 않도록 막음
-          await handleFollowButtonClick(event);
+          await handleFollowButtonClick(event, item.nickname);
           await updateFollowCounts(nickname); // 팔로우/언팔로우 후 숫자 업데이트
         });
       }
@@ -269,7 +264,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     await updateFollowCounts(targetUserNickname);
 
     // 정적으로 생성된(화면에 무조건 있는) 팔로우 버튼에 대한 이벤트 핸들러
-    document.body.addEventListener("click", handleFollowButtonClick);
+    document.body.addEventListener("click", function (event) {
+      handleFollowButtonClick(event, targetUserNickname);
+    });
 
     // 팔로워 목록 불러오기 클릭 이벤트
     const followerText = document.querySelector("#follower_list_modal");
