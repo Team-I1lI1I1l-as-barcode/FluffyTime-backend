@@ -17,6 +17,7 @@ import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,14 @@ public class ChatServcie {
         return findUserById(userId);
     }
 
+    // 프로필 사진 찾기
+    public String findByProfileImage(String nickname) {
+        User user = findUserByNickname(nickname);
+        Profile profile = user.getProfile();
+        String fileUrl = profile.getProfileImages().getFilePath();
+        return fileUrl;
+    }
+
     // roomID 조회
     public Long findByRoomId(String roomName) {
         ChatRoom chatRoom = chatRoomRepository.findByRoomName(roomName).orElse(null);
@@ -81,7 +90,14 @@ public class ChatServcie {
         Set<String> recipient = chatRoomRepository.findAllOtherParticipants(nickname);
         Set<String> chatRoomList = chatRoomRepository.findByRoomNameContaining(nickname);
 
-        return new ChatRoomListResponse(recipient, chatRoomList);
+        // 프로필 사진 리스트 생성
+        Set<String> profileImages = new HashSet<>();
+        for (String username : recipient) {
+            String fileUrl = findByProfileImage(username);
+            profileImages.add(fileUrl);
+        }
+
+        return new ChatRoomListResponse(recipient, chatRoomList, profileImages);
     }
 
     // 토픽 생성하기

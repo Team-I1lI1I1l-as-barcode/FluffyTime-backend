@@ -22,6 +22,7 @@
 }
 
 .chat_list_sidebar h3 {
+  text-align: center;
   padding: 20px;
   margin: 0;
   background-color: #fff;
@@ -35,16 +36,30 @@
   overflow-y: auto;
 }
 
-.chat-room-list p {
-  display: flex;
-  align-items: center;
+.chat-item {
+  display: flex; /* img와 p 요소를 가로로 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
   padding: 15px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #ddd; /* 각 아이템을 구분하는 선 */
 }
 
-.chat-room-list p img {
+.chat-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px; /* 이미지와 텍스트 사이 간격 */
+  object-fit: cover;
+  flex-shrink: 0; /* 이미지가 축소되지 않도록 설정 */
+}
+
+.chat-item p {
+  margin: 0; /* p 태그의 기본 margin을 제거 */
+  flex: 1; /* 텍스트가 남은 공간을 차지하도록 설정 */
+}
+
+.chat-item p img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -52,8 +67,8 @@
   margin-right: 10px;
 }
 
-.chat-room-list p:hover,
-.chat-room-list p.active {
+.chat-item:hover,
+.chat-item.active {
   background-color: #e0e0e0;
 }
 

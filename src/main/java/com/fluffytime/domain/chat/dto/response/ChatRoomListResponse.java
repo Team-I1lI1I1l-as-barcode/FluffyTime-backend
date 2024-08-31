@@ -12,7 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChatRoomListResponse {
 
-    private Set<String> recipient; // 수신이
+    private Set<String> recipient; // 수신자
     private Set<String> chatRoomList; // 채널 이름
+    private Set<String> profileImages; // 수신자 프로필 사진
 
 }
