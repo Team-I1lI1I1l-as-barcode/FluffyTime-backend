@@ -1,12 +1,13 @@
 spring:
   application:
     name: fluffytime
-
+  # mysql 설정
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+
   # spring jpa 설정
   jpa:
     hibernate:
@@ -29,14 +30,23 @@ spring:
             enable: true
 
   data:
+    #  redis 설정
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
       timeout: 5000
+      #  mongo 설정
+    mongodb:
+      uri: mongodb://yoon:1234@localhost:27017/fluffytime?authSource=admin
+  #      host: localhost
+  #      port: 27017
+  #      database: fluffytime
+  #      username: root
+  #      password: 1234
 
-#oauth2
-#registration
+  #oauth2
+  #registration
   security:
     oauth2:
       client:

@@ -56,6 +56,8 @@ dependencies {
     implementation platform('software.amazon.awssdk:bom:2.20.64') // 최신 버전으로 변경
     // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    //mongo db
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 }
 
 
