@@ -1,15 +1,23 @@
 package com.fluffytime.domain.chat.service;
 
+import com.fluffytime.domain.chat.dto.response.ChatLogResponse;
 import com.fluffytime.domain.chat.dto.response.ChatResponse;
 import com.fluffytime.domain.chat.dto.response.ChatRoomListResponse;
+import com.fluffytime.domain.chat.dto.response.RecipientResponse;
+import com.fluffytime.domain.chat.entity.Chat;
 import com.fluffytime.domain.chat.entity.ChatRoom;
 import com.fluffytime.domain.chat.repository.ChatRoomRepository;
+import com.fluffytime.domain.chat.repository.MessageRepository;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.ProfileImages;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +32,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatServcie {
 
     private final UserRepository userRepository;
-    private final JwtTokenizer jwtTokenizer;
+    private final MessageRepository messageRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final JwtTokenizer jwtTokenizer;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisMessagePublisher redisMessagePublisher;
     private final RedisMessageSubscriber redisMessageSubscriber;
@@ -35,6 +44,13 @@ public class ChatServcie {
     public User findUserById(Long userId) {
         log.info("findUserById 실행");
         return userRepository.findById(userId).orElse(null);
+    }
+
+    // 사용자 조회(nickname으로 조회)  메서드
+    @Transactional
+    public User findUserByNickname(String nickname) {
+        log.info("findUserByNickname 실행");
+        return userRepository.findByNickname(nickname).orElse(null);
     }
 
     // accessToken 토큰으로 사용자 찾기  메서드
@@ -50,6 +66,12 @@ public class ChatServcie {
             ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
         // id(pk)에 해당되는 사용자 추출
         return findUserById(userId);
+    }
+
+    // roomID 조회
+    public Long findByRoomId(String roomName) {
+        ChatRoom chatRoom = chatRoomRepository.findByRoomName(roomName).orElse(null);
+        return chatRoom.getChatRoomId();
     }
 
     // 토픽 목록 불러오기
@@ -91,6 +113,37 @@ public class ChatServcie {
         ChannelTopic channelTopic = new ChannelTopic(roomName);
         redisMessageListenerContainer.addMessageListener(redisMessageSubscriber, channelTopic);
         return new ChatResponse(roomName, true);
+
+    }
+
+    // 수신자 정보 불러오기
+    public RecipientResponse recipientInfo(String nickname) {
+        User user = findUserByNickname(nickname);
+        Profile profile = user.getProfile();
+        ProfileImages profileImages = profile.getProfileImages();
+        String fileUrl = profileImages.getFilePath();
+        log.info("반려동물 이름!!!!!!!!!!" + profile.getPetName());
+        return RecipientResponse.builder()
+            .petName(profile.getPetName())
+            .nickname(nickname)
+            .fileUrl(fileUrl)
+            .build();
+    }
+
+    // 채팅 내역 가져오기
+    public ChatLogResponse chatLog(String roomName, HttpServletRequest request) {
+        Long chatRoomId = findByRoomId(roomName);
+        String sender = findByAccessToken(request).getNickname();
+        List<Chat> chat = messageRepository.findByRoomId(chatRoomId);
+
+        List<String> chatLog = new ArrayList<>();
+
+        for (Chat chatMessage : chat) {
+            String logEntry = chatMessage.getSender() + " : " + chatMessage.getContent();
+            chatLog.add(logEntry);
+        }
+
+        return new ChatLogResponse(roomName, sender, chatLog);
 
     }
 

@@ -23,4 +23,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "FROM chat_room c " +
             "WHERE c.participantA = :nickname OR c.participantB = :nickname")
     Set<String> findAllOtherParticipants(@Param("nickname") String nickname);
+
+
 }

@@ -1,7 +1,5 @@
 package com.fluffytime.global.config;
 
-import com.fluffytime.domain.chat.service.ChatServcie;
-import com.fluffytime.domain.chat.service.RedisMessageSubscriber;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +11,6 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @RequiredArgsConstructor
 public class RedisListenerConfig {
 
-    private final ChatServcie chatServcie;
-    private final RedisMessageSubscriber redisMessageSubscriber;
 
     // Spring Data Redis에서 제공하는 클래스이며, Redis의 pub/sub을 처리하는 리스너 컨테이너 생성
     @Bean

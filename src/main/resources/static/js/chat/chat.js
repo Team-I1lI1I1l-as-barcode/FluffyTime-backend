@@ -4,6 +4,9 @@ const chatMessages = document.getElementById('chatMessages');
 const emptyMessage = document.getElementById('empty-message');
 const chatHeader = document.getElementById('chat-header');
 const sendMessageBtn = document.getElementById('sendMessage');
+const recipient = document.getElementById('recipient');
+const recipientProfile = document.getElementById('recipient_profile');
+const recipientPetName = document.getElementById('recipient_pet_name');
 let ws; // 웹소켓
 
 function initialize() {
@@ -45,12 +48,21 @@ function createChatRoomList(data) {
   data.chatRoomList.forEach(roomName => {
     const chatRoom = document.createElement('p');
     chatRoom.textContent = data.recipient[count];
-    count += 1;
+    const recipient = data.recipient[count];
+
     chatRoom.addEventListener('click', () => {
-      console.log(`${roomName}와 채팅을 시작합니다.`);
+      console.log(`${recipient}와 채팅을 시작합니다.`);
+      // 수신자의 정보 불러오기
+      fetchChat(`/chat/recipient/${encodeURIComponent(recipient)}`,
+          'GET', recipientInfo);
       emptyMessage.style.display = "none";
       chatHeader.style.display = "flex";
       chatMessages.innerHTML = ''; // 기존 메시지 지우기
+
+      // 메시지 리스트 가져오기
+      fetchChat(`/chat/log/${encodeURIComponent(roomName)}`,
+          'GET', chatLog);
+
       if (ws) {
         ws.close(); // 기존 WebSocket 연결 종료
       }
@@ -74,8 +86,25 @@ function createChatRoomList(data) {
       fetchChat(`/chat/topics/${encodeURIComponent(roomName)}`, "GET",
           ServerResponse);
     });
+    count += 1;
     chatRooms.appendChild(chatRoom);
   });
+}
+
+function recipientInfo(data) {
+  recipient.innerText = data.nickname;
+  // data.PetName이 null이거나 undefined인 경우 빈 문자열로 처리
+  recipientPetName.innerText = data.petName;
+  recipientProfile.src = data.fileUrl;
+
+}
+
+function chatLog(data) {
+  data.chatLog.forEach(log => {
+    const messageElement = document.createElement("p");
+    messageElement.innerText = log;
+    chatMessages.appendChild(messageElement);
+  })
 }
 
 function ServerResponse(data) {

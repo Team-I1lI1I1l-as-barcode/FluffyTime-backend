@@ -1,15 +1,13 @@
 package com.fluffytime.domain.chat.controller.api;
 
+import com.fluffytime.domain.chat.dto.response.ChatLogResponse;
 import com.fluffytime.domain.chat.dto.response.ChatResponse;
 import com.fluffytime.domain.chat.dto.response.ChatRoomListResponse;
-import com.fluffytime.domain.chat.repository.ChatRoomRepository;
+import com.fluffytime.domain.chat.dto.response.RecipientResponse;
 import com.fluffytime.domain.chat.service.ChatServcie;
-import com.fluffytime.domain.chat.service.RedisMessagePublisher;
-import com.fluffytime.domain.chat.service.RedisMessageSubscriber;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class ChatApiController {
 
-    private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final RedisMessagePublisher redisMessagePublisher;
-    private final RedisMessageSubscriber redisMessageSubscriber;
     private final ChatServcie chatServcie;
-    private final ChatRoomRepository chatRoomRepository;
 
     // 토픽 목록
     @GetMapping("/topics")
@@ -52,6 +46,23 @@ public class ChatApiController {
 
         ChatResponse chatResponse = chatServcie.JoinTopic(roomName);
         return ResponseEntity.status(HttpStatus.OK).body(chatResponse);
+    }
+
+    // 수신자의 정보 가져오기
+    @GetMapping("/recipient/{nickname}")
+    public ResponseEntity<RecipientResponse> recipientInfo(
+        @PathVariable(name = "nickname") String nickname) {
+        RecipientResponse recipientResponse = chatServcie.recipientInfo(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(recipientResponse);
+    }
+
+    // 채팅 내역 가져오기
+    @GetMapping("/log/{roomName}")
+    public ResponseEntity<ChatLogResponse> chatLog(
+        @PathVariable(name = "roomName") String roomName, HttpServletRequest request) {
+        ChatLogResponse chatLogResponse = chatServcie.chatLog(roomName, request);
+        return ResponseEntity.status(HttpStatus.OK).body(chatLogResponse);
+
     }
 //    // 토픽 제거
 //    @DeleteMapping("/topics/{roomName}")
