@@ -17,8 +17,10 @@ import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,20 +87,42 @@ public class ChatServcie {
 
     // 토픽 목록 불러오기
     public ChatRoomListResponse getTopicList(HttpServletRequest request) {
-        String nickname = findByAccessToken(request).getNickname(); // 로그인한 유저 nickname
+        // 로그인한 유저의 닉네임 가져오기
+        User user = findByAccessToken(request);
+        if (user == null) {
+            // 사용자 정보가 없을 경우 적절한 예외 처리
+            throw new IllegalStateException("User not found.");
+        }
+        String nickname = user.getNickname();
         log.info(nickname + "의 토픽 목록 불러오기!");
-        Set<String> recipient = chatRoomRepository.findAllOtherParticipants(nickname);
-        Set<String> chatRoomList = chatRoomRepository.findByRoomNameContaining(nickname);
+
+        // Optional 처리
+        Set<String> recipient = chatRoomRepository.findAllOtherParticipants(nickname)
+            .orElse(Collections.emptySet());
+        Set<String> chatRoomList = chatRoomRepository.findByRoomNameContaining(nickname)
+            .orElse(Collections.emptySet());
 
         // 프로필 사진 리스트 생성
         Set<String> profileImages = new HashSet<>();
         for (String username : recipient) {
             String fileUrl = findByProfileImage(username);
-            profileImages.add(fileUrl);
+            if (fileUrl != null) {
+                profileImages.add(fileUrl);
+            }
         }
 
-        return new ChatRoomListResponse(recipient, chatRoomList, profileImages);
+        // 최근 채팅 리스트 생성
+        List<String> recentChatList = new ArrayList<>();
+        for (String roomName : chatRoomList) {
+            String recentChat = recentChatLog(roomName);
+            if (recentChat != null) {
+                recentChatList.add(recentChat);
+            }
+        }
+
+        return new ChatRoomListResponse(recipient, chatRoomList, profileImages, recentChatList);
     }
+
 
     // 토픽 생성하기
     public ChatResponse createTopic(String nickname, HttpServletRequest request) {
@@ -138,7 +162,7 @@ public class ChatServcie {
         Profile profile = user.getProfile();
         ProfileImages profileImages = profile.getProfileImages();
         String fileUrl = profileImages.getFilePath();
-        log.info("반려동물 이름!!!!!!!!!!" + profile.getPetName());
+
         return RecipientResponse.builder()
             .petName(profile.getPetName())
             .nickname(nickname)
@@ -146,21 +170,47 @@ public class ChatServcie {
             .build();
     }
 
+    // 각 채팅방별로 마지막 채팅 내역 가져오기
+    public String recentChatLog(String roomName) {
+        Long chatRoomId = findByRoomId(roomName);
+
+        // messageRepository.findByRoomId(chatRoomId)의 반환값이 Optional<List<Chat>>일 때
+        Optional<List<Chat>> optionalChat = messageRepository.findByRoomId(chatRoomId);
+
+        // Optional이 비어있지 않으며, List가 비어있지 않은 경우에만 작업 수행
+        if (optionalChat.isPresent()) {
+            List<Chat> chat = optionalChat.get();
+            if (!chat.isEmpty()) {
+                // List가 비어있지 않으므로 마지막 요소의 content 반환
+                return chat.get(chat.size() - 1).getContent(); // getLast() 대신 get(size() - 1)
+            }
+        }
+        // chat이 null이거나 빈 List인 경우
+        return null;
+    }
+
     // 채팅 내역 가져오기
     public ChatLogResponse chatLog(String roomName, HttpServletRequest request) {
         Long chatRoomId = findByRoomId(roomName);
         String sender = findByAccessToken(request).getNickname();
-        List<Chat> chat = messageRepository.findByRoomId(chatRoomId);
+
+        // Optional<List<Chat>> 반환으로 변경
+        List<Chat> chat = messageRepository.findByRoomId(chatRoomId)
+            .orElse(Collections.emptyList());
 
         List<String> chatLog = new ArrayList<>();
-
         for (Chat chatMessage : chat) {
-            String logEntry = chatMessage.getSender() + " : " + chatMessage.getContent();
+            // null 체크 및 기본값 설정
+            String senderName =
+                chatMessage.getSender() != null ? chatMessage.getSender() : "Unknown";
+            String content =
+                chatMessage.getContent() != null ? chatMessage.getContent() : "No content";
+            String logEntry = senderName + " : " + content;
             chatLog.add(logEntry);
         }
 
-        return new ChatLogResponse(roomName, sender, chatLog);
-
+        return new ChatLogResponse(roomName, sender != null ? sender : "Unknown Sender", chatLog);
     }
+
 
 }

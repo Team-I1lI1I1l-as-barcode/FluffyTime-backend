@@ -39,6 +39,7 @@
 .chat-item {
   display: flex; /* img와 p 요소를 가로로 정렬 */
   align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center;
   padding: 15px;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -59,13 +60,6 @@
   flex: 1; /* 텍스트가 남은 공간을 차지하도록 설정 */
 }
 
-.chat-item p img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #ddd;
-  margin-right: 10px;
-}
 
 .chat-item:hover,
 .chat-item.active {
@@ -81,11 +75,15 @@
   background-color: #fff;
 }
 
+.recent_chat {
+  font-size: 13px;
+  color: #888;
+}
+
 .chat-header {
-  display: none; /* Hidden unless chat is active */
+  display: none;
   padding: 20px;
   border-bottom: 1px solid #ddd;
-  background-color: #f7f7f7;
   align-items: center;
 }
 
@@ -112,15 +110,57 @@
   padding: 20px;
   overflow-y: auto;
   width: 100%;
-  background-color: #fff;
+  background-color: #f7f7f7; /* 배경색을 밝은 회색으로 변경 */
+  display: flex;
+  flex-direction: column; /* 메시지들을 수직으로 배치 */
+  gap: 10px; /* 각 메시지 간의 간격 */
 }
 
 .chat-messages p {
-  margin: 10px 0;
-  padding: 10px;
-  background-color: #f1f1f1;
-  border-radius: 5px;
-  max-width: 70%;
+  max-width: 60%; /* 메시지의 최대 너비 설정 */
+  padding: 10px 15px; /* 메시지 내용의 여백 */
+  border-radius: 20px; /* 메시지 버블의 모서리를 둥글게 */
+  line-height: 1.5; /* 텍스트의 줄 간격 설정 */
+  font-size: 14px; /* 텍스트 크기 설정 */
+  position: relative; /* 화살표 위치 조정을 위해 relative 설정 */
+}
+
+/* 송신자 메시지 스타일 */
+.chat-messages p.sender {
+  align-self: flex-end; /* 송신자의 메시지를 오른쪽에 정렬 */
+  background-color: #0084ff; /* 송신자 메시지의 배경색 (인스타 블루) */
+  color: #fff; /* 텍스트 색상 흰색으로 설정 */
+}
+
+/* 수신자 메시지 스타일 */
+.chat-messages p.receiver {
+  align-self: flex-start; /* 수신자의 메시지를 왼쪽에 정렬 */
+  background-color: #e4e6eb; /* 수신자 메시지의 배경색 (밝은 회색) */
+  color: #000; /* 텍스트 색상 검정으로 설정 */
+}
+
+/* 송신자 메시지의 화살표 */
+.chat-messages p.sender::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent transparent transparent #0084ff;
+}
+
+/* 수신자 메시지의 화살표 */
+.chat-messages p.receiver::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #e4e6eb transparent transparent;
 }
 
 .chat-messages p.sent {

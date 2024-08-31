@@ -38,12 +38,7 @@ spring:
       timeout: 5000
       #  mongo 설정
     mongodb:
-      uri: mongodb://yoon:1234@localhost:27017/fluffytime?authSource=admin
-  #      host: localhost
-  #      port: 27017
-  #      database: fluffytime
-  #      username: root
-  #      password: 1234
+      uri: ${MONGO_URI}
 
   #oauth2
   #registration

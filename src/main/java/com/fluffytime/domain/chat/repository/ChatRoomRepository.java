@@ -16,13 +16,13 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByRoomName(String roodName);
 
     @Query("SELECT c.roomName FROM chat_room c WHERE c.roomName LIKE %:nickname%")
-    Set<String> findByRoomNameContaining(@Param("nickname") String nickname);
+    Optional<Set<String>> findByRoomNameContaining(@Param("nickname") String nickname);
 
     @Query(
         "SELECT CASE WHEN c.participantA = :nickname THEN c.participantB ELSE c.participantA END " +
             "FROM chat_room c " +
             "WHERE c.participantA = :nickname OR c.participantB = :nickname")
-    Set<String> findAllOtherParticipants(@Param("nickname") String nickname);
+    Optional<Set<String>> findAllOtherParticipants(@Param("nickname") String nickname);
 
 
 }

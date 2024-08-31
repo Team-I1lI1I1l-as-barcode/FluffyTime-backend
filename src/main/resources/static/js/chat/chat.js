@@ -8,7 +8,9 @@ const recipient = document.getElementById('recipient');
 const recipientProfile = document.getElementById('recipient_profile');
 const recipientPetName = document.getElementById('recipient_pet_name');
 let currentSelectedChatItem = null; // 현재 선택된 chatItem을 추적하는 변수
+let currentSelectedChat = null; // 현재 선택된 chat을 추적하는 변수
 let ws; // 웹소켓
+let roomRecipient = null; // 채널 방 주인(본인)
 
 function initialize() {
   fetchChat("/chat/topics", "GET", createChatRoomList);
@@ -48,18 +50,30 @@ function createChatRoomList(data) {
   let count = 0;
   data.chatRoomList.forEach(roomName => {
     const chatRoom = document.createElement('p');
+    const recentChat = document.createElement('p');
     const profileImage = document.createElement('img');
     const chatItem = document.createElement('div');
-    chatItem.classList.add('chat-item'); // id 대신 class를 사용해 관리
-    profileImage.classList.add('profile_Image'); // id 대신 class를 사용
-    chatRoom.textContent = data.recipient[count];
-    const recipient = data.recipient[count];
-    profileImage.src = data.profileImages[count];
-    count += 1;
+    chatItem.classList.add('chat-item'); // class 이름 추가
+    profileImage.classList.add('profile_Image'); // class 이름 추가
+    recentChat.classList.add('recent_chat'); // class 이름 추가
+    let recipient;
+    if (data.recipient !== null) {
+      chatRoom.textContent = data.recipient[count];
+      recipient = data.recipient[count];
+    }
+
+    if (data.profileImages !== null) {
+      profileImage.src = data.profileImages[count];
+    }
+
+    if (data.recentChat !== null) {
+      recentChat.textContent = data.recentChat[count];
+    }
     chatItem.appendChild(profileImage);
     chatItem.appendChild(chatRoom);
+    chatItem.appendChild(recentChat);
     roomList.appendChild(chatItem);
-
+    count += 1;
     chatItem.addEventListener('click', () => {
       // 이전에 선택된 chatItem의 배경색 초기화
       if (currentSelectedChatItem && currentSelectedChatItem !== chatItem) {
@@ -69,7 +83,7 @@ function createChatRoomList(data) {
       // 현재 선택된 chatItem의 배경색 설정
       chatItem.style.background = "#fbc02d";
       currentSelectedChatItem = chatItem; // 현재 선택된 chatItem을 갱신
-
+      currentSelectedChat = recentChat;
       console.log(`${recipient}와 채팅을 시작합니다.`);
       // 수신자의 정보 불러오기
       fetchChat(`/chat/recipient/${encodeURIComponent(recipient)}`, 'GET',
@@ -87,10 +101,24 @@ function createChatRoomList(data) {
       ws = new WebSocket(`ws://${window.location.host}/ws?room=${roomName}`);
       ws.onmessage = function (event) {
         console.log('Message received: ', event.data);
+        const sender = event.data.split(':')[0].trim(); // 메시지 발신자
+
         const messageElement = document.createElement("p");
-        messageElement.innerText = event.data;
+        messageElement.innerText = event.data.split(":").pop().trim();
+
+        if (roomRecipient && roomRecipient !== recipient) {
+          roomRecipient.className = '';
+        }
+        roomRecipient = recipient;
+
+        if (sender === roomRecipient) {// 메시지를 보내는 사람과 실제 채널에서 수신자와 같다면
+          messageElement.classList.add('receiver');
+        } else {
+          messageElement.classList.add('sender');
+        }
         chatMessages.appendChild(messageElement);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤을 자동으로 내리기 (최신 메시지를 보기 위함)
+        currentSelectedChat.textContent = event.data.split(':').pop().trim();
       };
       ws.onopen = function () {
         console.log('WebSocket connection established.');
@@ -103,24 +131,35 @@ function createChatRoomList(data) {
       };
       fetchChat(`/chat/topics/${encodeURIComponent(roomName)}`, "GET",
           ServerResponse);
+
     });
   });
 }
 
 function recipientInfo(data) {
-  recipient.innerText = data.nickname;
-  // data.PetName이 null이거나 undefined인 경우 빈 문자열로 처리
-  recipientPetName.innerText = data.petName;
-  recipientProfile.src = data.fileUrl;
+  if (data != null) {
+    recipient.innerText = data.nickname;
+    // data.PetName이 null이거나 undefined인 경우 빈 문자열로 처리
+    recipientPetName.innerText = data.petName;
+    recipientProfile.src = data.fileUrl;
+  }
 
 }
 
 function chatLog(data) {
-  data.chatLog.forEach(log => {
-    const messageElement = document.createElement("p");
-    messageElement.innerText = log;
-    chatMessages.appendChild(messageElement);
-  })
+  if (data.chatLog != null) {
+    data.chatLog.forEach(log => {
+      const messageElement = document.createElement("p");
+      messageElement.innerText = log.split(":").pop().trim();
+      if (data.sender === log.split(":")[0].trim()) {// 메시지를 보내는 사람과 실제 채널에서 발신자와 같다면
+        messageElement.classList.add('sender');
+      } else {
+        messageElement.classList.add('receiver');
+      }
+      chatMessages.appendChild(messageElement);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤을 자동으로 내리기 (최신 메시지를 보기 위함)
+  }
 }
 
 function ServerResponse(data) {
