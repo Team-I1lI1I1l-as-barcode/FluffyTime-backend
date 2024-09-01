@@ -27,6 +27,12 @@ async function loadEditPostData(postId) {
     document.getElementById('profileImage').src = postData.profileImageurl || '/image/profile/profile.png';
     document.getElementById('charCount').textContent = `${postData.content.length} / 2200`;
 
+    // 좋아요 숨기기 상태 설정
+    document.getElementById('hideLikes').checked = postData.hideLikeCount;
+
+    // 댓글 기능 해제 상태 설정
+    document.getElementById('disableComments').checked = postData.commentsDisabled;
+
     // 태그 보여주기
     tagsSet = new Set(postData.tags)
     displayTagList()
@@ -97,7 +103,7 @@ function removeTag(event, tag) {
   displayTagList(); // DOM 업데이트
 }
 
-// 이미지 미리보기 및 파일 처리 함수
+// 이미지와 동영상 파일을 미리보기로 처리하는 함수
 function previewImages(event) {
   const files = event.target.files;
   const container = document.getElementById('imagePreviewContainer');
@@ -113,9 +119,13 @@ function previewImages(event) {
     const file = files[i];
     const reader = new FileReader();
     reader.onload = function (e) {
-      imagesArray.push({ file: file, url: e.target.result });
+      const fileUrl = e.target.result;
+      const fileExtension = file.name.split('.').pop().toLowerCase();
+
+      imagesArray.push({ file: file, url: fileUrl, filepath: fileUrl });
+
       if (i === 0) {
-        displayImage(e.target.result);
+        displayImageOrVideo(fileUrl, fileExtension);
       }
     };
     reader.readAsDataURL(file);
@@ -128,36 +138,58 @@ function previewImages(event) {
   }
 }
 
-// 선택된 이미지를 화면에 표시하는 함수
-function displayImage(url) {
-  const img = document.createElement('img');
-  img.src = url;
-  img.classList.add('photo');
-  img.style.width = '100%';  // 이미지가 컨테이너에 꽉 차도록 설정
-  img.style.height = '100%'; // 이미지가 컨테이너에 꽉 차도록 설정
-  img.style.objectFit = 'cover'; // 이미지 비율을 유지하면서 컨테이너에 맞게 조정
-  document.getElementById('imagePreviewContainer').appendChild(img);
+// 선택된 이미지나 동영상을 화면에 표시하는 함수
+function displayImageOrVideo(url, fileExtension) {
+  const container = document.getElementById('imagePreviewContainer');
+  container.innerHTML = '';
+
+  let mediaElement;
+  if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'webm') {
+    mediaElement = document.createElement('video');
+    mediaElement.controls = true;
+  } else {
+    mediaElement = document.createElement('img');
+  }
+
+  mediaElement.src = url;
+  mediaElement.style.width = '100%';
+  mediaElement.style.height = '100%';
+  mediaElement.style.objectFit = 'cover';
+
+  container.appendChild(mediaElement);
 }
 
-// 이미지 컨테이너를 업데이트하는 함수
+// 이미지 및 동영상 컨테이너를 업데이트하는 함수
 function updateImageContainer(containerId, urls) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
 
-  urls.forEach((imageObj, index) => {
-    const img = document.createElement('img');
-    img.src = imageObj.filepath;
-    img.alt = `image ${index + 1}`;
-    img.style.display = index === 0 ? 'block' : 'none';
-    img.className = index === 0 ? 'active' : '';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    img.onerror = () => {
-      console.error('이미지 로드 실패:', imageObj.filepath);
-      img.parentElement.removeChild(img);
+  urls.forEach((mediaObj, index) => {
+    let mediaElement;
+    const fileExtension = mediaObj.filepath.split('.').pop().toLowerCase(); // 파일 확장자 추출
+
+    if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'webm') {
+      mediaElement = document.createElement('video');
+      mediaElement.controls = true;
+      mediaElement.src = mediaObj.url || mediaObj.filepath; // 동영상 파일 경로 설정
+    } else {
+      mediaElement = document.createElement('img');
+      mediaElement.src = mediaObj.url || mediaObj.filepath; // 이미지 파일 경로 설정
+    }
+
+    mediaElement.alt = `media ${index + 1}`;
+    mediaElement.style.display = index === 0 ? 'block' : 'none';
+    mediaElement.className = index === 0 ? 'active' : '';
+    mediaElement.style.width = '100%';
+    mediaElement.style.height = '100%';
+    mediaElement.style.objectFit = 'cover';
+
+    mediaElement.onerror = () => {
+      console.error('미디어 로드 실패:', mediaObj.url || mediaObj.filepath);
+      mediaElement.parentElement.removeChild(mediaElement);
     };
-    container.appendChild(img);
+
+    container.appendChild(mediaElement);
   });
 }
 
@@ -179,12 +211,12 @@ function nextImage(event) {
   }
 }
 
-// 현재 인덱스에 해당하는 이미지를 표시하는 함수
+// 현재 인덱스에 해당하는 이미지를 표시하는 함수 (동영상도 포함)
 function showImage(index, containerId) {
-  const images = document.querySelectorAll(`#${containerId} img`);
-  images.forEach((img, idx) => {
-    img.style.display = idx === index ? 'block' : 'none';
-    img.className = idx === index ? 'active' : '';
+  const mediaElements = document.querySelectorAll(`#${containerId} img, #${containerId} video`);
+  mediaElements.forEach((media, idx) => {
+    media.style.display = idx === index ? 'block' : 'none';
+    media.className = idx === index ? 'active' : '';
   });
 }
 
@@ -198,10 +230,19 @@ function toggleSlideButtons(length, prevBtnId, nextBtnId) {
 // 게시물 수정 완료 후 서버로 데이터를 전송하는 함수
 async function submitEditPost() {
   const content = document.getElementById('content').value;
+  const hideLikes = document.getElementById('hideLikes').checked; // 좋아요 숨김 상태 가져오기
+  const disableComments = document.getElementById('disableComments').checked; // 댓글 기능 해제 상태 가져오기
 
+  // formData 객체 생성 및 게시물 데이터 추가
   const formData = new FormData();
-  formData.append('post', new Blob([JSON.stringify({ content: content, tags: Array.from(tagsSet) })], { type: 'application/json' }));
+  formData.append('post', new Blob([JSON.stringify({
+    content: content,
+    tags: Array.from(tagsSet), // 태그 배열
+    hideLikeCount: hideLikes,  // 좋아요 숨김 상태 추가
+    commentsDisabled: disableComments // 댓글 기능 해제 상태 추가
+  })], { type: 'application/json' }));
 
+  // 이미지 파일이 있는 경우 formData에 추가
   imagesArray.forEach(imageObj => {
     if (imageObj.file) {
       formData.append('images', imageObj.file);
@@ -209,6 +250,7 @@ async function submitEditPost() {
   });
 
   try {
+    // 서버로 POST 요청 전송
     const response = await fetch(`/api/posts/edit/${currentPostId}`, {
       method: 'POST',
       body: formData,
@@ -220,7 +262,6 @@ async function submitEditPost() {
     }
 
     alert('게시물이 수정되었습니다.');
-
     // 페이지 이동
     window.location.replace(`/posts/detail/${currentPostId}`);
   } catch (error) {

@@ -245,12 +245,17 @@ function updateCharCount() {
 }
 
 // 게시물 데이터를 준비하는 함수
-function preparePostData(tempId, content, tagsSet ,status) {
+function preparePostData(tempId, content, tagsSet, status) {
+  const hideLikes = document.getElementById('hideLikes').checked;  // 좋아요 숨김 상태 가져오기
+  const disableComments = document.getElementById('disableComments').checked;  // 댓글 기능 해제 상태 가져오기
+
   return {
     tempId: tempId, // 임시 저장된 게시물의 ID (없으면 null)
     content: content, // 게시물 내용
-    tags: Array.from(tagsSet),
+    tags: Array.from(tagsSet), // 태그 배열
     tempStatus: status, // 게시물 상태 (임시 저장 또는 최종 저장)
+    hideLikeCount: hideLikes, // 좋아요 숨김 여부
+    commentsDisabled: disableComments // 댓글 기능 해제 여부
   };
 }
 
@@ -432,6 +437,9 @@ function continueDraft(post) {
   document.getElementById('images').disabled = true; // 이미지 입력 비활성화
   shareButton.style.display = 'none'; // 이미지 선택 버튼 숨기기
   dragDropText.style.display = 'none'; // 드래그 앤 드롭 텍스트 숨기기
+
+  document.getElementById('hideLikes').checked = post.hideLikeCount; // 숨김 상태 반영
+  document.getElementById('disableComments').checked = post.commentsDisabled; // 댓글 해제 상태 반영
 
   closeDraftModal(); // 임시 저장 모달 닫기
   openPostCreationModal(); // 게시물 작성 모달 열기

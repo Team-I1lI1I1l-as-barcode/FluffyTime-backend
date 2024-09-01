@@ -89,7 +89,19 @@ async function loadPostData(postId) {
       commentForm.style.display = 'flex'; // 댓글 작성 폼 보이기 추가
       commentToggleButton.textContent = '댓글 기능 해제';
     }
-    console.log(`초기화 후 comment section display 상태: ${commentSection.style.display}`);
+    //console.log(`업데이트 후 comment section display 상태: ${commentSection.style.display}`);
+
+    // 좋아요 수 숨김 상태 설정
+    const likeHideButtons = document.querySelectorAll('.dropdown-menu a.like-hide');
+    likeHideButtons.forEach(button => {
+      if (postData.hideLikeCount) {
+        button.innerText = '다른 사람에게 좋아요 수 숨기기 취소';
+        document.getElementById('likeCountSpan').style.display = 'none';
+      } else {
+        button.innerText = '다른 사람에게 좋아요 수 숨기기';
+        document.getElementById('likeCountSpan').style.display = 'inline';
+      }
+    });
 
   } catch (error) {
     console.error('게시물 데이터 로드 중 오류 발생:', error.message);
@@ -98,6 +110,7 @@ async function loadPostData(postId) {
 }
 
 function displayTagList() {
+  const tagList = document.getElementById('tagList');
   tagList.innerHTML = ''; // 기존 태그 리스트 초기화
   tagsSet.forEach(tag => {
     const tagElement = document.createElement('span');
@@ -186,7 +199,6 @@ function toggleSlideButtons(length, prevBtnId, nextBtnId) {
   document.getElementById(prevBtnId).style.display = displayValue; // 이전 버튼
   document.getElementById(nextBtnId).style.display = displayValue; // 다음 버튼
 }
-
 
 // 모달을 여는 함수
 function openPostDetailModal() {
@@ -313,41 +325,25 @@ async function toggleBookmark() {
 
 // 댓글 기능 토글 함수
 async function toggleComments() {
-  try {
-    const response = await fetch(`/api/posts/toggle-comments/${currentPostId}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+  // 서버에 댓글 기능 토글 요청 보내기
+  const response = await fetch(`/api/posts/toggle-comments/${currentPostId}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
 
-    if (!response.ok) {
-      throw new Error('댓글 기능을 토글하는 중 문제가 발생했습니다.');
-    }
+  // 상태에 따라 UI 업데이트
+  const commentSection = document.getElementById('comment-list');
+  const commentForm = document.querySelector('.comment-form');
+  const commentToggleButtons = document.querySelectorAll('.dropdown-menu a.comment-toggle');
 
-    // 댓글 기능 상태를 확인하여 UI를 업데이트
-    const commentSection = document.getElementById('comment-list');
-    const commentForm = document.querySelector('.comment-form'); // 댓글 작성 폼
-    const commentToggleButtons = document.querySelectorAll('.dropdown-menu a.comment-toggle');
-
-    // 현재 상태를 체크하여 토글
-    commentToggleButtons.forEach(button => {
-      if (commentSection.style.display === 'none' && commentForm.style.display === 'none') {
-        commentSection.style.display = 'block';
-        commentForm.style.display = 'block'; // 댓글 작성 폼 보이기
-        if (button.innerText.trim() === '댓글 기능 설정') {
-          button.innerText = '댓글 기능 해제';
-        }
-      } else {
-        commentSection.style.display = 'none';
-        commentForm.style.display = 'none'; // 댓글 작성 폼 숨기기
-        if (button.innerText.trim() === '댓글 기능 해제') {
-          button.innerText = '댓글 기능 설정';
-        }
-      }
-    });
-
-  } catch (error) {
-    console.error('댓글 기능 토글 중 오류 발생:', error.message);
-    alert('댓글 기능을 토글하는 중 오류가 발생했습니다.');
+  if (commentSection.style.display === 'none') {
+    commentSection.style.display = 'block';
+    commentForm.style.display = 'block';
+    commentToggleButtons.forEach(button => button.innerText = '댓글 기능 해제');
+  } else {
+    commentSection.style.display = 'none';
+    commentForm.style.display = 'none';
+    commentToggleButtons.forEach(button => button.innerText = '댓글 기능 설정');
   }
 }
 
@@ -401,12 +397,33 @@ async function checkIfUserIsAuthor(postId) {
   }
 }
 
+// 좋아요 수 숨기기 토글 함수
+async function toggleLikeVisibility() {
+  // 서버에 좋아요 수 숨기기/보이기 요청 보내기
+  const response = await fetch(`/api/posts/toggle-like-visibility/${currentPostId}`, {
+    method: 'POST',
+    credentials: 'include',
+  });
+
+  // 상태에 따라 UI 업데이트
+  const likeCountSpan = document.getElementById('likeCountSpan');
+  const likeHideButtons = document.querySelectorAll('.dropdown-menu a.like-hide');
+
+  if (likeCountSpan.style.display === 'none') {
+    likeCountSpan.style.display = 'inline';
+    likeHideButtons.forEach(button => button.innerText = '다른 사람에게 좋아요 수 숨기기');
+  } else {
+    likeCountSpan.style.display = 'none';
+    likeHideButtons.forEach(button => button.innerText = '다른 사람에게 좋아요 수 숨기기 취소');
+  }
+}
+
 // 게시물 수정 페이지로 이동하는 함수
 function editPost() {
   window.location.href = `/posts/edit/${currentPostId}`;
 }
 
-// 페이지 로드 시 댓글 상태를 확인하여 초기 설정
+// 페이지 로드 시 초기 설정
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('페이지 로드 완료');
 

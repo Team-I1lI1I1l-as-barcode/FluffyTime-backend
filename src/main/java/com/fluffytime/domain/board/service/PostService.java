@@ -70,6 +70,8 @@ public class PostService {
             post.setTempStatus(TempStatus.SAVE);
             post.setUpdatedAt(LocalDateTime.now());
             post.setContent(postRequest.getContent());
+            post.setHideLikeCount(postRequest.isHideLikeCount());
+            post.setCommentsDisabled(postRequest.isCommentsDisabled());
         } else {
             // 새 게시물 생성
             post = Post.builder()
@@ -77,6 +79,8 @@ public class PostService {
                 .content(postRequest.getContent())
                 .createdAt(LocalDateTime.now())
                 .tempStatus(TempStatus.SAVE)  // 새로 생성되는 게시물은 최종 등록 상태로 설정
+                .hideLikeCount(postRequest.isHideLikeCount())
+                .commentsDisabled(postRequest.isCommentsDisabled())
                 .build();
         postRepository.save(post);
         }
@@ -109,6 +113,8 @@ public class PostService {
             // 게시물 내용 업데이트
             post.setContent(postRequest.getContent());
             post.setUpdatedAt(LocalDateTime.now());
+            post.setHideLikeCount(postRequest.isHideLikeCount());
+            post.setCommentsDisabled(postRequest.isCommentsDisabled());
         } else {
             // 현재 사용자의 임시 저장 글 개수를 확인
             List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus(user.getUserId(), TempStatus.TEMP);
@@ -130,6 +136,8 @@ public class PostService {
                 .content(postRequest.getContent())
                 .createdAt(LocalDateTime.now())
                 .tempStatus(TempStatus.TEMP)
+                .hideLikeCount(postRequest.isHideLikeCount())
+                .commentsDisabled(postRequest.isCommentsDisabled())
                 .build();
 
             postRepository.save(post);
@@ -201,6 +209,8 @@ public class PostService {
 
         // 게시물 내용을 업데이트함
         existingPost.setContent(postRequest.getContent());
+        existingPost.setHideLikeCount(postRequest.isHideLikeCount());
+        existingPost.setCommentsDisabled(postRequest.isCommentsDisabled());
 
         // 새로운 파일이 업로드된 경우 이미지를 저장함
         if (files != null && files.length > 0) {
@@ -282,7 +292,7 @@ public class PostService {
     }
 
     private void checkFileSize(MultipartFile file) {
-        long maxSize = file.getContentType().startsWith("video/") ? 104857600 : 10485760; // 동영상은 100MB, 이미지는 10MB
+        long maxSize = 104857600; // 모든 파일에 대해 최대 100MB로 설정
         if (file.getSize() > maxSize) {
             throw new FileSizeExceeded();
         }
@@ -297,10 +307,15 @@ public class PostService {
     // 지원되는 파일 형식인지 확인
     private boolean isSupportedFormat(String contentType) {
         return contentType != null && (
+            // 이미지 파일 형식
             contentType.equals("image/jpeg") ||
-                contentType.equals("image/png") ||
-                contentType.equals("video/mp4") ||  // MP4 동영상 파일 허용
-                contentType.equals("video/mpeg")    // MPEG 동영상 파일 허용
+            contentType.equals("image/png") ||
+            contentType.equals("image/webp") ||
+            contentType.equals("image/avif") ||  // AVIF 형식 추가
+            // 비디오 파일 형식
+            contentType.equals("video/mp4") ||  // MP4 동영상 파일 허용
+            contentType.equals("video/mpeg") ||  // MPEG 동영상 파일 허용
+            contentType.equals("video/quicktime") // MOV 형식
         );
     }
 
@@ -357,6 +372,7 @@ public class PostService {
             post.getLikes().stream()
                 .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
             post.isCommentsDisabled(),
+            post.isHideLikeCount(),
             author.getNickname(),        // 작성자 닉네임
             profileImageUrl,             // 프로필 이미지 URL
             petName,                     // 반려동물 이름
@@ -365,6 +381,7 @@ public class PostService {
         );
     }
 
+    //댓글 기능 설정/해제
     @Transactional
     public void toggleComments(Long postId, User user) {
         Post post = postRepository.findById(postId)
@@ -380,6 +397,23 @@ public class PostService {
         postRepository.save(post);
     }
 
+    //다른 사람에게 좋아요 수 숨기기/취소
+    @Transactional
+    public void toggleLikeVisibility(Long postId, User user) {
+        Post post = postRepository.findById(postId)
+            .orElseThrow(PostNotFound::new);
+
+        // 요청한 사용자가 게시글 작성자인지 확인
+        if (!post.getUser().getUserId().equals(user.getUserId())) {
+            throw new UserNotFound(); // 권한이 없으면 UserNotFound 예외 발생
+        }
+
+        // 좋아요 수 숨김 상태를 토글
+        post.setHideLikeCount(!post.isHideLikeCount());
+        postRepository.save(post);
+    }
+
+    //게시글 작성자인지 확인
     @Transactional(readOnly = true)
     public boolean checkIfUserIsAuthor(Long postId, User user) {
         Post post = postRepository.findById(postId)
