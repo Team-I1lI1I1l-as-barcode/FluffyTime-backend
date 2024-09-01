@@ -3,6 +3,7 @@ let currentImageIndex = 0;
 let imageUrls = []; // 이미지 URL 배열을 저장
 let currentBookmarkId = null;  // 북마크 ID를 저장할 변수
 let tagsSet = new Set();
+let postData; //follow.js에서 사용할 수 있게 전역변수로 사용
 
 // 사용자 프로필 정보 로드
 async function loadPostData(postId) {
@@ -16,13 +17,17 @@ async function loadPostData(postId) {
       throw new Error('서버 응답이 올바르지 않습니다: ' + response.statusText);
     }
 
-    const postData = await response.json();
+    postData = await response.json();
     console.log('API로부터 받은 데이터:', postData);
 
     if (!postData || !postData.content) {
       console.error('postData가 비어 있거나 유효하지 않습니다.');
       throw new Error('게시물 데이터가 올바르지 않습니다.');
     }
+
+    // 데이터 로드가 완료되었음을 알리는 커스텀 이벤트 발생
+    const event = new CustomEvent('postDataLoaded', {detail: postData});
+    document.dispatchEvent(event);
 
     currentPostId = postId;
 
@@ -40,12 +45,23 @@ async function loadPostData(postId) {
     // 닉네임 설정
     nicknameElement.textContent = postData.nickname || '닉네임 없음';
 
+    //프로필 클릭시 사용자 프로필로 이동하게 설정
+    const profile = document.getElementById("profile-linkBox");
+
+    if (profile) {
+      profile.addEventListener('click', () => {
+        window.location.href = `/userpages/${nicknameElement.textContent}`;
+      });
+    }
+
     // 프로필 이미지 설정 (없으면 기본 이미지 사용)
-    profileImageElement.src = postData.profileImageurl || '/image/profile/profile.png';
+    profileImageElement.src = postData.profileImageurl
+        || '/image/profile/profile.png';
 
     // 펫 정보 설정 (없으면 공백으로 설정)
     petNameElement.textContent = postData.petName || '';
-    petSexElement.textContent = postData.petSex && postData.petSex !== 'none' ? postData.petSex : '';
+    petSexElement.textContent = postData.petSex && postData.petSex !== 'none'
+        ? postData.petSex : '';
     if (postData.petAge) {
       petAgeElement.textContent = postData.petAge;
       document.getElementById('petAgeWrapper').style.display = 'inline';  // "살" 텍스트 포함 영역 보이기
@@ -65,10 +81,10 @@ async function loadPostData(postId) {
     toggleSlideButtons(imageUrls.length, 'prevButton', 'nextButton');
 
     // 태그 보여주기
-    if(postData.tags.length === 0) {
+    if (postData.tags.length === 0) {
       const noneTagElement = document.createElement('span');
       noneTagElement.className = 'noneTag';
-      noneTagElement.innerText="태그 없음"
+      noneTagElement.innerText = "태그 없음"
       tagList.appendChild(noneTagElement); // 태그 리스트에 추가
     } else {
       tagsSet = new Set(postData.tags)
@@ -93,7 +109,8 @@ async function loadPostData(postId) {
     // 댓글 기능 상태에 따라 댓글 섹션과 댓글 작성 폼을 설정
     const commentSection = document.getElementById('comment-list');
     const commentForm = document.querySelector('.comment-form');
-    const commentToggleButton = document.querySelector('.dropdown-menu a.comment-toggle');
+    const commentToggleButton = document.querySelector(
+        '.dropdown-menu a.comment-toggle');
 
     if (postData.commentsDisabled) {
       commentSection.style.display = 'none';
@@ -104,7 +121,8 @@ async function loadPostData(postId) {
       commentForm.style.display = 'flex'; // 댓글 작성 폼 보이기 추가
       commentToggleButton.textContent = '댓글 기능 해제';
     }
-    console.log(`초기화 후 comment section display 상태: ${commentSection.style.display}`);
+    console.log(
+        `초기화 후 comment section display 상태: ${commentSection.style.display}`);
 
   } catch (error) {
     console.error('게시물 데이터 로드 중 오류 발생:', error.message);
@@ -150,7 +168,8 @@ function prevImage(event) {
   console.log('이전 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
     // 현재 인덱스가 0이면 마지막 이미지로, 아니면 이전 이미지로 이동
-    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1;
+    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
+        : currentImageIndex - 1;
     showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
   }
 }
@@ -161,7 +180,8 @@ function nextImage(event) {
   console.log('다음 이미지 표시');
   if (imageUrls.length > 1) { // 이미지가 여러 장일 때만 작동
     // 현재 인덱스가 마지막이면 첫 번째 이미지로, 아니면 다음 이미지로 이동
-    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1;
+    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
+        : currentImageIndex + 1;
     showImage(currentImageIndex, 'imageContainer'); // 이미지를 업데이트
   }
 }
@@ -190,7 +210,8 @@ function closePostDetailModal() {
 function toggleDropdownMenu() {
   console.log('드롭다운 메뉴 토글');
   const dropdownMenu = document.getElementById('dropdownMenu');
-  dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block'; // 드롭다운 메뉴를 보이거나 숨김
+  dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none'
+      : 'block'; // 드롭다운 메뉴를 보이거나 숨김
 }
 
 // 링크를 클립보드에 복사하는 함수
@@ -207,43 +228,6 @@ function copyLinkToClipboard() {
   });
   toggleDropdownMenu();
 }
-
-// 페이지 로드 시 댓글 상태를 확인하여 초기 설정
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('페이지 로드 완료');
-
-  const path = window.location.pathname;
-  const pathSegments = path.split('/');
-  const postId = pathSegments[pathSegments.length - 1];
-
-  if (postId && !isNaN(postId)) {
-    currentPostId = postId; // currentPostId를 설정
-    loadPostData(postId); // 게시물 데이터를 로드
-    openPostDetailModal(); // 모달을 열기
-    initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
-
-    const isAuthor = await checkIfUserIsAuthor(postId);
-
-    if (isAuthor) {
-      // 작성자인 경우 숨겨진 메뉴 항목을 표시
-      document.querySelector('.delete').style.display = 'block';
-      document.querySelector('.edit').style.display = 'block'; // 수정 버튼 표시
-      document.querySelector('.like-hide').style.display = 'block';
-      document.querySelector('.comment-toggle').style.display = 'block';
-      document.querySelector('.report').style.display = 'none'; // 작성자인 경우 신고 숨김
-    } else {
-      document.querySelector('.report').style.display = 'block'; // 작성자가 아닌 경우 신고 표시
-    }
-
-    // 댓글/답글 버튼 클릭 시
-    const commentButton = document.getElementById('commentButton');
-    commentButton.onclick = function () {
-      postComment(postId);
-    };
-  } else {
-    console.error('URL에서 postId를 찾을 수 없습니다.');
-  }
-});
 
 // 북마크 상태 업데이트 함수
 async function initializeBookmarkState(postId) {
@@ -298,10 +282,11 @@ async function toggleBookmark() {
 
     if (isBookmarked) {
       // 이미 북마크된 경우, 북마크 삭제 요청
-      const response = await fetch(`/api/bookmarks/delete/${currentBookmarkId}`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+      const response = await fetch(`/api/bookmarks/delete/${currentBookmarkId}`,
+          {
+            method: 'POST',
+            credentials: 'include'
+          });
 
       if (!response.ok) {
         throw new Error('북마크 삭제 실패: ' + response.statusText);
@@ -317,7 +302,7 @@ async function toggleBookmark() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ postId: currentPostId })
+        body: JSON.stringify({postId: currentPostId})
       });
 
       if (!response.ok) {
@@ -336,10 +321,11 @@ async function toggleBookmark() {
 // 댓글 기능 토글 함수
 async function toggleComments() {
   try {
-    const response = await fetch(`/api/posts/toggle-comments/${currentPostId}`, {
-      method: 'POST',
-      credentials: 'include',
-    });
+    const response = await fetch(`/api/posts/toggle-comments/${currentPostId}`,
+        {
+          method: 'POST',
+          credentials: 'include',
+        });
 
     if (!response.ok) {
       throw new Error('댓글 기능을 토글하는 중 문제가 발생했습니다.');
@@ -348,11 +334,13 @@ async function toggleComments() {
     // 댓글 기능 상태를 확인하여 UI를 업데이트
     const commentSection = document.getElementById('comment-list');
     const commentForm = document.querySelector('.comment-form'); // 댓글 작성 폼
-    const commentToggleButtons = document.querySelectorAll('.dropdown-menu a.comment-toggle');
+    const commentToggleButtons = document.querySelectorAll(
+        '.dropdown-menu a.comment-toggle');
 
     // 현재 상태를 체크하여 토글
     commentToggleButtons.forEach(button => {
-      if (commentSection.style.display === 'none' && commentForm.style.display === 'none') {
+      if (commentSection.style.display === 'none' && commentForm.style.display
+          === 'none') {
         commentSection.style.display = 'block';
         commentForm.style.display = 'block'; // 댓글 작성 폼 보이기
         if (button.innerText.trim() === '댓글 기능 설정') {
@@ -408,9 +396,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (postId && !isNaN(postId)) {
     currentPostId = postId; // currentPostId를 설정
-    loadPostData(postId); // 게시물 데이터를 로드
+    await loadPostData(postId); // 게시물 데이터를 로드
     openPostDetailModal(); // 모달을 열기
-    initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
+    await initializeBookmarkState(postId); // 북마크 상태 확인 및 초기화
 
     const isAuthor = await checkIfUserIsAuthor(postId);
 

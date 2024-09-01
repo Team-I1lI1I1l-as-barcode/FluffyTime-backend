@@ -218,6 +218,8 @@ body {
 .profile-info {
   display: flex;
   flex-direction: column;
+  text-align: left;
+  justify-content: space-between;
 }
 
 #petInfo {
@@ -233,6 +235,7 @@ body {
 .post-header {
   margin-bottom: 10px;
 }
+
 .post-content {
   padding: 10px 20px;
   /*margin: 10px 10px;*/
@@ -280,7 +283,7 @@ body {
 
 .noneTag {
   font-size: 14px;
-  color:#7f7f7f;
+  color: #7f7f7f;
   margin: 0 10px;
 }
 
