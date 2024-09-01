@@ -15,6 +15,7 @@ import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.CommentNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
+import jakarta.persistence.Table;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class CommentLikeService {
     private final NotificationService notificationService;
 
     //댓글 좋아요 등록
+    @Transactional
     public CommentLikeResponse likeComment(Long commentId,
         CommentLikeRequest requestDto) {
         Comment comment = commentRepository.findById(commentId)
@@ -68,6 +70,7 @@ public class CommentLikeService {
     }
 
     //댓글 좋아요 취소
+    @Transactional
     public CommentLikeResponse unlikeComment(Long commentId,
         CommentLikeRequest requestDto) {
         Comment comment = commentRepository.findById(commentId)
@@ -94,6 +97,7 @@ public class CommentLikeService {
     }
 
     //댓글 좋아요 한 유저 목록
+    @Transactional
     public List<CommentLikeResponse> getUsersWhoLikedComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
@@ -115,6 +119,7 @@ public class CommentLikeService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;

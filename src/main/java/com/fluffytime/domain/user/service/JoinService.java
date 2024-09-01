@@ -2,6 +2,8 @@ package com.fluffytime.domain.user.service;
 
 import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_USER;
 
+import com.fluffytime.domain.admin.components.AdminSseEmitters;
+import com.fluffytime.domain.notification.service.SseEmitters;
 import com.fluffytime.global.auth.oauth2.dao.SocialTempUserDao;
 import com.fluffytime.global.auth.oauth2.dto.SocialTempUser;
 import com.fluffytime.global.common.exception.global.RoleNameNotFound;
@@ -31,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class JoinService {
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final EmailCertificationDao emailCertificationDao;
