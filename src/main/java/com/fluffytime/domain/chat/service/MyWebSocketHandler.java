@@ -1,5 +1,6 @@
 package com.fluffytime.domain.chat.service;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
@@ -17,16 +18,15 @@ public class MyWebSocketHandler extends TextWebSocketHandler {
 
     // 발신자의 유저 이름 조회
     public String getSenderNickname(WebSocketSession session) {
-        // 발신자 유저 객체 가져오기
+        // interceptor에서 생성한 발신자 유저 객체 가져오기
         return (String) session.getAttributes().get("SENDER_USER_NICKNAME");
     }
 
     // 채널명 가져오기
     private String getChatRoomNameFromSession(WebSocketSession session) {
-        // URL 쿼리 파라미터에서 채팅방 이름을 가져오는 방법
-        String uri = session.getUri().toString();
-        String chatRoomName = uri.substring(uri.indexOf("room=") + 5);
-        return chatRoomName;
+        // URL 쿼리 파라미터에서 채팅방 이름을 가져오기
+        String uri = Objects.requireNonNull(session.getUri()).toString();
+        return uri.substring(uri.indexOf("room=") + 5);
     }
 
     // 웹 소켓 연결이 수립될 때 호출되는 메서드

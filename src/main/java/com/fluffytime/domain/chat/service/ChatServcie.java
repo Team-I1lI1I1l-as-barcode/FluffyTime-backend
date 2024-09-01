@@ -3,7 +3,7 @@ package com.fluffytime.domain.chat.service;
 import com.fluffytime.domain.chat.dto.response.ChatLogResponse;
 import com.fluffytime.domain.chat.dto.response.ChatResponse;
 import com.fluffytime.domain.chat.dto.response.ChatRoomListResponse;
-import com.fluffytime.domain.chat.dto.response.RecipientResponse;
+import com.fluffytime.domain.chat.dto.response.RecipientInfoResponse;
 import com.fluffytime.domain.chat.entity.Chat;
 import com.fluffytime.domain.chat.entity.ChatRoom;
 import com.fluffytime.domain.chat.repository.ChatRoomRepository;
@@ -11,9 +11,7 @@ import com.fluffytime.domain.chat.repository.MessageRepository;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.user.entity.ProfileImages;
 import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.user.repository.UserRepository;
-import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
-import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
+import com.fluffytime.domain.user.service.MyPageService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,53 +25,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChatServcie {
 
-    private final UserRepository userRepository;
     private final MessageRepository messageRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final JwtTokenizer jwtTokenizer;
     private final RedisMessageListenerContainer redisMessageListenerContainer;
-    private final RedisMessagePublisher redisMessagePublisher;
     private final RedisMessageSubscriber redisMessageSubscriber;
+    private final MyPageService myPageService;
 
-    // 사용자 조회(userId로 조회)  메서드
-    @Transactional
-    public User findUserById(Long userId) {
-        log.info("findUserById 실행");
-        return userRepository.findById(userId).orElse(null);
-    }
-
-    // 사용자 조회(nickname으로 조회)  메서드
-    @Transactional
-    public User findUserByNickname(String nickname) {
-        log.info("findUserByNickname 실행");
-        return userRepository.findByNickname(nickname).orElse(null);
-    }
-
-    // accessToken 토큰으로 사용자 찾기  메서드
-    @Transactional
-    public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        log.info("findByAccessToken 실행");
-        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
-        if (accessToken == null) {
-            throw new TokenNotFound();
-        }
-        // accessToken값으로  UserId 추출
-        Long userId = Long.valueOf(
-            ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
-        // id(pk)에 해당되는 사용자 추출
-        return findUserById(userId);
-    }
 
     // 프로필 사진 찾기
     public String findByProfileImage(String nickname) {
-        User user = findUserByNickname(nickname);
+        User user = myPageService.findUserByNickname(nickname);
         Profile profile = user.getProfile();
         String fileUrl = profile.getProfileImages().getFilePath();
         return fileUrl;
@@ -85,10 +52,21 @@ public class ChatServcie {
         return chatRoom.getChatRoomId();
     }
 
+    // RecipientInfoResponse dto 생성
+    public ChatRoomListResponse createResponseDto(Set<String> recipient, Set<String> chatRoomList,
+        Set<String> profileImages, List<String> recentChatList) {
+        return ChatRoomListResponse.builder()
+            .recipient(recipient)
+            .chatRoomList(chatRoomList)
+            .profileImages(profileImages)
+            .recentChat(recentChatList)
+            .build();
+    }
+
     // 토픽 목록 불러오기
     public ChatRoomListResponse getTopicList(HttpServletRequest request) {
         // 로그인한 유저의 닉네임 가져오기
-        User user = findByAccessToken(request);
+        User user = myPageService.findByAccessToken(request);
         if (user == null) {
             // 사용자 정보가 없을 경우 적절한 예외 처리
             throw new IllegalStateException("User not found.");
@@ -119,15 +97,21 @@ public class ChatServcie {
                 recentChatList.add(recentChat);
             }
         }
-
-        return new ChatRoomListResponse(recipient, chatRoomList, profileImages, recentChatList);
+        return createResponseDto(recipient, chatRoomList, profileImages, recentChatList);
     }
 
+    // RecipientInfoResponse dto 생성
+    public ChatResponse createResponseDto(String chatRoomName, boolean success) {
+        return ChatResponse.builder()
+            .chatRoomName(chatRoomName)
+            .success(success)
+            .build();
+    }
 
     // 토픽 생성하기
     public ChatResponse createTopic(String nickname, HttpServletRequest request) {
         // 알파벳 순서대로 정렬
-        String[] users = {findByAccessToken(request).getNickname(), nickname};
+        String[] users = {myPageService.findByAccessToken(request).getNickname(), nickname};
         Arrays.sort(users);
 
         // 채널 명 생성
@@ -145,7 +129,7 @@ public class ChatServcie {
         } else {
             log.info("기존에 있던 채팅방을 사용합니다.");
         }
-        return new ChatResponse(chatRoomName, true);
+        return createResponseDto(chatRoomName, true);
     }
 
     // 토픽 참여하기
@@ -156,18 +140,24 @@ public class ChatServcie {
 
     }
 
-    // 수신자 정보 불러오기
-    public RecipientResponse recipientInfo(String nickname) {
-        User user = findUserByNickname(nickname);
-        Profile profile = user.getProfile();
-        ProfileImages profileImages = profile.getProfileImages();
-        String fileUrl = profileImages.getFilePath();
-
-        return RecipientResponse.builder()
+    // RecipientInfoResponse dto 생성
+    public RecipientInfoResponse createResponseDto(Profile profile, String nickname,
+        String fileUrl) {
+        return RecipientInfoResponse.builder()
             .petName(profile.getPetName())
             .nickname(nickname)
             .fileUrl(fileUrl)
             .build();
+    }
+
+    // 수신자 정보 불러오기
+    public RecipientInfoResponse recipientInfo(String nickname) {
+        User user = myPageService.findUserByNickname(nickname);
+        Profile profile = user.getProfile();
+        ProfileImages profileImages = profile.getProfileImages();
+        String fileUrl = profileImages.getFilePath();
+
+        return createResponseDto(profile, nickname, fileUrl);
     }
 
     // 각 채팅방별로 마지막 채팅 내역 가져오기
@@ -189,10 +179,19 @@ public class ChatServcie {
         return null;
     }
 
+    // ChatLogResponse dto 생성
+    public ChatLogResponse createResponseDto(String roomName, String sender, List<String> chatLog) {
+        return ChatLogResponse.builder()
+            .roomName(roomName)
+            .sender(sender != null ? sender : "Unknown Sender")
+            .chatLog(chatLog)
+            .build();
+    }
+
     // 채팅 내역 가져오기
     public ChatLogResponse chatLog(String roomName, HttpServletRequest request) {
         Long chatRoomId = findByRoomId(roomName);
-        String sender = findByAccessToken(request).getNickname();
+        String sender = myPageService.findByAccessToken(request).getNickname();
 
         // Optional<List<Chat>> 반환으로 변경
         List<Chat> chat = messageRepository.findByRoomId(chatRoomId)
@@ -209,7 +208,7 @@ public class ChatServcie {
             chatLog.add(logEntry);
         }
 
-        return new ChatLogResponse(roomName, sender != null ? sender : "Unknown Sender", chatLog);
+        return createResponseDto(roomName, sender != null ? sender : "Unknown Sender", chatLog);
     }
 
 

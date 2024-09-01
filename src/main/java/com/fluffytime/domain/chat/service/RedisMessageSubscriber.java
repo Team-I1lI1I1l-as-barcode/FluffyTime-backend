@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,25 @@ public class RedisMessageSubscriber implements MessageListener {
         }
     }
 
+    // 채널이름으로 채널 id 찾기
+    public Long getChatRoomId(String RoomName) {
+        return Objects.requireNonNull(chatRoomRepository.findByRoomName(RoomName).orElse(null))
+            .getChatRoomId();
+    }
+
+    // mongodb에 채팅 내역 저장하기
+    public void saveChat(Long chatRoomId, String[] temp) {
+        Chat chat = new Chat();
+        chat.setRoomId(chatRoomId);
+        chat.setSender(temp[0]);
+        chat.setContent(temp[1].trim());
+        chat.setTimestamp(LocalDateTime.now());
+        messageRepository.save(chat);
+    }
+
+
     @Override
+    // 메시지를 수신하고 처리
     public void onMessage(Message message, byte[] pattern) {
         String msg = (String) redisTemplate.getValueSerializer().deserialize(message.getBody());
 
@@ -63,19 +82,13 @@ public class RedisMessageSubscriber implements MessageListener {
         String RoomName = new String(pattern);
         Long chatRoomId = getChatRoomId(RoomName);
 
-        Chat chat = new Chat();
-        chat.setRoomId(chatRoomId);
-        chat.setSender(temp[0]);
-        chat.setContent(temp[1].trim());
-        chat.setTimestamp(LocalDateTime.now());
-        messageRepository.save(chat);
+        // 채팅 내역 저장하기
+        saveChat(chatRoomId, temp);
 
-        sendMessageToChannel(RoomName, msg); // 특정 채널에만 메시지 전송
+        // 특정 채널에만 메시지 전송
+        sendMessageToChannel(RoomName, msg);
     }
 
-    public Long getChatRoomId(String RoomName) {
-        return chatRoomRepository.findByRoomName(RoomName).get().getChatRoomId();
-    }
 
     // 특정 채널의 세션에만 메시지를 전송
     public void sendMessageToChannel(String channel, String msg) {

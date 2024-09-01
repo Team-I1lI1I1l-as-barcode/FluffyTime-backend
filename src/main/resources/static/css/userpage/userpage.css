@@ -325,6 +325,10 @@
   color: #0a84ff;
 }
 
+#chatBtn {
+  cursor: pointer;
+}
+
 /*반응형 웹 페이지 */
 /* 대형 화면 (1200px 이상) */
 @media (max-width: 1200px) {

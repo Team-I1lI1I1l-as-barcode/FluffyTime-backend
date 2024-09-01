@@ -3,7 +3,7 @@ package com.fluffytime.domain.chat.controller.api;
 import com.fluffytime.domain.chat.dto.response.ChatLogResponse;
 import com.fluffytime.domain.chat.dto.response.ChatResponse;
 import com.fluffytime.domain.chat.dto.response.ChatRoomListResponse;
-import com.fluffytime.domain.chat.dto.response.RecipientResponse;
+import com.fluffytime.domain.chat.dto.response.RecipientInfoResponse;
 import com.fluffytime.domain.chat.service.ChatServcie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +50,10 @@ public class ChatApiController {
 
     // 수신자의 정보 가져오기
     @GetMapping("/recipient/{nickname}")
-    public ResponseEntity<RecipientResponse> recipientInfo(
+    public ResponseEntity<RecipientInfoResponse> recipientInfo(
         @PathVariable(name = "nickname") String nickname) {
-        RecipientResponse recipientResponse = chatServcie.recipientInfo(nickname);
-        return ResponseEntity.status(HttpStatus.OK).body(recipientResponse);
+        RecipientInfoResponse recipientInfoResponse = chatServcie.recipientInfo(nickname);
+        return ResponseEntity.status(HttpStatus.OK).body(recipientInfoResponse);
     }
 
     // 채팅 내역 가져오기

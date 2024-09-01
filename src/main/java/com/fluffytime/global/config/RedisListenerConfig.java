@@ -20,7 +20,6 @@ public class RedisListenerConfig {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         // Redis 연결 설정
         container.setConnectionFactory(connectionFactory);
-        // 설정된 RedisMessageListenerContainer 반환
         return container;
     }
 

@@ -1,7 +1,7 @@
 package com.fluffytime.domain.chat.interceptor;
 
-import com.fluffytime.domain.chat.service.ChatServcie;
 import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.service.MyPageService;
 import io.micrometer.common.lang.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -14,11 +14,11 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Component
-// HttpSessionHandshakeInterceptor를 확장하여 WebSocket 핸드 셰이크 과정에서 추가적인 작업을 수행하는 클래스
+// WebSocket 핸드 셰이크 과정에서 추가적인 작업을 수행하는 클래스
 @RequiredArgsConstructor
 public class CustomHandshakeInterceptor extends HttpSessionHandshakeInterceptor {
 
-    private final ChatServcie chatServcie;
+    private final MyPageService myPageService;
 
     @Override
     // 핸드셰이크 전에 실행되는 메서드 정의
@@ -27,7 +27,7 @@ public class CustomHandshakeInterceptor extends HttpSessionHandshakeInterceptor 
 
         // jwt에서 토큰값을 얻고 사용자 찾기
         HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
-        User user = chatServcie.findByAccessToken(servletRequest);
+        User user = myPageService.findByAccessToken(servletRequest);
 
         attributes.put("SENDER_USER_NICKNAME", user.getNickname()); // 속성맵에 보내는이 유저 객체 추가하기
         return super.beforeHandshake(request, response, wsHandler,

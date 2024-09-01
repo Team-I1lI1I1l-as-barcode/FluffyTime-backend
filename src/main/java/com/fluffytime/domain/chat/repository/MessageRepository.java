@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface MessageRepository extends MongoRepository<Chat, Long> {
 
+    // 채널 id로 해당 채팅방에서 나눈 채팅 내역 리스트
     Optional<List<Chat>> findByRoomId(Long id);
 
 }

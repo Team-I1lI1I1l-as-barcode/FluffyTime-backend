@@ -13,7 +13,6 @@ public class RedisMessagePublisher {
     private final RedisTemplate<String, Object> redisTemplate;
 
     // convertAndSend() : 지정된 채널에 메시지 발행
-    // topic.getTopic() : 채널 이름  message : 발행할 메시지
     public void publish(String roomId, String message) {
         redisTemplate.convertAndSend(roomId, message); // 메시지를 지정된 채널로 전송
     }

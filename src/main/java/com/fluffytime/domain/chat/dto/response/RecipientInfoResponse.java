@@ -11,7 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RecipientResponse {
+// 수신자의 정보를 담은 dto
+public class RecipientInfoResponse {
 
     private String fileUrl; //프로필 사진
     private String nickname; // 닉네임

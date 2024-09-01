@@ -10,7 +10,7 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
-
+const chatBtn = getElement('chatBtn') // 메시지 버튼
 const unblockComment = getElement('unblock_comment'); // 차단됨 문구
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
@@ -128,6 +128,13 @@ async function checkFollowStatus() {
       });
 }
 
+// 채팅 보내기
+function sendMessage(nickname) {
+  // 메시지 방 생성
+  fetchUserPage(`/chat/topics/${encodeURIComponent(nickname)}`, "PUT",
+      serverResponse);
+}
+
 // 채팅관련 서버 결과를 처리하는 함수
 function serverResponse(data) {
   if (data.success) {
@@ -163,12 +170,14 @@ function initialize() {
     });
   });
 
-  // 초기화 - 메시지 보내기
-  chat.addEventListener('click', (event) => {
-    event.preventDefault();
-    // 메시지 방 생성
-    fetchUserPage(`/chat/topics/${encodeURIComponent(nickname)}`, "PUT",
-        serverResponse);
+  // 초기화 - 메시지 보내기(모달)
+  chat.addEventListener('click', () => {
+    sendMessage(nickname);
+  });
+
+  // 초기화 - 메시지 보내기(아이콘)
+  chatBtn.addEventListener('click', () => {
+    sendMessage(nickname);
   });
 }
 
