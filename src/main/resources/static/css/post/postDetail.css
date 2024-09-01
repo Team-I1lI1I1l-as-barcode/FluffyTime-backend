@@ -269,3 +269,11 @@ body {
   top: 0;
   left: 0;
 }
+.like-user-list {
+  display: none;
+  list-style: none;
+  padding: 0;
+}
+.like-user-list li {
+  margin: 5px 0;
+}

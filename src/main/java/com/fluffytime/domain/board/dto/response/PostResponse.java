@@ -19,6 +19,7 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     private int likeCount;
     private boolean isLiked;
     private boolean commentsDisabled;
+    private boolean hideLikeCount;
 
     //작성자 정보
     private String nickname;
