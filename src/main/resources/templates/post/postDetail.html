@@ -32,7 +32,8 @@
     <div class="right-content">
       <div class="header">
         <div class="profile">
-          <img id="profileImage" src="/image/profile/profile.png" alt="사용자의 프로필 이미지"> <!-- 기본 이미지 -->
+          <img id="profileImage" src="/image/profile/profile.png" alt="사용자의 프로필 이미지">
+          <!-- 기본 이미지 -->
           <div class="profile-info">
             <span id="nicknameDisplay"></span>
             <div id="petInfo">
@@ -66,10 +67,14 @@
         </div>
       </div>
       <div class="comment-form">
-        <textarea id="comment-content" placeholder="댓글 달기 .." required></textarea>
-        <button id="commentButton">작성</button> <!--postId에 댓글 달기-->
+        <div style="position: relative; width: 100%;">
+              <textarea id="comment-content" placeholder="댓글 달기 .." required
+                        oninput="handleInput()"></textarea>
+          <div id="contentPreview" class="content-preview"></div>
+        </div>
+        <button id="commentButton">작성</button>
       </div>
-
+      <div id="mentionSuggestions" class="mention-suggestions"></div>
     </div>
   </div>
 </div>
@@ -78,7 +83,8 @@
   <a href="javascript:void(0);" class="delete" style="display:none;" onclick="deletePost()">삭제</a>
   <a href="javascript:void(0);" class="edit" style="display:none;" onclick="editPost()">수정</a>
   <a href="javascript:void(0);" class="like-hide" style="display:none;">다른 사람에게 좋아요 수 숨기기</a>
-  <a href="javascript:void(0);" class="comment-toggle" style="display:none;" onclick="toggleComments()">댓글 기능 해제</a>
+  <a href="javascript:void(0);" class="comment-toggle" style="display:none;"
+     onclick="toggleComments()">댓글 기능 해제</a>
 
   <a href="javascript:void(0);" class="report" style="display: none;">신고</a>
   <a href="javascript:void(0);" class="copy-link" onclick="copyLinkToClipboard()">링크 복사</a>
@@ -89,7 +95,7 @@
   <div class="modal-content-like">
     <div class="like-modal-top">
       <h2>좋아요</h2>
-      <span class="close-like" onclick="closeModal()">&times;</span>
+      <span class="close-like" onclick="closeModalLike()">&times;</span>
     </div>
     <div class="user-list">
       <!-- 유저 목록이 동적으로 추가됩니다 -->

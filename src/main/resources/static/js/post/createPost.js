@@ -18,7 +18,6 @@ const completeContainer = document.getElementById('complete-container'); // 게�
 const imgElement = document.getElementById('profileImage'); // 사용자 프로필 이미지
 const nicknameElement = document.getElementById('nicknameDisplay'); // 사용자 닉네임
 
-
 // 태그 관련
 const tagsInputElement = document.getElementById('tagsInput');
 const tagList = document.getElementById('tagList');
@@ -31,23 +30,23 @@ const tagPattern = /^[\p{L}\p{N}_]+$/u;
 function addTag(event) {
   // 엔터 키의 키 코드는 13
   if (event.key === 'Enter') {
-    if(tagsSet.size > 10) {
+    if (tagsSet.size > 10) {
       alert("태그는 10개까지만 등록 가능합니다.")
-      tagsInputElement.value=""
+      tagsInputElement.value = ""
       return
     }
 
     let tag = tagsInputElement.value
-    tag = tag.trim().replace(/^#/,"")
+    tag = tag.trim().replace(/^#/, "")
 
-    if(tag.length > 20) {
+    if (tag.length > 20) {
       alert("태그 길이는 최대 20자까지만 가능합니다.");
       return;
     }
 
-    if(tagPattern.test(tag)) {
+    if (tagPattern.test(tag)) {
       tagsSet.add(tag);
-      tagsInputElement.value=""
+      tagsInputElement.value = ""
       displayTagList();
     } else {
       alert("등록할 수 없는 태그입니다.")
@@ -68,7 +67,7 @@ function displayTagList() {
     const removeBtn = document.createElement('button');
     removeBtn.textContent = 'x';
     removeBtn.className = 'remove-btn';
-    removeBtn.addEventListener("click", (event) => removeTag(event,tag))
+    removeBtn.addEventListener("click", (event) => removeTag(event, tag))
 
     tagElement.appendChild(tagText); // 태그 텍스트 추가
     tagElement.appendChild(removeBtn); // 삭제 버튼 추가
@@ -82,6 +81,110 @@ function removeTag(event, tag) {
   tagsSet.delete(tag);
   console.log(tagsSet)
   displayTagList(); // DOM 업데이트
+}
+
+// 멘션 관련
+// 멘션 유형으로 입력 시 사용자 계정 이름 검색 반환
+let searchTimeout; // 검색 요청 지연 타이머
+
+async function handleInput() {
+  const textarea = document.getElementById('content');
+  const cursorPosition = textarea.selectionStart;
+  const text = textarea.value.slice(0, cursorPosition);
+  const mentionIndex = text.lastIndexOf('@');
+
+  //글자 수 업데이트
+  const content = contentElement.value; // 입력된 내용 가져오기
+  charCountElement.textContent = `${content.length} / 2200`; // 글자 수 업데이트
+
+  if (mentionIndex !== -1) {
+    const mentionText = text.slice(mentionIndex + 1);
+    if (mentionText.length > 0) {
+      // 이전 검색 요청 취소
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      // 검색 요청 지연
+      searchTimeout = setTimeout(async () => {
+        try {
+          const response = await fetch(`/api/search/accounts`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({query: mentionText})
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          displayMentionSuggestions(data.list); // data.list를 사용하여 배열을 전달
+        } catch (error) {
+          console.error('Fetch error:', error);
+        }
+      }, 300); // 300ms 지연 후 검색
+    } else {
+      hideMentionSuggestions();
+    }
+  } else {
+    hideMentionSuggestions();
+  }
+
+  formatMentions(); // 스타일 적용
+}
+
+// 목록 보여줌
+function displayMentionSuggestions(users) {
+  const suggestionsBox = document.getElementById('mentionSuggestions');
+  suggestionsBox.innerHTML = '';
+  users.forEach(user => {
+    const suggestion = document.createElement('div');
+    suggestion.classList.add('mention-suggestion');
+    suggestion.textContent = `@${user.nickName}`;
+    suggestion.addEventListener('click', () => selectMention(user.nickName));
+    suggestionsBox.appendChild(suggestion);
+  });
+  suggestionsBox.style.display = 'block';
+}
+
+// 목록 토글
+function hideMentionSuggestions() {
+  document.getElementById('mentionSuggestions').style.display = 'none';
+}
+
+// 목록에서 유저 선택
+function selectMention(nickname) {
+  const textarea = document.getElementById('content');
+  const cursorPosition = textarea.selectionStart;
+  const text = textarea.value;
+  const mentionIndex = text.lastIndexOf('@', cursorPosition - 1);
+  textarea.value = text.slice(0, mentionIndex) + `@${nickname} `;
+  hideMentionSuggestions();
+  textarea.focus();
+  formatMentions(); // 스타일 적용
+}
+
+// 멘션 스타일 적용
+function formatMentions() {
+  const textarea = document.getElementById('content');
+  let content = textarea.value;
+
+  // 멘션된 닉네임을 찾아서 스타일 적용
+  const formattedContent = content.replace(/@(\w+)/g,
+      '<span class="mention-text">@$1</span>');
+
+  document.getElementById(
+      'contentPreview').innerHTML = formattedContent.replace(/\n/g, '<br>');
+}
+
+// 멘션 데이터 추출
+function extractMentions(text) {
+  const mentionPattern = /@(\w+)/g;
+  const mentions = [];
+  let match;
+  while ((match = mentionPattern.exec(text)) !== null) {
+    mentions.push(match[1]);
+  }
+  return mentions;
 }
 
 // 프로필 정보를 ~~
@@ -224,7 +327,8 @@ function displayImages() {
 function prevImage(event) {
   event.preventDefault(); // 기본 동작 방지
   if (imagesArray.length > 1) {
-    currentImageIndex = currentImageIndex === 0 ? imagesArray.length - 1 : currentImageIndex - 1; // 현재 이미지 인덱스 업데이트
+    currentImageIndex = currentImageIndex === 0 ? imagesArray.length - 1
+        : currentImageIndex - 1; // 현재 이미지 인덱스 업데이트
     displayImages(); // 업데이트된 미디어 표시
   }
 }
@@ -233,19 +337,19 @@ function prevImage(event) {
 function nextImage(event) {
   event.preventDefault(); // 기본 동작 방지
   if (imagesArray.length > 1) {
-    currentImageIndex = currentImageIndex === imagesArray.length - 1 ? 0 : currentImageIndex + 1; // 현재 이미지 인덱스 업데이트
+    currentImageIndex = currentImageIndex === imagesArray.length - 1 ? 0
+        : currentImageIndex + 1; // 현재 이미지 인덱스 업데이트
     displayImages(); // 업데이트된 미디어 표시
   }
 }
 
 // 글자 수를 업데이트하는 함수
 function updateCharCount() {
-  const content = contentElement.value; // 입력된 내용 가져오기
-  charCountElement.textContent = `${content.length} / 2200`; // 글자 수 업데이트
+
 }
 
 // 게시물 데이터를 준비하는 함수
-function preparePostData(tempId, content, tagsSet ,status) {
+function preparePostData(tempId, content, tagsSet, status) {
   return {
     tempId: tempId, // 임시 저장된 게시물의 ID (없으면 null)
     content: content, // 게시물 내용
@@ -302,7 +406,8 @@ async function saveAsTemp(event) {
     return;
   }
 
-  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,'TEMP'); // 임시 저장 요청 데이터 준비
+  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,
+      'TEMP'); // 임시 저장 요청 데이터 준비
 
   await submitPostData('/api/posts/temp-reg', postRequest, imagesArray); // 서버로 임시 저장 요청 전송
   alert('임시 저장되었습니다.'); // 임시 저장 완료 알림
@@ -327,10 +432,32 @@ async function submitPost(event) {
     return;
   }
 
-  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,'SAVE'); // 최종 제출 요청 데이터 준비
+  // 멘션 추출
+  const mentions = extractMentions(content);
+
+  const postRequest = preparePostData(currentDraftPostId, content, tagsSet,
+      'SAVE'); // 최종 제출 요청 데이터 준비
 
   const data = await submitPostData('/api/posts/reg', postRequest, imagesArray); // 서버로 게시물 등록 요청 전송
   const postId = data?.data?.postId || data.data; // 응답에서 게시물 ID 가져오기
+
+  // 멘션을 서버로 전송
+  if (mentions.length > 0) {
+    for (const nickname of mentions) {
+      const mentionRequest = {
+        mentionedUserNickname: nickname,
+        postId: data,
+        content: content
+      };
+      await fetch('/api/mentions/reg', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mentionRequest)
+      });
+    }
+  }
 
   document.querySelector('.post-right-content').style.display = 'none'; // 게시물 작성 부분 숨기기
   document.querySelector('.post-left-content').style.display = 'none'; // 등록한 이미지 숨기기

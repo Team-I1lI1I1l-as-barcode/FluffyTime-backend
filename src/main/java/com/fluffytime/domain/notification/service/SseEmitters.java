@@ -17,19 +17,17 @@ public class SseEmitters {
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter createForUser(Long userId) {
-        SseEmitter sseEmitter = new SseEmitter(30 * 60 * 1000L); //30분 타임아웃 설정
-
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); //30분 타임아웃 설정
         emitters.put(userId, emitter);
 
         emitter.onCompletion(() -> emitters.remove(userId));
         emitter.onTimeout(() -> {
             emitters.remove(userId);
-            sseEmitter.complete();
+            emitter.complete();
         });
-        sseEmitter.onError((e) -> {
+        emitter.onError((e) -> {
             emitters.remove(userId);
-            sseEmitter.completeWithError(e);
+            emitter.completeWithError(e);
         });
 
         try {

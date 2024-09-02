@@ -1,13 +1,16 @@
 package com.fluffytime.domain.board.controller.api;
 
-import com.fluffytime.domain.board.exception.NotPermissionDelete;
-import com.fluffytime.domain.board.exception.NotPermissionModify;
-import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.board.dto.request.ReplyRequest;
 import com.fluffytime.domain.board.dto.response.ReplyResponse;
+import com.fluffytime.domain.board.entity.Reply;
+import com.fluffytime.domain.board.exception.NotPermissionDelete;
+import com.fluffytime.domain.board.exception.NotPermissionModify;
 import com.fluffytime.domain.board.service.ReplyService;
+import com.fluffytime.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +32,16 @@ public class ReplyRestController {
 
     //답글 저장
     @PostMapping("/reg")
-    public ResponseEntity<Void> createReply(@RequestBody ReplyRequest requestDto,
+    public ResponseEntity<Map<String, Object>> createReply(@RequestBody ReplyRequest requestDto,
         HttpServletRequest httpServletRequest) {
         User user = replyService.findByAccessToken(httpServletRequest);
         requestDto.setUserId(user.getUserId());
-        replyService.createReply(requestDto);
-        return ResponseEntity.ok().build();
+        Reply savedReply = replyService.createReply(requestDto);
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("replyId", savedReply.getReplyId());
+
+        return ResponseEntity.ok().body(responseBody);
     }
 
     //답글 조회

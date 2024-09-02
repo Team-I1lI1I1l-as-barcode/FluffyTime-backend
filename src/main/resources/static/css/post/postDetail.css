@@ -196,6 +196,7 @@ body {
 .post-header {
   margin-bottom: 10px;
 }
+
 .post-content {
   padding: 10px 20px;
   /*margin: 10px 10px;*/
@@ -243,7 +244,7 @@ body {
 
 .noneTag {
   font-size: 14px;
-  color:#7f7f7f;
+  color: #7f7f7f;
   margin: 0 10px;
 }
 
@@ -261,9 +262,9 @@ body {
 }
 
 .modal-content video {
-  width: 100%;        /* 비디오의 너비를 100%로 설정 */
-  height: 100%;       /* 비디오의 높이를 100%로 설정 */
-  object-fit: cover;  /* 비디오가 컨테이너에 맞게 잘리도록 설정 */
+  width: 100%; /* 비디오의 너비를 100%로 설정 */
+  height: 100%; /* 비디오의 높이를 100%로 설정 */
+  object-fit: cover; /* 비디오가 컨테이너에 맞게 잘리도록 설정 */
   aspect-ratio: auto; /* 비디오의 비율을 자동으로 설정 (일부 브라우저에서 필요할 수 있음) */
   position: absolute; /* 비디오를 절대 위치로 설정하여 컨테이너에 맞게 배치 */
   top: 0;

@@ -38,7 +38,7 @@ public class CommentService {
     private final NotificationService notificationService;
 
     //댓글 저장
-    public void createComment(CommentRequest requestDto) {
+    public Comment createComment(CommentRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Post post = postRepository.findById(requestDto.getPostId())
@@ -49,10 +49,11 @@ public class CommentService {
             .user(user)
             .post(post)
             .build();
-        commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
 
         // 알림 생성 및 전송
         notificationService.createCommentsNotification(post, comment.getUser());
+        return savedComment;
     }
 
     //댓글 조회 - 게시글마다
