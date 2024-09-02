@@ -25,6 +25,7 @@ import com.fluffytime.global.config.aws.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class PostService {
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
     private final TagService tagService;
+    private final ReelsService reelsService;
 
     // 게시글 등록하기
     @Transactional
@@ -153,20 +155,32 @@ public class PostService {
         return post.getPostId(); // 생성된 임시 게시물의 ID를 반환
     }
 
-    // 이미지 파일 저장 로직
+    // 이미지 및 동영상 파일을 처리하는 메서드
     private void savePostFiles(MultipartFile[] files, Post post) {
-        for (MultipartFile file : files) {
+        List<MultipartFile> imageFiles = Arrays.stream(files)
+            .filter(file -> isImageFormat(file.getContentType()))
+            .collect(Collectors.toList());
+
+        List<MultipartFile> videoFiles = Arrays.stream(files)
+            .filter(file -> isVideoFormat(file.getContentType()))
+            .collect(Collectors.toList());
+
+        saveImageFiles(imageFiles, post);
+        saveVideoFiles(videoFiles, post);
+    }
+
+    // 이미지 파일을 저장하는 메서드
+    private void saveImageFiles(List<MultipartFile> imageFiles, Post post) {
+        for (MultipartFile file : imageFiles) {
             try {
-                // 파일을 S3에 업로드하고 URL을 가져옴
                 String fileName = s3Service.uploadFile(file);
                 String fileUrl = s3Service.getFileUrl(fileName);
 
-                // PostImages 엔티티를 생성하여 데이터베이스에 저장함
                 PostImages postImage = PostImages.builder()
                     .filename(fileName)
                     .filepath(fileUrl)
                     .filesize(file.getSize())
-                    .mimetype(file.getContentType())  // 이미지 또는 동영상의 MIME 타입 저장
+                    .mimetype(file.getContentType())
                     .post(post)
                     .build();
 
@@ -175,6 +189,50 @@ public class PostService {
                 throw new FileUploadFailed();
             }
         }
+    }
+
+    // 동영상 파일을 저장하고 릴스에 업로드하는 메서드
+    private void saveVideoFiles(List<MultipartFile> videoFiles, Post post) {
+        for (MultipartFile file : videoFiles) {
+            try {
+                String fileName = s3Service.uploadFile(file);
+                String fileUrl = s3Service.getFileUrl(fileName);
+
+                // 원래 게시물에 동영상 파일을 저장
+                PostImages postVideo = PostImages.builder()
+                    .filename(fileName)
+                    .filepath(fileUrl)
+                    .filesize(file.getSize())
+                    .mimetype(file.getContentType())
+                    .post(post)
+                    .build();
+
+                postImagesRepository.save(postVideo);
+
+                // 릴스에 동영상 파일을 업로드
+                reelsService.reelsUpload(post, fileName, fileUrl);
+
+            } catch (Exception e) {
+                throw new FileUploadFailed();
+            }
+        }
+    }
+
+    private boolean isVideoFormat(String contentType) {
+        return contentType != null && (
+            contentType.equals("video/mp4") ||
+                contentType.equals("video/mpeg") ||
+                contentType.equals("video/quicktime")
+        );
+    }
+
+    private boolean isImageFormat(String contentType) {
+        return contentType != null && (
+            contentType.equals("image/jpeg") ||
+                contentType.equals("image/png") ||
+                contentType.equals("image/webp") ||
+                contentType.equals("image/avif")
+        );
     }
 
     // 게시글 조회하기
