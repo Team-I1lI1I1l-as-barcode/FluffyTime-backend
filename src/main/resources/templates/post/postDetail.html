@@ -8,9 +8,11 @@
   <link rel="stylesheet" href="/css/post/postDetail.css">
   <link rel="stylesheet" href="/css/comment/comment.css">
   <link rel="stylesheet" href="/css/like/like.css">
+  <link rel="stylesheet" href="/css/follow/follow.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/post/postDetail.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
   <script th:src="@{/js/comment/comment.js}"></script>
   <script th:src="@{/js/like/commentLike.js}"></script>
   <script th:src="@{/js/like/replyLike.js}"></script>
@@ -31,11 +33,14 @@
     </div>
     <div class="right-content">
       <div class="header">
-        <div class="profile">
+        <div id="profile-linkBox" class="profile">
           <img id="profileImage" src="/image/profile/profile.png" alt="사용자의 프로필 이미지">
           <!-- 기본 이미지 -->
           <div class="profile-info">
-            <span id="nicknameDisplay"></span>
+            <div>
+              <span id="nicknameDisplay"></span>
+              <span><button class="follow_button">팔로우</button></span>
+            </div>
             <div id="petInfo">
               <span id="petNameDisplay"></span>
               <span id="petSexDisplay"></span>
@@ -82,9 +87,8 @@
 <div class="dropdown-menu" id="dropdownMenu"> <!-- 드롭다운 메뉴 -->
   <a href="javascript:void(0);" class="delete" style="display:none;" onclick="deletePost()">삭제</a>
   <a href="javascript:void(0);" class="edit" style="display:none;" onclick="editPost()">수정</a>
-  <a href="javascript:void(0);" class="like-hide" style="display:none;">다른 사람에게 좋아요 수 숨기기</a>
-  <a href="javascript:void(0);" class="comment-toggle" style="display:none;"
-     onclick="toggleComments()">댓글 기능 해제</a>
+  <a href="javascript:void(0);" class="like-hide" style="display:none;" onclick="toggleLikeVisibility()">다른 사람에게 좋아요 수 숨기기</a>
+  <a href="javascript:void(0);" class="comment-toggle" style="display:none;" onclick="toggleComments()">댓글 기능 해제</a>
 
   <a href="javascript:void(0);" class="report" style="display: none;">신고</a>
   <a href="javascript:void(0);" class="copy-link" onclick="copyLinkToClipboard()">링크 복사</a>

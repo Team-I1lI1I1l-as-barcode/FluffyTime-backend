@@ -215,6 +215,10 @@ li {
   width: 600px; /* 고정된 콘텐츠 너비 */
   padding: 1rem;
   background-color: var(--background-color);
+  -webkit-line-clamp: 2; /* 최대 2줄까지만 표시 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 생략 표시(...) */
 }
 
 .hidden {

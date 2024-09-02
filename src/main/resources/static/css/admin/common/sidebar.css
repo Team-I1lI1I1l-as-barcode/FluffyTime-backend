@@ -1,0 +1,101 @@
+@import url('https://fonts.googleapis.com/css2?family=Sansita:ital,wght@0,400;0,700;0,800;0,900;1,400;1,700;1,800;1,900&display=swap');
+
+:root {
+  --primary-color: #FFCC00;
+  --text-color: #000000;
+  --background-color: #FFFFFF;
+  --content-text: #2c3e50;
+  --border-color: #ddd;
+  --hover-color: #da9500;
+}
+
+li {
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 2rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar h2 {
+  font-family: "Sansita One", sans-serif;
+  font-size: 1.5em;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.sidebar ul li a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.04rem;
+}
+
+.sidebar ul li a:hover {
+  text-decoration: underline;
+}
+
+.logout {
+  position: absolute;
+  bottom: 0; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.logout a:hover {
+  text-decoration: underline;
+}
+
+.logout .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+
+.home {
+  position: absolute;
+  bottom: 3rem; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.home a:hover {
+  text-decoration: underline;
+}
+
+.home .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+

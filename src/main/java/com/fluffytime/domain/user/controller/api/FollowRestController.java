@@ -100,15 +100,18 @@ public class FollowRestController {
     //팔로워 목록 조회
     @GetMapping("/search/followers/{nickname}")
     public ResponseEntity<List<FollowListResponse>> findFollowers(
-        @PathVariable(name = "nickname") String nickname) {
+        @PathVariable(name = "nickname") String nickname,
+        HttpServletRequest httpServletRequest) {
         log.info("/api/follow/search/followers/{} 호출됨", nickname);
 
         try {
+            Long myUserId = followService.findByAccessToken(httpServletRequest).getUserId();
+            //팔로워 목록을 볼 대상 유저
             User user = followService.findUserByNickname(nickname);
 
             // 대상 유저의 팔로워 목록 가져오기
             List<FollowListResponse> followListResponses = followService.findFollowersByUserId(
-                user.getUserId());
+                user.getUserId(), myUserId);
 
             return ResponseEntity.status(HttpStatus.OK).body(followListResponses);
         } catch (RuntimeException e) {
@@ -119,15 +122,18 @@ public class FollowRestController {
     //팔로잉 목록 조회
     @GetMapping("/search/followings/{nickname}")
     public ResponseEntity<List<FollowListResponse>> findFollowings(
-        @PathVariable(name = "nickname") String nickname) {
+        @PathVariable(name = "nickname") String nickname,
+        HttpServletRequest httpServletRequest) {
         log.info("/api/follow/search/followings/{} 호출됨", nickname);
 
         try {
+            Long myUserId = followService.findByAccessToken(httpServletRequest).getUserId();
+            //팔로잉 목록을 볼 대상 유저
             User user = followService.findUserByNickname(nickname);
 
             // 대상 유저의 팔로잉 목록 가져오기
             List<FollowListResponse> followListResponses = followService.findFollowingsByUserId(
-                user.getUserId());
+                user.getUserId(), myUserId);
 
             return ResponseEntity.status(HttpStatus.OK).body(followListResponses);
         } catch (RuntimeException e) {

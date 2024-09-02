@@ -181,6 +181,8 @@ body {
 .profile-info {
   display: flex;
   flex-direction: column;
+  text-align: left;
+  justify-content: space-between;
 }
 
 #petInfo {
@@ -269,4 +271,12 @@ body {
   position: absolute; /* 비디오를 절대 위치로 설정하여 컨테이너에 맞게 배치 */
   top: 0;
   left: 0;
+}
+.like-user-list {
+  display: none;
+  list-style: none;
+  padding: 0;
+}
+.like-user-list li {
+  margin: 5px 0;
 }
