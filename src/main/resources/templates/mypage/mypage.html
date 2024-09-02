@@ -5,10 +5,12 @@
   <title>마이페이지</title>
   <script th:src="@{/js/auth/auth.js}" defer></script>
   <script th:src="@{/js/mypage/mypage.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
   <script th:src="@{/js/post/createPost.js}" defer></script>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/post/createPost.css">
   <link rel="stylesheet" href="/css/mypage/mypage.css">
+  <link rel="stylesheet" href="/css/follow/follow.css">
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
 </head>
@@ -28,6 +30,26 @@
         <input type="file" id="mypage-images" name="images" style="display: none;"/>
         <!-- 이미지 업로드 버튼 -->
       </form>
+
+      <!-- 팔로워 리스트를 보여줄 모달 -->
+      <div id="followerList-modal" class="follow-modal">
+        <div class="follow-modal-content">
+          <span class="follow-close">&times;</span>
+          <h2>팔로워 목록</h2>
+          <ul id="followerList"></ul>
+        </div>
+      </div>
+
+      <!-- 팔로잉 리스트를 보여줄 모달 -->
+      <div id="followingList-modal" class="follow-modal">
+        <div class="follow-modal-content">
+          <span class="follow-close">&times;</span>
+          <h2>팔로잉 목록</h2>
+          <ul id="followingList"></ul>
+        </div>
+      </div>
+
+
       <!-- 프로필 이미지와 정보를 담는 컨테이너 -->
       <div id="profile_container">
         <!-- 이미지 미리보기 및 출력 영역 -->
@@ -42,8 +64,8 @@
           </button>
           <div id="profile_information_user">
             <p>게시물 <span id="posts_count"></span></p>
-            <p>팔로워 0 <span id="follower_count"></span></p>
-            <p> 팔로우 0 <span id="follow_count"></span></p>
+            <p id="follower_list_modal">팔로워 <span id="follower_count"></span></p>
+            <p id="following_list_modal">팔로우 <span id="follow_count"></span></p>
           </div>
           <div id="profile_information_pet">
             <p id="pet_name"></p>

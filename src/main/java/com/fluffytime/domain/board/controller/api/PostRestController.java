@@ -1,11 +1,14 @@
 package com.fluffytime.domain.board.controller.api;
 
+import com.fluffytime.domain.board.service.TagService;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.board.dto.request.PostRequest;
 import com.fluffytime.domain.board.dto.response.PostResponse;
 import com.fluffytime.domain.board.service.PostService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,8 @@ public class PostRestController {
         @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("게시물 등록 요청 받음: {}", postRequest);
+        log.info("좋아요 숨기기 상태: {}", postRequest.isHideLikeCount());
+        log.info("댓글 기능 해제 상태: {}", postRequest.isCommentsDisabled());
 
         if (postRequest.getTempId() != null) {
             // 임시 저장된 글 최종 등록 시 이미지 추가/수정 불가
@@ -51,7 +56,7 @@ public class PostRestController {
     // 임시 게시물 등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files,
+        @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("임시 게시물 등록 요청 받음: {}", postRequest);
 
@@ -115,9 +120,35 @@ public class PostRestController {
     public ResponseEntity<Void> deletePost(@PathVariable(name = "id") Long id,
         HttpServletRequest request) {
         log.info("게시물 삭제 요청 받음, ID: {}", id);
-
         postService.deletePost(id, request);
         log.info("게시물 삭제 성공, ID: {}", id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    // 댓글 기능 설정
+    @PostMapping("/toggle-comments/{id}")
+    public ResponseEntity<Void> toggleComments(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        postService.toggleComments(id, user);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    //현재 사용자가 게시물의 작성자인지 확인
+    @GetMapping("/is-author/{id}")
+    public ResponseEntity<Map<String, Boolean>> isAuthor(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        boolean isAuthor = postService.checkIfUserIsAuthor(id, user);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isAuthor", isAuthor);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    //다른 사람에게 좋아요 숨기기 기능
+    @PostMapping("/toggle-like-visibility/{id}")
+    public ResponseEntity<Void> toggleLikeVisibility(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        postService.toggleLikeVisibility(id, user);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
 }

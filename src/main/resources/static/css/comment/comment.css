@@ -7,11 +7,35 @@ body {
   margin: 0;
 }
 
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--hover-color);
+}
+
+
 /* 댓글 목록 전체 스타일 */
 #comment-list {
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 20px 20px;
+  height: 100%;
+  border-bottom: 1px solid #ccc;
+  overflow-y: auto; /* 세로 스크롤 자동 표시 */
+  scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
+  -ms-overflow-style: none; /* IE 및 Edge에서 스크롤바 숨기기 */
+}
+
+/* Chrome, Safari, Edge에서 스크롤바 숨기기 */
+#comment-list::-webkit-scrollbar {
+  display: none;
 }
 
 .comment-form {
@@ -20,27 +44,28 @@ body {
   left: 0;
   right: 0;
   background-color: white;
-  padding: 10px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  z-index: 10;
 }
 
 #comment-content {
   flex-grow: 1;
-  margin-right: 10px; /* 버튼과의 간격 */
+  /*margin-right: 10px; !* 버튼과의 간격 *!*/
+  border: none;
   padding: 5px;
   box-sizing: border-box;
 }
 
 #commentButton {
-  padding: 5px 10px; /* padding을 조정하여 글씨가 세로로 나오지 않게 함 */
+  /*padding: 5px 10px; !* padding을 조정하여 글씨가 세로로 나오지 않게 함 *!*/
   white-space: nowrap; /* 버튼의 텍스트가 강제로 한 줄에 나오도록 설정 */
-  height: 100%; /* 버튼의 높이를 textarea와 맞추기 위해 추가 */
+  /*height: 100%; !* 버튼의 높이를 textarea와 맞추기 위해 추가 *!*/
+  background-color: unset;
+  padding: 0 12px;
+  color: var(--primary-color);
   line-height: 1;
   box-sizing: border-box;
+  font-size: 14px;
 }
 
 /* 댓글 스타일 */
@@ -48,8 +73,8 @@ body {
   display: flex;
   flex-direction: column; /* 댓글 본문과 버튼을 수직으로 배치 */
   margin-bottom: 20px; /* 댓글 간 간격 */
-  padding: 12px;
-  border-radius: 10px;
+  /*padding: 12px;*/
+  border-radius: 5px;
   background-color: #fff; /* 배경색 흰색 */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 효과 */
 }
@@ -111,11 +136,16 @@ body {
 }
 
 .edit-delete-buttons {
-  width: 160px;
+  /*width: 160px;*/
   display: flex;
-  justify-content: space-between;
-  margin-left: 3.3rem;
+  justify-content: end;
+  /*justify-content: space-between;*/
+  /*margin-left: 3.3rem;*/
   margin-top: 0.5rem;
+}
+
+.edit-delete-buttons button {
+  margin: 0 5px;
 }
 
 .comment .buttons button {
@@ -172,8 +202,9 @@ body {
 }
 
 .reply-section textarea {
-  width: calc(100% - 22px);
-  border: 1px solid #ddd;
+  /*width: calc(100% - 22px);*/
+  width: 100%;
+  /*border: 1px solid #ddd;*/
   padding: 10px;
   border-radius: 8px;
   font-size: 14px;
@@ -185,9 +216,9 @@ body {
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 8px 12px;
+  padding: 5px 10px;
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 10px;
   cursor: pointer;
 }
 
@@ -196,30 +227,27 @@ body {
 }
 
 .edit-delete-buttons-reply {
-  width: 106px;
+  /*width: 106px;*/
   display: flex;
-  justify-content: space-between;
-  margin-left: 2.5rem;
+  /*justify-content: space-between;*/
+  justify-content: end;
+  /*margin-left: 2.5rem;*/
+  margin-top: 0.5rem;
+}
+
+.edit-delete-buttons-reply button {
+  margin: 0 5px;
 }
 
 /* 댓글/답글 수정 칸 */
 textarea {
-  width: calc(100% - 22px);
-  border: 1px solid #ddd;
+  /*width: calc(100% - 22px);*/
+  width: 100%;
+  /*border: 1px solid #ddd;*/
   padding: 10px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 10px;
   resize: none;
-}
-
-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
 }
 
 .comment-edit-button {
@@ -235,10 +263,88 @@ button {
   margin-left: 5px;
 }
 
-button:hover {
-  background-color: var(--hover-color);
-}
-
 .save-cancle-button-box {
   display: flex;
+}
+
+/*멘션 관련*/
+
+textarea#comment-content {
+  position: relative;
+  z-index: 2; /* Preview보다 위에 위치하게 설정 */
+  width: calc(100% - 20px);
+  height: 50px; /* 필요한 높이로 조정 */
+  padding: 15px;
+  background-color: transparent; /* 배경 투명하게 설정 */
+  color: transparent; /* Hide text color to only show the preview */
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  font-size: 14px;
+  border: none; /* 테두리 제거 */
+  outline: none; /* 포커스 시 외곽선 제거 */
+}
+
+/* 댓글 입력창 미리보기 */
+.content-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 20px); /* textarea와 동일한 너비 설정 */
+  height: 100%;
+  padding: 15px; /* textarea와 동일한 패딩 설정 */
+  color: black; /* 텍스트 색상 */
+  background: transparent; /* 배경 투명하게 설정 */
+  white-space: pre-wrap;
+  z-index: 1; /* textarea 아래에 위치 */
+  pointer-events: none; /* 상호작용 비활성화 */
+  box-sizing: border-box; /* 패딩 및 보더를 포함하여 박스 크기 계산 */
+}
+
+.mention-text {
+  color: #4848ff;
+  font-size: 14px;
+  font-weight: 700;
+  background-color: #d3edff;
+  padding: 5px 7px 5px 7px;
+  border-radius: 20px;
+}
+
+.mention-suggestions {
+  position: absolute;
+  bottom: 10%; /* Position below the textarea */
+  left: 10px;
+  width: calc(100% - 20px);
+  max-height: 200px; /* Maximum height for the suggestions box */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  background: white; /* Background color for suggestions */
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for better visibility */
+  z-index: 3; /* Ensure suggestions box is above other content */
+}
+
+.mention-suggestion {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-suggestion:hover {
+  background-color: #f0f0f0; /* Highlight color on hover */
+}
+
+.mention-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-item:hover {
+  background-color: #f0f0f0; /* 항목을 마우스로 오버할 때의 배경색 */
+}
+
+/* 답글 내용 미리보기 스타일 */
+#contentPreview-reply {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f9f9f9; /* Light background for contrast */
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px; /* Matching font size with textarea */
 }

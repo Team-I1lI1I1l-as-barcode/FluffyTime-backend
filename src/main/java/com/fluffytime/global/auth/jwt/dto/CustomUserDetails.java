@@ -5,11 +5,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 // 사용자의 세부 정보 구현
+@Slf4j
 @Getter
 public class CustomUserDetails implements UserDetails {
 

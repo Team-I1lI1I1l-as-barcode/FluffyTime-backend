@@ -97,21 +97,6 @@
   font-size: 15px;
 }
 
-/* 프로필 편집 버튼 */
-.follow_button {
-  background-color: var(--primary-color);
-  color: black;
-  border: none;
-  border-radius: 5px;
-  padding: 0.2rem 0.5rem;
-  cursor: pointer;
-  font-size: 0.8em; /* 버튼의 폰트 사이즈 조정 */
-}
-
-#follow_button:hover {
-  background-color: #e6b800; /* Primary color를 조금 어둡게 */
-}
-
 
 /* 차단 해제 버튼  - 평상시에는 비활성화, 차단 시 활성화*/
 #unblock_comment {

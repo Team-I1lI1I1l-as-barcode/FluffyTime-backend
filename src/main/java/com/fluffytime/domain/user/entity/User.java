@@ -3,10 +3,12 @@ package com.fluffytime.domain.user.entity;
 import com.fluffytime.domain.board.entity.Bookmark;
 import com.fluffytime.domain.board.entity.Comment;
 import com.fluffytime.domain.board.entity.CommentLike;
+import com.fluffytime.domain.board.entity.Mention;
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.board.entity.PostLike;
 import com.fluffytime.domain.board.entity.Reply;
 import com.fluffytime.domain.board.entity.ReplyLike;
+import com.fluffytime.domain.notification.entity.Notification;
 import com.fluffytime.domain.user.entity.enums.LoginType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -113,6 +115,20 @@ public class User {
         orphanRemoval = true
     )
     private List<PostLike> postLikes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "user",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "metionedUser",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> receivedMentions = new ArrayList<>();
 
     // 유저 - 프로필 (일대일 단방향 -> 양방향으로 수정(프로필의 반려동물 이름을 기반으로 아이디를 찾아야 하기 때문)
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

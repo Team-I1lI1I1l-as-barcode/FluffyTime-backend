@@ -1,18 +1,19 @@
 package com.fluffytime.domain.board.service;
 
+import com.fluffytime.domain.board.dto.request.ReplyRequest;
+import com.fluffytime.domain.board.dto.response.ReplyResponse;
+import com.fluffytime.domain.board.entity.Comment;
+import com.fluffytime.domain.board.entity.Reply;
+import com.fluffytime.domain.board.repository.CommentRepository;
+import com.fluffytime.domain.board.repository.ReplyLikeRepository;
+import com.fluffytime.domain.board.repository.ReplyRepository;
+import com.fluffytime.domain.notification.service.NotificationService;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.CommentNotFound;
 import com.fluffytime.global.common.exception.global.ReplyNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.domain.board.entity.Comment;
-import com.fluffytime.domain.board.entity.Reply;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.request.ReplyRequest;
-import com.fluffytime.domain.board.dto.response.ReplyResponse;
-import com.fluffytime.domain.board.repository.CommentRepository;
-import com.fluffytime.domain.board.repository.ReplyLikeRepository;
-import com.fluffytime.domain.board.repository.ReplyRepository;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -30,9 +31,10 @@ public class ReplyService {
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
     private final ReplyLikeRepository replyLikeRepository;
+    private final NotificationService notificationService;
 
     //답글 저장
-    public void createReply(ReplyRequest requestDto) {
+    public Reply createReply(ReplyRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
@@ -43,7 +45,11 @@ public class ReplyService {
             .user(user)
             .comment(comment)
             .build();
-        replyRepository.save(reply);
+        Reply savedReply = replyRepository.save(reply);
+
+        // 알림 생성 및 전송
+        notificationService.createRepliesNotification(comment, reply.getUser());
+        return savedReply;
     }
 
     //답글 조회

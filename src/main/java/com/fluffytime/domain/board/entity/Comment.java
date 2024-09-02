@@ -1,5 +1,6 @@
 package com.fluffytime.domain.board.entity;
 
+import com.fluffytime.domain.notification.entity.Notification;
 import com.fluffytime.domain.user.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +18,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +29,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "comments")
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Comment {
 
@@ -66,6 +68,20 @@ public class Comment {
         orphanRemoval = true
     )
     private List<CommentLike> likes = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "comment",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Notification> notifications = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "comment",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> mentions = new ArrayList<>();
 
     @Builder
     public Comment(String content, User user, Post post) {

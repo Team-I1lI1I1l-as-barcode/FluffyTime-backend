@@ -1,5 +1,6 @@
 package com.fluffytime.global.config;
 
+import com.fluffytime.domain.admin.interceptor.AdminCheckInterceptor;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.domain.user.interceptor.LoginCheckInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,12 @@ public class WebConfig implements WebMvcConfigurer {
             .addPathPatterns(
                 "/login",
                 "/join/**"
+            );
+
+        registry.addInterceptor(new AdminCheckInterceptor(jwtTokenizer))
+            .order(2)
+            .addPathPatterns(
+                "/api/auth/refreshToken"
             );
     }
 }

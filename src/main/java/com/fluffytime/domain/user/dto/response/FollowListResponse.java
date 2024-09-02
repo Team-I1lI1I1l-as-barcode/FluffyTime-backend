@@ -9,9 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowResponse {
+public class FollowListResponse {
 
-    private Long followMappingId;
-    private Long followingUserId;
-    private Long followedUserId;
+    private Long myUserId;
+    private Long targetUserId;
+    private String nickname;
+    private String profileImageUrl;
+    private String intro;
+
 }

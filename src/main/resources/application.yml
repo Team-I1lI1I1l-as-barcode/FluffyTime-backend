@@ -39,9 +39,14 @@ spring:
       #  mongo 설정
     mongodb:
       uri: ${MONGO_URI}
+      
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
-  #oauth2
-  #registration
+#oauth2
+#registration
   security:
     oauth2:
       client:

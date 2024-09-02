@@ -143,6 +143,10 @@ function toggleReplyInput(commentId) {
     const replyTextarea = document.createElement('textarea');
     replyTextarea.id = `reply-textarea-${commentId}`;
     replyTextarea.placeholder = '답글 내용을 입력하세요...';
+    replyTextarea.oninput = () => handleReplyInput(commentId);
+
+    const replyContentPreview = document.createElement('div');
+    replyContentPreview.id = 'contentPreview-reply';
 
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글 달기';
@@ -260,6 +264,9 @@ async function fetchReplies(commentId, replyDiv) {
 // 답글 등록
 async function postReply(commentId, content) {
   try {
+    // 멘션 추출
+    const mentions = extractMentions(content);
+
     const response = await fetch('/api/replies/reg', {
       method: 'POST',
       headers: {
@@ -270,6 +277,29 @@ async function postReply(commentId, content) {
 
     if (response.ok) {
       console.log('답글 등록 성공!');
+
+      // 멘션을 서버로 전송
+      if (mentions.length > 0) {
+        const {replyId} = await response.json(); // 서버에서 반환된 replyId 사용
+        for (const nickname of mentions) {
+          const mentionRequest = {
+            mentionedUserNickname: nickname,
+            replyId: replyId, // 서버에서 반환된 replyId 사용
+            content: content
+          };
+
+          console.log(mentionRequest);
+
+          await fetch('/api/mentions/reg', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mentionRequest)
+          });
+        }
+      }
+
       await fetchComments(postId); // 댓글 목록 갱신
     } else {
       console.error('답글 등록 실패! 상태 코드: ', response.status);
@@ -360,10 +390,34 @@ async function postComment() {
       body: JSON.stringify({content, postId}),
     });
 
+    // 멘션 추출
+    const mentions = extractMentions(content);
+
     const data = await response.json();
+    const commentId = data.commentId;  // 서버에서 반환된 commentId 사용
+
+    // 멘션을 서버로 전송
+    if (mentions.length > 0) {
+      for (const nickname of mentions) {
+        const mentionRequest = {
+          mentionedUserNickname: nickname,
+          commentId: commentId,
+          content: content
+        };
+
+        await fetch('/api/mentions/reg', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(mentionRequest)
+        });
+      }
+    }
 
     if (response.ok) {
       document.getElementById('comment-content').value = '';
+      document.getElementById('contentPreview').innerText = '';  // contentPreview 초기화
       console.log('댓글 등록 성공!');
       console.log('서버 응답: ', data);
       await fetchComments(postId);
@@ -442,4 +496,165 @@ async function deleteComment(commentId) {
   } catch (error) {
     console.error('댓글 삭제 중 예외 발생!', error);
   }
+}
+
+// 멘션 기능
+// 멘션 유형으로 입력 시 사용자 계정 이름 검색 반환
+let searchTimeout; // 검색 요청 지연 타이머
+
+async function handleInput() {
+  const textarea = document.getElementById('comment-content');
+  const cursorPosition = textarea.selectionStart;
+  const text = textarea.value.slice(0, cursorPosition);
+  const mentionIndex = text.lastIndexOf('@');
+
+  if (mentionIndex !== -1) {
+    const mentionText = text.slice(mentionIndex + 1);
+    if (mentionText.length > 0) {
+      // 이전 검색 요청 취소
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      // 검색 요청 지연
+      searchTimeout = setTimeout(async () => {
+        try {
+          const response = await fetch(`/api/search/accounts`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({query: mentionText})
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          displayMentionSuggestions(data.list); // data.list를 사용하여 배열을 전달
+        } catch (error) {
+          console.error('Fetch error:', error);
+        }
+      }, 300); // 300ms 지연 후 검색
+    } else {
+      hideMentionSuggestions();
+    }
+  } else {
+    hideMentionSuggestions();
+  }
+
+  formatMentions(); // 스타일 적용
+}
+
+// 목록 보여줌
+function displayMentionSuggestions(users, commmentId) {
+  const suggestionsBox = document.getElementById('mentionSuggestions');
+  suggestionsBox.innerHTML = '';
+  users.forEach(user => {
+    const suggestion = document.createElement('div');
+    suggestion.classList.add('mention-suggestion');
+    suggestion.textContent = `@${user.nickName}`;
+    suggestion.addEventListener('click',
+        () => selectMention(user.nickName, commmentId));
+    suggestionsBox.appendChild(suggestion);
+  });
+  suggestionsBox.style.display = 'block';
+}
+
+// 목록 토글
+function hideMentionSuggestions() {
+  document.getElementById('mentionSuggestions').style.display = 'none';
+}
+
+// 목록에서 유저 선택
+function selectMention(nickname, commentId) {
+  let textarea;
+  if (commentId) {
+    textarea = document.getElementById(`reply-textarea-${commentId}`);
+  } else {
+    textarea = document.getElementById('comment-content');
+  }
+
+  const cursorPosition = textarea.selectionStart;
+  const text = textarea.value;
+  const mentionIndex = text.lastIndexOf('@', cursorPosition - 1);
+  textarea.value = text.slice(0, mentionIndex) + `@${nickname} `;
+  hideMentionSuggestions();
+  textarea.focus();
+  formatMentions(); // 댓글/답글 스타일 적용
+}
+
+// 멘션 스타일 적용
+function formatMentions() {
+  const textarea = document.getElementById('comment-content');
+  let content = textarea.value;
+
+  // 멘션된 닉네임을 찾아서 스타일 적용
+  const formattedContent = content.replace(/@(\w+)/g,
+      '<span class="mention-text">@$1</span>');
+
+  document.getElementById(
+      'contentPreview').innerHTML = formattedContent.replace(/\n/g, '<br>');
+}
+
+function formatReplyMentions(commentId) {
+  const replyTextarea = document.getElementById(`reply-textarea-${commentId}`);
+  let content = replyTextarea.value;
+
+  // 멘션된 닉네임을 찾아서 스타일 적용
+  const formattedContent = content.replace(/@(\w+)/g,
+      '<span class="mention-text">@$1</span>');
+
+  document.getElementById(
+      'contentPreview-reply').innerHTML = formattedContent.replace(/\n/g,
+      '<br>');
+}
+
+// 멘션 데이터 추출
+function extractMentions(text) {
+  const mentionPattern = /@(\w+)/g;
+  const mentions = [];
+  let match;
+  while ((match = mentionPattern.exec(text)) !== null) {
+    mentions.push(match[1]);
+  }
+  return mentions;
+}
+
+function handleReplyInput(commentId) {
+  const replyTextarea = document.getElementById(`reply-textarea-${commentId}`);
+  const cursorPosition = replyTextarea.selectionStart;
+  const text = replyTextarea.value.slice(0, cursorPosition);
+  const mentionIndex = text.lastIndexOf('@');
+
+  if (mentionIndex !== -1) {
+    const mentionText = text.slice(mentionIndex + 1);
+    if (mentionText.length > 0) {
+      // 이전 검색 요청 취소
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+
+      // 검색 요청 지연
+      searchTimeout = setTimeout(async () => {
+        try {
+          const response = await fetch(`/api/search/accounts`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({query: mentionText})
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          displayMentionSuggestions(data.list, commentId); // data.list와 commentId를 전달
+        } catch (error) {
+          console.error('Fetch error:', error);
+        }
+      }, 300); // 300ms 지연 후 검색
+    } else {
+      hideMentionSuggestions();
+    }
+  } else {
+    hideMentionSuggestions();
+  }
+
+  formatReplyMentions(commentId); // 스타일 적용
 }

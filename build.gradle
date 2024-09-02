@@ -51,9 +51,11 @@ dependencies {
     //gson - json 메시지를 다루기 위한 라이브러리
     implementation 'com.google.code.gson:gson'
     //aws
-    implementation 'software.amazon.awssdk:s3:2.20.10' // AWS SDK for S3
-    implementation 'software.amazon.awssdk:auth:2.20.10' // AWS SDK Auth
-    implementation platform('software.amazon.awssdk:bom:2.20.64') // 최신 버전으로 변경
+    // AWS SDK BOM을 통해 모든 AWS SDK 모듈의 버전을 통일
+    implementation platform('software.amazon.awssdk:bom:2.20.64')
+    // AWS SDK for S3 및 Auth 모듈 (BOM에 따라 버전 자동 지정)
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:auth'
     // websocket
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     //mongo db

@@ -138,11 +138,26 @@ li {
   line-height: 24px;
 }
 
+.adminPageBtn {
+  position: absolute;
+  bottom: 6rem; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+}
+
 .more-menu .material-symbols-rounded {
   margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
 .logout .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+
+.adminPageBtn .material-symbols-rounded {
   margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
@@ -164,11 +179,24 @@ li {
   padding-top: 0.07rem;
 }
 
+.adminPageBtn a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.07rem;
+}
+
 .more-menu a:hover {
   text-decoration: underline;
 }
 
 .logout a:hover {
+  text-decoration: underline;
+}
+
+.adminPageBtn a:hover {
   text-decoration: underline;
 }
 
@@ -187,5 +215,12 @@ li {
   width: 600px; /* 고정된 콘텐츠 너비 */
   padding: 1rem;
   background-color: var(--background-color);
+  -webkit-line-clamp: 2; /* 최대 2줄까지만 표시 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 생략 표시(...) */
 }
 
+.hidden {
+  display: none;
+}

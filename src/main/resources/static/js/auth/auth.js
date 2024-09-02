@@ -13,6 +13,15 @@ async function refreshAccessToken() {
     return;
   }
 
+  const isAdminValue = response.headers.get('is-admin');
+
+  if (isAdminValue !== null) {
+    localStorage.setItem('isAdmin', isAdminValue);
+    console.log('is-true value saved to localStorage:', isAdminValue);
+  } else {
+    console.log('is-true header not found in the response');
+  }
+
   console.log("Access Token refreshed successfully")
   localStorage.setItem('lastRefreshTime', new Date().getTime());
 }
@@ -24,11 +33,11 @@ async function initTokenRefresh() {
   const currentTime = new Date().getTime();
   const timeElapsed = currentTime - lastRefreshTime;
 
-  // 마지막 갱신 후 50분이 지났다면 즉시 갱신
-  if(timeElapsed >= 50 * 60 * 1000) {
+  // // 마지막 갱신 후 50분이 지났다면 즉시 갱신
+  // if(timeElapsed >= 50 * 60 * 1000) {
     console.log("즉시갱신")
      await refreshAccessToken();
-  }
+  // }
 
   // 주기적으로 AccessToken 갱신
   intervalId = setInterval(() => {
@@ -43,10 +52,39 @@ async function initTokenRefresh() {
   }, 60 * 1000); // 매 1분마다 체크
 }
 
+function hiddenAdminPageBtn() {
+  // localStorage에서 isAdmin 값 가져오기
+
+  let isAdmin = localStorage.getItem('isAdmin');
+
+  // adminPageBtn 요소 선택
+  let adminPageBtnDiv = document.querySelector('.adminPageBtn');
+
+  if(adminPageBtnDiv == null || isAdmin == null) {return;}
+
+  // isAdmin 값에 따라 요소 표시/숨김 처리
+  if (isAdmin === 'true') {
+    adminPageBtnDiv.classList.remove('hidden');  // 보여줌
+    console.log("admin 숨기기 제거")
+  } else {
+    if(adminPageBtnDiv.classList.contains('hidden')) {
+      console.log("admin 숨기기 이미있음")
+      return
+    }
+    console.log("admin 숨기기 실행")
+    adminPageBtnDiv.classList.add('hidden');  // 보여줌
+  }
+}
+
+async function onPageLoad() {
+  await initTokenRefresh();
+  hiddenAdminPageBtn();
+}
+
 window.addEventListener("beforeunload", () => {
   clearInterval(intervalId);
 });
 
 // 페이지 로드 시 초기화
 console.log('Script loaded');
-window.addEventListener("load", initTokenRefresh);
+window.addEventListener("load", onPageLoad);
