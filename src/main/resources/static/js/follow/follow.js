@@ -44,6 +44,7 @@ async function checkFollowStatus(button, targetUserNickname) {
 
     const isFollowing = await response.json();
     updateButtonStatus(button, isFollowing);
+
   } catch (error) {
     console.error('checkFollowStatus() Error:', error);
   }
@@ -79,8 +80,11 @@ async function updateFollowCounts(nickname) {
     }
 
     const data = await response.json();
-    document.getElementById("follower_count").textContent = data.followerCount;
-    document.getElementById("follow_count").textContent = data.followingCount;
+    if (document.getElementById("follower_count")) {
+      document.getElementById(
+          "follower_count").textContent = data.followerCount;
+      document.getElementById("follow_count").textContent = data.followingCount;
+    }
   } catch (error) {
     console.error('updateFollowCounts() Error:', error);
   }
@@ -251,6 +255,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const path = window.location.pathname;
   const pathSegments = path.split('/');
 
+  //mypage혹은 userpage인 경우
   if (asynchronousPages.includes(pathSegments[pathSegments.length - 2])) {
 
     const targetUserNickname = pathSegments[pathSegments.length - 1];
@@ -283,8 +288,34 @@ document.addEventListener("DOMContentLoaded", async function () {
         await fetchFollowingList(targetUserNickname);
       });
     }
+
+    //게시물 상세보기(detail) 페이지인 경우
+  } else if (pathSegments[pathSegments.length - 2] === "detail") {
+
+    document.addEventListener('postDataLoaded', async (event) => {
+
+      const postData = event.detail;  // postData를 postDetail.js의 이벤트로부터 가져옴
+      console.log('postData를 사용하여 follow.js에서 작업 수행:', postData.nickname);
+
+      const targetUserNickname = postData.nickname;
+      console.log("포스트 작성 유저 닉네임: " + targetUserNickname);
+
+      // 팔로우 상태를 확인하고 상태를 화면에 적용
+      const followButton = document.querySelector(".follow_button");
+      if (followButton) {//팔로우 버튼이 있는 경우에만 팔로우 버튼 상태확인(마이페이지는 없음)
+        console.log("팔로우 버튼 존재!");
+        await checkFollowStatus(followButton, targetUserNickname);
+      }
+
+      // 정적으로 생성된(화면에 무조건 있는) 팔로우 버튼에 대한 이벤트 핸들러
+      followButton.addEventListener("click", function (event) {
+        event.stopPropagation();
+        handleFollowButtonClick(event, targetUserNickname);
+      });
+    });
+
   } else {
-    console.log("이 페이지에는 팔로우 버튼이 아직 없습니다.")
+    console.log("이 페이지에는 팔로우 버튼이 없습니다.")
   }
 
 });
