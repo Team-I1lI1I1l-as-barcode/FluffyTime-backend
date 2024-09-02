@@ -2,8 +2,7 @@ package com.fluffytime.domain.user.service;
 
 import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_USER;
 
-import com.fluffytime.domain.admin.components.AdminSseEmitters;
-import com.fluffytime.domain.notification.service.SseEmitters;
+import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.global.auth.oauth2.dao.SocialTempUserDao;
 import com.fluffytime.global.auth.oauth2.dto.SocialTempUser;
 import com.fluffytime.global.common.exception.global.RoleNameNotFound;
@@ -38,6 +37,7 @@ public class JoinService {
     private final EmailCertificationDao emailCertificationDao;
     private final SocialTempUserDao socialTempUserDao;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AdminNotificationService adminNotificationService;
 
     @Transactional
     public JoinResponse tempJoin(JoinRequest joinUser) {
@@ -92,6 +92,8 @@ public class JoinService {
 
         emailCertificationDao.removeTempUser(email);
 
+        adminNotificationService.createJoinNotification(user);
+
         return JoinResponse.builder()
             .email(user.getEmail())
             .nickname(user.getNickname())
@@ -128,6 +130,8 @@ public class JoinService {
         userRepository.save(user);
 
         socialTempUserDao.removeSocialTempUser(joinUser.getEmail());
+
+        adminNotificationService.createJoinNotification(user);
 
         return JoinResponse.builder()
             .email(user.getEmail())

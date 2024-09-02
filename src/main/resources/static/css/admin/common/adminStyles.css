@@ -22,6 +22,7 @@ time, mark, audio, video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  box-sizing: border-box;
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
@@ -79,12 +80,10 @@ button {
 .main-container {
   display: flex;
   flex-direction: column;
-  /*justify-content: center;*/
   align-items: center;
   margin-left: 250px;
   flex-grow: 1;
   padding: 2rem 0;
-  height: 100vh;
 }
 
 /*아이콘

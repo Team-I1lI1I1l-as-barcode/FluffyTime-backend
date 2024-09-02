@@ -15,6 +15,8 @@ import com.fluffytime.domain.board.exception.TooManyFiles;
 import com.fluffytime.domain.board.exception.UnsupportedFileFormat;
 import com.fluffytime.domain.board.repository.PostImagesRepository;
 import com.fluffytime.domain.board.repository.PostRepository;
+import com.fluffytime.domain.notification.repository.AdminNotificationRepository;
+import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
@@ -45,6 +47,8 @@ public class PostService {
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
     private final TagService tagService;
+    private final AdminNotificationService adminNotificationService;
+    private final AdminNotificationRepository adminNotificationRepository;
 
     // 게시글 등록하기
     @Transactional
@@ -70,6 +74,8 @@ public class PostService {
             post.setTempStatus(TempStatus.SAVE);
             post.setUpdatedAt(LocalDateTime.now());
             post.setContent(postRequest.getContent());
+
+            adminNotificationService.createRegPostNotification(user,post);
         } else {
             // 새 게시물 생성
             post = Post.builder()
@@ -79,6 +85,7 @@ public class PostService {
                 .tempStatus(TempStatus.SAVE)  // 새로 생성되는 게시물은 최종 등록 상태로 설정
                 .build();
         postRepository.save(post);
+        adminNotificationService.createRegPostNotification(user,post);
         }
 
         // 파일 저장 로직
@@ -230,6 +237,8 @@ public class PostService {
             throw new UserNotFound();
         }
 
+        adminNotificationService.createDeletePostNotification(user, post);
+//        adminNotificationRepository.updatePostIdToNull(post.getPostId());
         postRepository.deleteById(id);
     }
 

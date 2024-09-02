@@ -50,6 +50,7 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .requestMatchers(
+                    "/api/notifications/admin/**",
                     "/api/admin/**",
                     "/admin/**"
                 ).hasRole(ROLE_ADMIN.getNoneHeaderName())
