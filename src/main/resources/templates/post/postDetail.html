@@ -23,15 +23,13 @@
   <div class="modal-content">
     <button class="close-btn" onclick="closePostDetailModal()">&times;</button> <!-- 모달 닫기 버튼 -->
     <div class="left-content">
+      <div id="imageContainer" class="image-slider"></div>
       <button class="nav-button prev" id="prevButton" onclick="prevImage(event)"
               style="display: none;">&#10094;
       </button>
-      <!-- 이전 이미지 버튼 -->
-      <div id="imageContainer" class="image-slider"></div> <!-- 이미지 슬라이더 컨테이너 -->
       <button class="nav-button next" id="nextButton" onclick="nextImage(event)"
               style="display: none;">&#10095;
       </button>
-      <!-- 다음 이미지 버튼 -->
     </div>
     <div class="right-content">
       <div class="header">
@@ -85,39 +83,12 @@
 <div class="dropdown-menu" id="dropdownMenu"> <!-- 드롭다운 메뉴 -->
   <a href="javascript:void(0);" class="delete" style="display:none;" onclick="deletePost()">삭제</a>
   <a href="javascript:void(0);" class="edit" style="display:none;" onclick="editPost()">수정</a>
-  <a href="javascript:void(0);" class="like-hide" style="display:none;">다른 사람에게 좋아요 수 숨기기</a>
-  <a href="javascript:void(0);" class="comment-toggle" style="display:none;"
-     onclick="toggleComments()">댓글 기능 해제</a>
+  <a href="javascript:void(0);" class="like-hide" style="display:none;" onclick="toggleLikeVisibility()">다른 사람에게 좋아요 수 숨기기</a>
+  <a href="javascript:void(0);" class="comment-toggle" style="display:none;" onclick="toggleComments()">댓글 기능 해제</a>
 
   <a href="javascript:void(0);" class="report" style="display: none;">신고</a>
   <a href="javascript:void(0);" class="copy-link" onclick="copyLinkToClipboard()">링크 복사</a>
   <a href="javascript:void(0);" onclick="toggleDropdownMenu()">취소</a>
-</div>
-
-<div class="edit-modal" id="editModal"> <!-- 수정 모달 -->
-  <div class="edit-modal-content">
-    <button class="close-btn" onclick="closeEditModal()">&times;</button> <!-- 수정 모달 닫기 버튼 -->
-    <div class="edit-left-content">
-      <button class="nav-button prev" id="prevEditButton" onclick="prevEditImage(event)"
-              style="display: none;">&#10094;
-      </button>
-      <!-- 이전 이미지 버튼 -->
-      <div id="editImagePreviewContainer"></div> <!-- 이미지 미리보기 컨테이너 -->
-      <button class="nav-button next" id="nextEditButton" onclick="nextEditImage(event)"
-              style="display: none;">&#10095;
-      </button>
-      <!-- 다음 이미지 버튼 -->
-    </div>
-    <div class="edit-right-content">
-      <div class="header">게시물 수정</div>
-      <form id="editForm" enctype="multipart/form-data">
-        <input type="text" id="editContent" name="content" placeholder="내용을 입력하세요">
-        <!-- 수정 내용 입력 -->
-        <button type="button" onclick="submitEdit()">저장</button> <!-- 저장 버튼 -->
-        <button type="button" onclick="closeEditModal()">취소</button> <!-- 취소 버튼 -->
-      </form>
-    </div>
-  </div>
 </div>
 
 <div id="like-user-modal" class="modal-like">

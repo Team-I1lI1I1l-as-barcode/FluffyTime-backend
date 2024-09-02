@@ -138,11 +138,26 @@ li {
   line-height: 24px;
 }
 
+.adminPageBtn {
+  position: absolute;
+  bottom: 6rem; /* 사이드바 하단에 위치 */
+  width: 100%;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  line-height: 24px;
+}
+
 .more-menu .material-symbols-rounded {
   margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
 .logout .material-symbols-rounded {
+  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+}
+
+.adminPageBtn .material-symbols-rounded {
   margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
 }
 
@@ -164,11 +179,24 @@ li {
   padding-top: 0.07rem;
 }
 
+.adminPageBtn a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 24px;
+  padding-top: 0.07rem;
+}
+
 .more-menu a:hover {
   text-decoration: underline;
 }
 
 .logout a:hover {
+  text-decoration: underline;
+}
+
+.adminPageBtn a:hover {
   text-decoration: underline;
 }
 
@@ -189,3 +217,6 @@ li {
   background-color: var(--background-color);
 }
 
+.hidden {
+  display: none;
+}

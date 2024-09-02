@@ -64,10 +64,4 @@ public class UserController {
     public String changePasswordPage() {
      return "login/changePassword";
     }
-
-    // 테스트용 admin 화면
-    @GetMapping("/admin")
-    public String adminPage() {
-        return "admin/admin";
-    }
 }

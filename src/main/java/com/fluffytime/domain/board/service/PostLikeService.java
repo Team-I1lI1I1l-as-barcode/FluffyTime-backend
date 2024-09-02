@@ -8,6 +8,7 @@ import com.fluffytime.domain.board.exception.LikeIsExists;
 import com.fluffytime.domain.board.exception.NoLikeFound;
 import com.fluffytime.domain.board.repository.PostLikeRepository;
 import com.fluffytime.domain.board.repository.PostRepository;
+import com.fluffytime.domain.notification.service.NotificationService;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
@@ -30,6 +31,7 @@ public class PostLikeService {
     private final UserRepository userRepository;
     private final PostLikeRepository postLikeRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final NotificationService notificationService;
 
     //게시글 좋아요 등록
     public PostLikeResponse likePost(Long postId, PostLikeRequest requestDto) {
@@ -46,6 +48,9 @@ public class PostLikeService {
             .user(user)
             .build();
         postLikeRepository.save(postLike); //좋아요 등록
+
+        // 알림 생성 및 전송
+        notificationService.createLikesNotification(post, postLike.getUser());
 
         int likeCount = postLikeRepository.countByPost(post); //현재 좋아요 수
 

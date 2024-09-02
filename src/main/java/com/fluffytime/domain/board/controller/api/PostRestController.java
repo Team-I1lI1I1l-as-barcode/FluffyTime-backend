@@ -35,6 +35,8 @@ public class PostRestController {
         @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("게시물 등록 요청 받음: {}", postRequest);
+        log.info("좋아요 숨기기 상태: {}", postRequest.isHideLikeCount());
+        log.info("댓글 기능 해제 상태: {}", postRequest.isCommentsDisabled());
 
         if (postRequest.getTempId() != null) {
             // 임시 저장된 글 최종 등록 시 이미지 추가/수정 불가
@@ -54,7 +56,7 @@ public class PostRestController {
     // 임시 게시물 등록
     @PostMapping("/temp-reg")
     public ResponseEntity<Long> tempRegPost(@RequestPart("post") PostRequest postRequest,
-        @RequestPart("images") MultipartFile[] files,
+        @RequestPart(value = "images", required = false) MultipartFile[] files,
         HttpServletRequest request) {
         log.info("임시 게시물 등록 요청 받음: {}", postRequest);
 
@@ -139,6 +141,14 @@ public class PostRestController {
         Map<String, Boolean> response = new HashMap<>();
         response.put("isAuthor", isAuthor);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    //다른 사람에게 좋아요 숨기기 기능
+    @PostMapping("/toggle-like-visibility/{id}")
+    public ResponseEntity<Void> toggleLikeVisibility(@PathVariable(name = "id") Long id, HttpServletRequest request) {
+        User user = postService.findUserByAccessToken(request);
+        postService.toggleLikeVisibility(id, user);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
 }

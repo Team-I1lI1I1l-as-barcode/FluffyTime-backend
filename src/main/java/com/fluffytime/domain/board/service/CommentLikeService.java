@@ -1,19 +1,20 @@
 package com.fluffytime.domain.board.service;
 
+import com.fluffytime.domain.board.dto.request.CommentLikeRequest;
+import com.fluffytime.domain.board.dto.response.CommentLikeResponse;
+import com.fluffytime.domain.board.entity.Comment;
+import com.fluffytime.domain.board.entity.CommentLike;
+import com.fluffytime.domain.board.exception.LikeIsExists;
 import com.fluffytime.domain.board.exception.NoLikeFound;
+import com.fluffytime.domain.board.repository.CommentLikeRepository;
+import com.fluffytime.domain.board.repository.CommentRepository;
+import com.fluffytime.domain.notification.service.NotificationService;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.CommentNotFound;
 import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.domain.board.entity.Comment;
-import com.fluffytime.domain.board.entity.CommentLike;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.dto.request.CommentLikeRequest;
-import com.fluffytime.domain.board.dto.response.CommentLikeResponse;
-import com.fluffytime.domain.board.exception.LikeIsExists;
-import com.fluffytime.domain.board.repository.CommentLikeRepository;
-import com.fluffytime.domain.board.repository.CommentRepository;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class CommentLikeService {
     private final UserRepository userRepository;
     private final CommentLikeRepository commentLikeRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final NotificationService notificationService;
 
     //댓글 좋아요 등록
     public CommentLikeResponse likeComment(Long commentId,
@@ -51,6 +53,9 @@ public class CommentLikeService {
             .user(user)
             .build();
         commentLikeRepository.save(commentLike);
+
+        // 알림 생성 및 전송
+        notificationService.createLikesNotification(comment, commentLike.getUser());
 
         int likeCount = commentLikeRepository.countByComment(comment); //현재 좋아요 수
 

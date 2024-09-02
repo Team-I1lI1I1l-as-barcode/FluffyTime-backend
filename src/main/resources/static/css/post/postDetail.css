@@ -9,7 +9,7 @@ body {
   height: 100vh;
 }
 
-.modal, .edit-modal {
+.modal {
   display: none;
   position: fixed;
   top: 0;
@@ -21,7 +21,7 @@ body {
   align-items: center;
 }
 
-.modal-content, .edit-modal-content {
+.modal-content {
   background-color: #ffffff;
   width: 80%;
   max-width: 1200px;
@@ -32,7 +32,7 @@ body {
   overflow: hidden;
 }
 
-.left-content, .right-content, .edit-left-content, .edit-right-content {
+.left-content, .right-content {
   height: 100%;
 }
 
@@ -40,16 +40,18 @@ body {
   position: relative;
 }
 
-.left-content, .edit-left-content {
+.left-content {
   flex: 3.5;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.left-content img, .edit-left-content img {
+.left-content img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -59,11 +61,11 @@ body {
   display: none;
 }
 
-.left-content img.active, .edit-left-content img.active {
+.left-content img.active {
   display: block;
 }
 
-.left-content .nav-button, .edit-left-content .nav-button {
+.left-content .nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -82,22 +84,19 @@ body {
   z-index: 10;
 }
 
-.left-content .prev, .edit-left-content .prev {
+.left-content .prev {
   left: 10px;
 }
 
-.left-content .next, .edit-left-content .next {
+.left-content .next {
   right: 10px;
 }
 
-.right-content, .edit-right-content {
+.right-content {
   flex: 1.5;
-  /*padding: 20px;*/
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
-  /*overflow-x: hidden; !* 가로 스크롤 숨기기 *!*/
-  /*overflow-y: auto; !* 세로 스크롤은 자동으로 표시되도록 *!*/
 }
 
 .header {
@@ -107,19 +106,6 @@ body {
   font-size: 18px;
   font-weight: bold;
   position: relative;
-}
-
-/*.content {*/
-/*  display: flex;*/
-/*  flex-direction: column;*/
-/*  flex: 0 1 auto;*/
-/*  display: block;*/
-/*  padding: 20px;*/
-/*}*/
-
-.content p {
-  font-size: 18px;
-  margin-bottom: 20px;
 }
 
 .close-btn {
@@ -176,29 +162,6 @@ body {
 
 .dropdown-menu a.report {
   color: red;
-}
-
-.edit-modal {
-  display: none;
-}
-
-.edit-modal-content input[type="text"] {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-#editImagePreviewContainer img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
-
-.edit-left-content img.active {
-  display: block;
 }
 
 .profile {
@@ -298,4 +261,22 @@ body {
   font-size: 14px;
   position: relative;
   cursor: pointer;
+}
+
+.modal-content video {
+  width: 100%;        /* 비디오의 너비를 100%로 설정 */
+  height: 100%;       /* 비디오의 높이를 100%로 설정 */
+  object-fit: cover;  /* 비디오가 컨테이너에 맞게 잘리도록 설정 */
+  aspect-ratio: auto; /* 비디오의 비율을 자동으로 설정 (일부 브라우저에서 필요할 수 있음) */
+  position: absolute; /* 비디오를 절대 위치로 설정하여 컨테이너에 맞게 배치 */
+  top: 0;
+  left: 0;
+}
+.like-user-list {
+  display: none;
+  list-style: none;
+  padding: 0;
+}
+.like-user-list li {
+  margin: 5px 0;
 }

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>게시물 수정하기</title>
   <link rel="stylesheet" href="/css/post/postEdit.css">
-  <script src="/js/post/postEdit.js"></script>
 </head>
 <body>
 <div class="modal" id="postModal" style="display: flex;">
@@ -17,8 +16,8 @@
         <div id="imagePreviewContainer">
           <!-- 이미지 미리보기 -->
         </div>
-        <input type="file" id="images" name="images" accept="image/*" multiple
-               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 파일 선택 입력 -->
+        <input type="file" id="images" name="images" accept="image/*,video/*" multiple
+               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 및 동영상 파일 선택 입력 -->
         <button type="button" class="share-button" id="shareButton" style="display: none;">
           이미지 선택
         </button>
@@ -42,14 +41,14 @@
           <hr>
           <!--태그-->
           <div class="tags-container">
+            <div id="tagList" class="tag-list"></div>
             <input type="text" id="tagsInput" name="tags" class="post-textarea"
                    placeholder="#태그 입력 후 엔터를 누르세요" maxlength="10">
-            <div id="tagList" class="tag-list"></div>
           </div>
 
           <hr>
           <div class="toggle">
-            <label for="hideLikes">이 게시물의 좋아요 수 및 조회수 숨기기</label>
+            <label for="hideLikes">다른 사람에게 좋아요 수 숨기기</label>
             <label class="switch">
               <input type="checkbox" name="hideLikes" id="hideLikes">
               <span class="slider"></span>
@@ -76,6 +75,6 @@
     </div>
   </div>
 </div>
-
 </body>
+<script src="/js/post/postEdit.js"></script>
 </html>
