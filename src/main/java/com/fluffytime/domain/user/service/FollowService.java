@@ -1,5 +1,6 @@
 package com.fluffytime.domain.user.service;
 
+import com.fluffytime.domain.notification.service.NotificationService;
 import com.fluffytime.domain.user.dto.request.FollowRequest;
 import com.fluffytime.domain.user.dto.response.FollowCountResponse;
 import com.fluffytime.domain.user.dto.response.FollowListResponse;
@@ -29,6 +30,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
+    private final NotificationService notificationService;
 
     // 팔로우 여부 단 건 확인 메서드
     public boolean isFollowing(Long followingId, Long followedId) {
@@ -58,6 +60,9 @@ public class FollowService {
         follow.setFollowedUser(followedUser);
 
         followRepository.save(follow);
+
+        // 알림 생성 및 전송
+        notificationService.createFollowNotification(followingUser, followedUser);
     }
 
     //언팔로우 (팔로우 취소)

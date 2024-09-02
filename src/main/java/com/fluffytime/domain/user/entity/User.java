@@ -117,11 +117,18 @@ public class User {
     private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(
+        mappedBy = "sender",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Notification> sentNotifications = new ArrayList<>();
+
+    @OneToMany(
         mappedBy = "user",
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Notification> receiveNotifications = new ArrayList<>();
 
     @OneToMany(
         mappedBy = "metionedUser",
