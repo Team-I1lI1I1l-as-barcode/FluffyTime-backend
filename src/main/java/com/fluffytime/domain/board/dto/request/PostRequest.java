@@ -2,8 +2,6 @@ package com.fluffytime.domain.board.dto.request;
 
 import com.fluffytime.domain.board.entity.enums.TempStatus;
 import com.fluffytime.domain.board.validation.annotation.ValidTags;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
