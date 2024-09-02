@@ -34,7 +34,7 @@ public class ReplyService {
     private final NotificationService notificationService;
 
     //답글 저장
-    public void createReply(ReplyRequest requestDto) {
+    public Reply createReply(ReplyRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
@@ -45,10 +45,11 @@ public class ReplyService {
             .user(user)
             .comment(comment)
             .build();
-        replyRepository.save(reply);
+        Reply savedReply = replyRepository.save(reply);
 
         // 알림 생성 및 전송
         notificationService.createRepliesNotification(comment, reply.getUser());
+        return savedReply;
     }
 
     //답글 조회

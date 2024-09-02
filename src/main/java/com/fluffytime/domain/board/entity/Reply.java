@@ -69,6 +69,13 @@ public class Reply {
     )
     private List<Notification> notifications = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "reply",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> mentions = new ArrayList<>();
+
     @Builder
     public Reply(String content, User user, Comment comment) {
         this.content = content;

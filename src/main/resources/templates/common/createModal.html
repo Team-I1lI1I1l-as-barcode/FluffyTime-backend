@@ -33,9 +33,14 @@
             <img id="profileImage" src="" alt="사용자의 프로필 이미지">
             <span id="nicknameDisplay"></span>
           </div>
-          <textarea id="content" name="content" class="post-textarea" rows="10"
-                    placeholder="내용을 입력하세요" maxlength="2200" required
-                    oninput="updateCharCount()"></textarea>
+          <div class="textarea-wrapper">
+            <textarea id="content" name="content" class="post-textarea" rows="10"
+                      placeholder="내용을 입력하세요" maxlength="2200" required
+                      oninput="handleInput()"></textarea>
+            <!-- 멘션 기능을 위한 사용자 목록 컨테이너 -->
+            <div id="contentPreview" class="content-preview"></div>
+            <div id="mentionSuggestions" class="mention-suggestions"></div>
+          </div>
           <div class="char-count" id="charCount">0 / 2200</div>
           <hr>
           <!--태그-->

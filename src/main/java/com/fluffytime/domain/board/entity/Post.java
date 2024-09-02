@@ -97,6 +97,16 @@ public class Post {
     )
     private List<Notification> notifications = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> mentions = new ArrayList<>();
+
+    @Column(name = "comments_disabled", nullable = false)
+    private boolean commentsDisabled = false;
+
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
         LocalDateTime updatedAt, TempStatus tempStatus, User user,

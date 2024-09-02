@@ -76,6 +76,13 @@ public class Comment {
     )
     private List<Notification> notifications = new ArrayList<>();
 
+    @OneToMany(
+        mappedBy = "comment",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> mentions = new ArrayList<>();
+
     @Builder
     public Comment(String content, User user, Post post) {
         this.content = content;

@@ -72,10 +72,14 @@
         </div>
       </div>
       <div class="comment-form">
-        <textarea id="comment-content" placeholder="댓글 달기 .." required></textarea>
-        <button id="commentButton">작성</button> <!--postId에 댓글 달기-->
+        <div style="position: relative; width: 100%;">
+              <textarea id="comment-content" placeholder="댓글 달기 .." required
+                        oninput="handleInput()"></textarea>
+          <div id="contentPreview" class="content-preview"></div>
+        </div>
+        <button id="commentButton">작성</button>
       </div>
-
+      <div id="mentionSuggestions" class="mention-suggestions"></div>
     </div>
   </div>
 </div>
@@ -95,7 +99,7 @@
   <div class="modal-content-like">
     <div class="like-modal-top">
       <h2>좋아요</h2>
-      <span class="close-like" onclick="closeModal()">&times;</span>
+      <span class="close-like" onclick="closeModalLike()">&times;</span>
     </div>
     <div class="user-list">
       <!-- 유저 목록이 동적으로 추가됩니다 -->
