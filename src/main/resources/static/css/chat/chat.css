@@ -106,12 +106,12 @@
 }
 
 .chat-messages {
+  display: none;
   flex: 1;
   padding: 20px;
   overflow-y: auto;
   width: 100%;
   background-color: #f7f7f7; /* 배경색을 밝은 회색으로 변경 */
-  display: flex;
   flex-direction: column; /* 메시지들을 수직으로 배치 */
   gap: 10px; /* 각 메시지 간의 간격 */
 }
@@ -169,7 +169,8 @@
 }
 
 .chat-input {
-  display: flex;
+  /*display: flex;*/
+  display: none;
   border-top: 1px solid #ddd;
   padding: 15px;
   background-color: #f7f7f7;

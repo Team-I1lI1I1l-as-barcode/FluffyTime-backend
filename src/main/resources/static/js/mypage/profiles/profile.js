@@ -341,7 +341,7 @@ function initialize() {
       fetchProfile("GET", withdrawAccount, "/api/users/withdraw");
     } else {
       alert("회원 탈퇴가 취소되었습니다.");
-      window.location.href = "/";
+      window.location.reload();
     }
   });
 
