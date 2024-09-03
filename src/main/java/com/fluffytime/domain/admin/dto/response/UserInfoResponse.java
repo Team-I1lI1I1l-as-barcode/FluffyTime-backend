@@ -1,9 +1,7 @@
 package com.fluffytime.domain.admin.dto.response;
 
 import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.user.entity.UserRole;
 import com.fluffytime.domain.user.entity.enums.LoginType;
-import com.fluffytime.domain.user.entity.enums.RoleName;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
