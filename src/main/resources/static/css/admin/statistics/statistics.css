@@ -71,15 +71,8 @@ h3 {
   box-sizing: border-box;
 }
 
-.notification-item {
-  padding: 10px;
-  margin: 10px 10px 10px 0;
-  border: 1px solid var(--primary-color);
-  border-radius: 10px;
-  box-sizing: border-box;
-}
-
 .notification-list {
+  margin: 10px 0;
   overflow-x: auto;
   max-height: 450px;
 }
@@ -114,6 +107,28 @@ h3 {
 }
 
 
+/* Define the fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-item {
+  box-sizing: border-box;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
 
 
 

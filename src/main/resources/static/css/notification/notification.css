@@ -50,3 +50,14 @@
 .delete-button:hover {
   color: #ff1a1a;
 }
+
+/* notification.css */
+.notification.read .notification-box {
+  background-color: #f0f0f0; /* 어두운 배경색 */
+  color: #999999; /* 연한 글씨 색 */
+}
+
+/* 다른 스타일들도 추가 가능 */
+.notification.read .notification-content {
+  color: #999999;
+}
