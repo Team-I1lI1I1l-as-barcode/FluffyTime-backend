@@ -46,6 +46,12 @@ public class Post {
     @Column(name = "temp_status", nullable = false)
     private TempStatus tempStatus;
 
+    @Column(name = "comments_disabled", nullable = false)
+    private boolean commentsDisabled = false;
+
+    @Column(name = "hide_like_count", nullable = false)
+    private boolean hideLikeCount = false;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -92,17 +98,24 @@ public class Post {
     )
     private List<Notification> notifications = new ArrayList<>();
 
-    @Column(name = "comments_disabled", nullable = false)
-    private boolean commentsDisabled = false;
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
+    private List<Mention> mentions = new ArrayList<>();
 
     @Builder
     public Post(Long postId, String content, LocalDateTime createdAt,
-        LocalDateTime updatedAt, TempStatus tempStatus, User user) {
+        LocalDateTime updatedAt, TempStatus tempStatus, User user,
+        boolean hideLikeCount, boolean commentsDisabled) {
         this.postId = postId;
         this.content = content;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.tempStatus = tempStatus;
         this.user = user;
+        this.hideLikeCount = hideLikeCount;
+        this.commentsDisabled = commentsDisabled;
     }
 }

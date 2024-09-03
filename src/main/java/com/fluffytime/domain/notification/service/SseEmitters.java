@@ -23,11 +23,10 @@ public class SseEmitters {
 
     public SseEmitter createForUser(Long userId) {
 
-        SseEmitter emitter = new SseEmitter(60*60*1000L);
+        SseEmitter emitter = new SseEmitter(30 * 60 * 1000L); //30분 타임아웃 설정
 
-        log.info("id, emitter = {} {}", userId, emitter);
         emitters.put(userId, emitter);
-
+      
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
             emitters.remove(userId);
@@ -40,6 +39,7 @@ public class SseEmitters {
         });
         emitter.onError((e) -> {
             log.info("onError callback");
+
             emitters.remove(userId);
             emitter.completeWithError(e);
         });

@@ -2,6 +2,7 @@ package com.fluffytime.domain.board.controller.api;
 
 import com.fluffytime.domain.board.dto.request.CommentRequest;
 import com.fluffytime.domain.board.dto.response.CommentResponse;
+import com.fluffytime.domain.board.entity.Comment;
 import com.fluffytime.domain.board.exception.NotPermissionDelete;
 import com.fluffytime.domain.board.exception.NotPermissionModify;
 import com.fluffytime.domain.board.service.CommentService;
@@ -9,6 +10,7 @@ import com.fluffytime.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -32,14 +34,18 @@ public class CommentRestController {
 
     //댓글 등록
     @PostMapping("/reg")
-    public ResponseEntity<Map<String, String>> createComment(
+    public ResponseEntity<Map<String, Object>> createComment(
         @Valid @RequestBody CommentRequest requestDto, HttpServletRequest httpServletRequest) {
         try {
             User user = commentService.findByAccessToken(httpServletRequest);
             requestDto.setUserId(user.getUserId());
-            commentService.createComment(requestDto);
-            return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Collections.singletonMap("message", "댓글 등록 성공!"));
+            Comment savedComment = commentService.createComment(requestDto);  // 댓글 저장 후 반환
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("message", "댓글 등록 성공!");
+            responseBody.put("commentId", savedComment.getCommentId());  // 저장된 댓글 ID 반환
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(Collections.singletonMap("message", "댓글 등록 실패!: " + e.getMessage()));

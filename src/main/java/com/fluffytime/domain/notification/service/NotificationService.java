@@ -1,6 +1,7 @@
 package com.fluffytime.domain.notification.service;
 
 import com.fluffytime.domain.board.entity.Comment;
+import com.fluffytime.domain.board.entity.Mention;
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.board.entity.Reply;
 import com.fluffytime.domain.notification.dto.request.NotificationRequest;
@@ -37,7 +38,6 @@ public class NotificationService {
     private final SseEmitters sseEmitters;
     private final JwtTokenizer jwtTokenizer;
 
-    @Transactional(readOnly = true)
     public SseEmitter createSseEmitter(NotificationRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
@@ -62,7 +62,8 @@ public class NotificationService {
         Notification notification = Notification.builder()
             .message(message)
             .isRead(false)
-            .user(user)
+            .user(user) //알림을 받는 사용자
+            .sender(commentAuthor)
             .post(post)
             .type("comment")
             .build();
@@ -90,6 +91,7 @@ public class NotificationService {
             .message(message)
             .isRead(false)
             .user(user)
+            .sender(replyAuthor)
             .comment(comment)
             .type("reply")
             .build();
@@ -109,8 +111,6 @@ public class NotificationService {
         Post post = null;
         Comment comment = null;
         Reply reply = null;
-
-        String profileImageurl = getProfileImageUrl(likeAuthor.getProfile());
 
         if (target instanceof Post) {
             Post postTarget = (Post) target;
@@ -156,6 +156,7 @@ public class NotificationService {
             .message(message)
             .isRead(false)
             .user(targetUser)
+            .sender(likeAuthor)
             .post(post)
             .comment(comment)
             .reply(reply)
@@ -166,6 +167,71 @@ public class NotificationService {
 
         NotificationResponse responseDto = convertToDto(notification);
         sseEmitters.sendToUser(targetUser.getUserId(), responseDto);
+    }
+
+    //멘션 알림 생성
+    @Transactional
+    public void createMentionNotification(Mention mention) {
+        User mentionedUser = mention.getMetionedUser();
+        User targetUser = null;
+        String message;
+        String type;
+
+        if (mention.getPost() != null) {
+            targetUser = mention.getPost().getUser();
+            message = targetUser.getNickname() + "님이 회원님을 게시글에 멘션했습니다";
+            type = "mentionPost";
+        } else if (mention.getComment() != null) {
+            targetUser = mention.getComment().getUser();
+            message = targetUser.getNickname() + "님이 회원님을 댓글에 멘션했습니다";
+            type = "mentionComment";
+        } else if (mention.getReply() != null) {
+            targetUser = mention.getReply().getUser();
+            message = targetUser.getNickname() + "님이 회원님을 답글에 멘션했습니다";
+            type = "mentionReply";
+        } else {
+            throw new IllegalArgumentException("Unsupported mention target");
+        }
+
+        // 작성자와 멘션 작성자가 동일한 경우 알림을 생성하지 않음
+        if (targetUser.getUserId().equals(mentionedUser.getUserId())) {
+            return;
+        }
+
+        Notification notification = Notification.builder()
+            .message(message)
+            .isRead(false)
+            .user(mentionedUser)
+            .sender(targetUser)
+            .post(mention.getPost())
+            .comment(mention.getComment())
+            .reply(mention.getReply())
+            .type(type)
+            .build();
+
+        notificationRepository.save(notification);
+
+        NotificationResponse responseDto = convertToDto(notification);
+        sseEmitters.sendToUser(targetUser.getUserId(), responseDto);
+    }
+
+    // 팔로우 알림 생성
+    @Transactional
+    public void createFollowNotification(User followingUser, User followedUser) {
+        String message = followingUser.getNickname() + "님이 회원님을 팔로우했습니다";
+
+        Notification notification = Notification.builder()
+            .message(message)
+            .isRead(false)
+            .user(followedUser)
+            .sender(followingUser)
+            .type("follow")
+            .build();
+
+        notificationRepository.save(notification);
+
+        NotificationResponse responseDto = convertToDto(notification);
+        sseEmitters.sendToUser(followedUser.getUserId(), responseDto);
     }
 
     //알림 읽음 표시 상태 바꿈
@@ -179,7 +245,6 @@ public class NotificationService {
 
     //모든 알림 조회
     @Cacheable(value = "notifications", key = "#requestDto.userId")
-    @Transactional(readOnly = true)
     public List<NotificationResponse> getAllNotifications(NotificationRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
@@ -219,17 +284,28 @@ public class NotificationService {
 
     public NotificationResponse convertToDto(Notification notification) {
         Long postId = null;
-        String profileImageurl = getProfileImageUrl(notification.getUser().getProfile());
+        Long commentId = null;
+        Long replyId = null;
 
-        if (notification.getReply() != null) {
-            // Reply를 통해 Post의 ID 가져오기
-            postId = notification.getReply().getComment().getPost().getPostId();
-        } else if (notification.getComment() != null) {
-            // Comment를 통해 Post의 ID 가져오기
-            postId = notification.getComment().getPost().getPostId();
-        } else if (notification.getPost() != null) {
-            // 직접 Post가 있을 때의 처리
-            postId = notification.getPost().getPostId();
+        User sender = notification.getSender(); // sender 가져오기
+        String profileImageurl =
+            sender != null ? getProfileImageUrl(sender.getProfile()) : "/image/profile/default.png";
+        String senderNickname = sender != null ? sender.getNickname() : "Unknown";
+
+        // 알림 타입이 팔로우일 경우, 관련 ID는 모두 null로 설정
+        if (!notification.getType().equals("follow")) {
+            if (notification.getReply() != null) {
+                // Reply를 통해 Post의 ID 가져오기
+                postId = notification.getReply().getComment().getPost().getPostId();
+                replyId = notification.getReply().getReplyId();
+            } else if (notification.getComment() != null) {
+                // Comment를 통해 Post의 ID 가져오기
+                postId = notification.getComment().getPost().getPostId();
+                commentId = notification.getComment().getCommentId();
+            } else if (notification.getPost() != null) {
+                // 직접 Post가 있을 때의 처리
+                postId = notification.getPost().getPostId();
+            }
         }
 
         return NotificationResponse.builder()
@@ -238,11 +314,10 @@ public class NotificationService {
             .isRead(notification.isRead())
             .type(notification.getType())
             .userId(notification.getUser().getUserId())
+            .nickname(senderNickname)
             .postId(postId) // postId 설정
-            .commentId(
-                notification.getComment() != null ? notification.getComment().getCommentId() : null)
-            .replyId(
-                notification.getReply() != null ? notification.getReply().getReplyId() : null)
+            .commentId(commentId)
+            .replyId(replyId)
             .createdAt(notification.getCreatedAt())
             .profileImageurl(profileImageurl)
             .build();

@@ -67,7 +67,7 @@ function connectSSE(userId) {
   eventSource.onerror = event => {
     console.error("SSE connection error:", event);
     eventSource.close();
-    setTimeout(connectSSE, 5000); // 연결 오류 시 5초 후 재연결 시도
+    setTimeout(connectSSE, 10000); // 연결 오류 시 10초 후 재연결 시도
   };
 
   eventSource.addEventListener('notification', event => {
@@ -89,7 +89,11 @@ function connectSSE(userId) {
 function createNotificationElement(notification) {
   const listItem = document.createElement('li');
   listItem.className = 'notification';
-  listItem.classList.toggle('read', notification.read);
+
+  // `read` 값이 true일 경우 `read` 클래스를 추가
+  if (notification.read) {
+    listItem.classList.add('read');
+  }
 
   const notificationBox = document.createElement('div');
   notificationBox.className = 'notification-box';
@@ -124,9 +128,18 @@ function createNotificationElement(notification) {
   listItem.appendChild(notificationBox);
 
   listItem.dataset.id = notification.notificationId;
-  listItem.dataset.url = notification.postId
-      ? `/posts/detail/${notification.postId}`
-      : '#';
+
+  // 알림 타입에 따라 URL을 설정
+  if (notification.type === 'follow') {
+    // 팔로우 알림의 경우 해당 유저의 프로필 페이지로 이동
+    listItem.dataset.url = `/userpages/${notification.nickname}`;
+  } else if (notification.postId) {
+    // 게시물 관련 알림의 경우 게시물 상세 페이지로 이동
+    listItem.dataset.url = `/posts/detail/${notification.postId}`;
+  } else {
+    // 다른 알림의 경우 URL 설정하지 않음
+    listItem.dataset.url = '#';
+  }
 
   listItem.onclick = function () {
     markAsRead(this);

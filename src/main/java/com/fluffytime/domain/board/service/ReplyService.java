@@ -46,10 +46,11 @@ public class ReplyService {
             .user(user)
             .comment(comment)
             .build();
-        replyRepository.save(reply);
+        Reply savedReply = replyRepository.save(reply);
 
         // 알림 생성 및 전송
         notificationService.createRepliesNotification(comment, reply.getUser());
+        return savedReply;
     }
 
     //답글 조회

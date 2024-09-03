@@ -16,6 +16,7 @@ public class NotificationResponse {
     private boolean isRead;
     private String type;
     private Long userId;
+    private String nickname;
     private Long postId;
     private Long commentId;
     private Long replyId;
@@ -25,12 +26,13 @@ public class NotificationResponse {
     @Builder
     public NotificationResponse(Long notificationId, String message, boolean isRead, String type,
         Long userId, Long postId, LocalDateTime createdAt, String profileImageurl, Long commentId,
-        Long replyId) {
+        Long replyId, String nickname) {
         this.notificationId = notificationId;
         this.message = message;
         this.isRead = isRead;
         this.type = type;
         this.userId = userId;
+        this.nickname = nickname;
         this.commentId = commentId;
         this.postId = postId;
         this.replyId = replyId;
