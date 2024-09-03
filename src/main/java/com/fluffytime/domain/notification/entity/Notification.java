@@ -60,13 +60,17 @@ public class Notification {
     @JoinColumn(name = "reply_id")
     private Reply reply;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id")
+    private User sender;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @Builder
     public Notification(String message, boolean isRead, User user, Post post, String type,
-        Comment comment, Reply reply) {
+        Comment comment, Reply reply, User sender) {
         this.message = message;
         this.isRead = isRead;
         this.user = user;
@@ -74,5 +78,6 @@ public class Notification {
         this.comment = comment;
         this.reply = reply;
         this.type = type;
+        this.sender = sender;
     }
 }

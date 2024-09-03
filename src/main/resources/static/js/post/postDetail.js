@@ -32,7 +32,8 @@ async function loadPostData(postId) {
     currentPostId = postId;
 
     // 게시물 내용을 화면에 설정
-    document.getElementById('postContent').innerText = postData.content;
+    document.getElementById('postContent').innerHTML = highlightMentions(
+        postData.content);
 
     // 사용자 정보 설정
     const nicknameElement = document.getElementById('nicknameDisplay');
@@ -108,7 +109,8 @@ async function loadPostData(postId) {
     }
 
     // 좋아요 수 숨김 상태 설정
-    const likeHideButtons = document.querySelectorAll('.dropdown-menu a.like-hide');
+    const likeHideButtons = document.querySelectorAll(
+        '.dropdown-menu a.like-hide');
     likeHideButtons.forEach(button => {
       if (postData.hideLikeCount) {
         button.innerText = '다른 사람에게 좋아요 수 숨기기 취소';
@@ -152,7 +154,8 @@ function updateImageContainer(containerId, urls) {
     const fileExtension = fileObj.filepath.split('.').pop().toLowerCase(); // 파일 확장자 추출
 
     // 파일 확장자에 따라 img 또는 video 요소를 생성
-    if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension === 'webm') {
+    if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
+        === 'webm') {
       mediaElement = document.createElement('video'); // 동영상 요소 생성
       mediaElement.controls = true; // 동영상 컨트롤러 표시
       mediaElement.classList.add('video-preview'); // .video-preview 클래스 추가
@@ -184,7 +187,8 @@ function prevImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
   console.log('이전 미디어 표시');
   if (imageUrls.length > 1) { // 미디어가 여러 개일 때만 작동
-    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1 : currentImageIndex - 1;
+    currentImageIndex = (currentImageIndex === 0) ? imageUrls.length - 1
+        : currentImageIndex - 1;
     showImage(currentImageIndex, 'imageContainer'); // 미디어를 업데이트
   }
 }
@@ -194,7 +198,8 @@ function nextImage(event) {
   event.preventDefault(); // 기본 이벤트 동작을 방지
   console.log('다음 미디어 표시');
   if (imageUrls.length > 1) { // 미디어가 여러 개일 때만 작동
-    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0 : currentImageIndex + 1;
+    currentImageIndex = (currentImageIndex === imageUrls.length - 1) ? 0
+        : currentImageIndex + 1;
     showImage(currentImageIndex, 'imageContainer'); // 미디어를 업데이트
   }
 }
@@ -202,7 +207,8 @@ function nextImage(event) {
 // 현재 인덱스에 해당하는 미디어를 표시하는 함수
 function showImage(index, containerId) {
   console.log(`미디어 표시: ${index}`);
-  const mediaElements = document.querySelectorAll(`#${containerId} img, #${containerId} video`); // 컨테이너 내의 모든 미디어 요소를 가져옴
+  const mediaElements = document.querySelectorAll(
+      `#${containerId} img, #${containerId} video`); // 컨테이너 내의 모든 미디어 요소를 가져옴
   mediaElements.forEach((media, idx) => {
     media.style.display = idx === index ? 'block' : 'none'; // 현재 인덱스의 미디어만 표시
     media.className = idx === index ? 'active' : ''; // 활성화된 미디어에 클래스를 추가
@@ -352,7 +358,8 @@ async function toggleComments() {
   // 상태에 따라 UI 업데이트
   const commentSection = document.getElementById('comment-list');
   const commentForm = document.querySelector('.comment-form');
-  const commentToggleButtons = document.querySelectorAll('.dropdown-menu a.comment-toggle');
+  const commentToggleButtons = document.querySelectorAll(
+      '.dropdown-menu a.comment-toggle');
 
   if (commentSection.style.display === 'none') {
     commentSection.style.display = 'block';
@@ -418,21 +425,24 @@ async function checkIfUserIsAuthor(postId) {
 // 좋아요 수 숨기기 토글 함수
 async function toggleLikeVisibility() {
   // 서버에 좋아요 수 숨기기/보이기 요청 보내기
-  const response = await fetch(`/api/posts/toggle-like-visibility/${currentPostId}`, {
-    method: 'POST',
-    credentials: 'include',
-  });
+  const response = await fetch(
+      `/api/posts/toggle-like-visibility/${currentPostId}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
 
   // 상태에 따라 UI 업데이트
   const likeCountSpan = document.getElementById('likeCountSpan');
-  const likeHideButtons = document.querySelectorAll('.dropdown-menu a.like-hide');
+  const likeHideButtons = document.querySelectorAll(
+      '.dropdown-menu a.like-hide');
 
   if (likeCountSpan.style.display === 'none') {
     likeCountSpan.style.display = 'inline';
     likeHideButtons.forEach(button => button.innerText = '다른 사람에게 좋아요 수 숨기기');
   } else {
     likeCountSpan.style.display = 'none';
-    likeHideButtons.forEach(button => button.innerText = '다른 사람에게 좋아요 수 숨기기 취소');
+    likeHideButtons.forEach(
+        button => button.innerText = '다른 사람에게 좋아요 수 숨기기 취소');
   }
 }
 
@@ -477,3 +487,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('URL에서 postId를 찾을 수 없습니다.');
   }
 });
+
+// 멘션 하이라이트 함수
+function highlightMentions(content) {
+  // '@nickname' 패턴을 찾아서 <span> 태그로 감싸기
+  return content.replace(/(@\w+)/g,
+      '<span style="color: #5a5aff; font-weight: 700;">$1</span>');
+}
