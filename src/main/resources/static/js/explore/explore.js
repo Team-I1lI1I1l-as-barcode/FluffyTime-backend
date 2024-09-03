@@ -71,17 +71,30 @@ async function populateGrid() {
     }
 
     list.forEach(item => {
-      const img = document.createElement('img');
-      img.src = item.imageUrl;
-      img.alt = item.content; //혹시 에레로 이미지가 없으면 게시물 내용이 대신 나타나게 함
-      img.className = 'grid-item';
+      // const img = document.createElement('img');
+      let mediaElement;
+      const fileExtension = item.imageUrl.split('.').pop().toLowerCase(); // 파일 확장자 추출
+
+      // 파일 확장자에 따라 img 또는 video 요소를 생성
+      if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
+          === 'webm') {
+        mediaElement = document.createElement('video'); // 동영상 요소 생성
+        mediaElement.controls = true; // 동영상 컨트롤러 표시
+        mediaElement.classList.add('video-preview'); // .video-preview 클래스 추가
+      } else {
+        mediaElement = document.createElement('img'); // 이미지 요소 생성
+      }
+
+      mediaElement.src = item.imageUrl;
+      mediaElement.alt = item.content; //혹시 에레로 이미지가 없으면 게시물 내용이 대신 나타나게 함
+      mediaElement.className = 'grid-item';
 
       // 이미지 클릭 이벤트 리스너 추가
-      img.addEventListener('click', () => {
+      mediaElement.addEventListener('click', () => {
         window.location.href = `posts/detail/${item.postId}`;
       });
 
-      gridContainer.appendChild(img);
+      gridContainer.appendChild(mediaElement);
     });
     currentPage++;
   } catch (error) {
