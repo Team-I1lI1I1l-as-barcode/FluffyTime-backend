@@ -12,8 +12,6 @@ const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
 const chatBtn = getElement('chatBtn') // 메시지 버튼
 const unblockComment = getElement('unblock_comment'); // 차단됨 문구
-// const follower_count = getElement("follower_count"); // 팔로워 수
-// const follow_count = getElement("follow_count");// 팔로우 수
 
 // div 영역
 const noPost = getElement('no_post'); // 게시물이 없을시 나올 div
@@ -85,13 +83,8 @@ function handleUserData(data) {
           : noPost.style.display = 'flex';
 
     } else { // 해당 유저의 계정이 비공개 계정일때
-      // 추후 팔로우 관계일시에는 게시물이 보이게 변경할 예정
-      // if (data.postsList !== null) {
-      //   renderPosts(data.postsList);
-      // } else {
       // 게시글이 없을시 문구 출력
       privateAccount.style.display = 'flex';
-      // }
     }
   }
 }
@@ -104,7 +97,7 @@ function renderPosts(posts) {
   posts.forEach(post => {
     if (post.fileUrl != null) {
       if (post.mineType === "video/mp4") {
-        const video = document.createElement('video'); // <img> 요소 생성
+        const video = document.createElement('video');
         video.src = post.fileUrl;
         // 비디오 자동 재생 끄기
         video.addEventListener('play', function (event) {

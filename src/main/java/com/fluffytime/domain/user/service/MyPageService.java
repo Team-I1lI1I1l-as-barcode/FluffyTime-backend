@@ -140,6 +140,7 @@ public class MyPageService {
             .petName(profile.getPetName()) // 반려동물 이름
             .petSex(profile.getPetSex()) // 반려동물 성별
             .petAge(profile.getPetAge()) // 반려동물 나이
+            .intro(profile.getIntro()) // 소개글
             .fileUrl(profileFileUrl(profile.getProfileImages())) // 프로필 파일 경로
             .build();
     }
