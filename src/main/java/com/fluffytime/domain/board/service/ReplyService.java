@@ -35,7 +35,7 @@ public class ReplyService {
 
     //답글 저장
     @Transactional
-    public void createReply(ReplyRequest requestDto) {
+    public Reply createReply(ReplyRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Comment comment = commentRepository.findById(requestDto.getCommentId())
