@@ -33,6 +33,7 @@ public class FollowService {
     private final NotificationService notificationService;
 
     // 팔로우 여부 단 건 확인 메서드
+    @Transactional
     public boolean isFollowing(Long followingId, Long followedId) {
         return followRepository.findByFollowingUserUserIdAndFollowedUserUserId(followingId,
             followedId).isPresent();
@@ -102,6 +103,7 @@ public class FollowService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
@@ -116,6 +118,7 @@ public class FollowService {
     }
 
     // 팔로워 및 팔로잉 수 조회 메서드
+    @Transactional
     public FollowCountResponse getFollowCounts(String nickname) {
 
         User user = userRepository.findByNickname(nickname)
@@ -128,6 +131,7 @@ public class FollowService {
     }
 
     // 팔로워 목록 조회 메서드
+    @Transactional
     public List<FollowListResponse> findFollowersByUserId(Long userId, Long myUserId) {
         List<Follow> followers = followRepository.findByFollowedUserUserId(userId);
         List<FollowListResponse> followListResponses = new ArrayList<>();
@@ -165,6 +169,7 @@ public class FollowService {
     }
 
     // 팔로잉 목록 조회 메서드
+    @Transactional
     public List<FollowListResponse> findFollowingsByUserId(Long userId, Long myUserId) {
         List<Follow> followings = followRepository.findByFollowingUserUserId(userId);
         List<FollowListResponse> followListResponses = new ArrayList<>();
