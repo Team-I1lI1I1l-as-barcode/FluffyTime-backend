@@ -37,8 +37,8 @@ public class CommentService {
     private final CommentLikeRepository commentLikeRepository;
     private final NotificationService notificationService;
 
-    //댓글 저장
-    public Comment createComment(CommentRequest requestDto) {
+    @Transactional
+    public void createComment(CommentRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Post post = postRepository.findById(requestDto.getPostId())
@@ -57,6 +57,7 @@ public class CommentService {
     }
 
     //댓글 조회 - 게시글마다
+    @Transactional
     public List<CommentResponse> getCommentByPostId(Long postId, Long currentUserId) {
         List<Comment> commentList = commentRepository.findByPostPostId(postId);
         return commentList.stream()
@@ -65,6 +66,7 @@ public class CommentService {
     }
 
     //댓글 수정
+    @Transactional
     public void updateComment(Long commentId, String content) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
@@ -74,6 +76,7 @@ public class CommentService {
     }
 
     //댓글 삭제
+    @Transactional
     public void deleteComment(Long commentId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);
@@ -92,12 +95,14 @@ public class CommentService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
     }
 
     //댓글 ID로 댓글 조회하기 - 수정 및 삭제
+    @Transactional
     public CommentResponse getCommentByCommentId(Long commentId, Long currentUserId) {
         Comment comment = commentRepository.findById(commentId)
             .orElseThrow(CommentNotFound::new);

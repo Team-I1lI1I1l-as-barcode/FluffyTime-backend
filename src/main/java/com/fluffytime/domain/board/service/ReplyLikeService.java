@@ -36,6 +36,7 @@ public class ReplyLikeService {
     private final NotificationService notificationService;
 
     //답글 좋아요 등록
+    @Transactional
     public ReplyLikeResponse likeReply(Long replyId, ReplyLikeRequest requestDto) {
 
         Reply reply = replyRepository.findById(replyId)
@@ -68,6 +69,7 @@ public class ReplyLikeService {
     }
 
     //답글 좋아요 취소
+    @Transactional
     public ReplyLikeResponse unlikeReply(Long replyId,
         ReplyLikeRequest requestDto) {
         Reply reply = replyRepository.findById(replyId)
@@ -94,6 +96,7 @@ public class ReplyLikeService {
     }
 
     //답글 좋아요 한 유저 목록
+    @Transactional
     public List<ReplyLikeResponse> getUsersWhoLikedReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);
@@ -104,7 +107,7 @@ public class ReplyLikeService {
     }
 
     //accessToken으로 사용자 찾기
-    @Transactional(readOnly = true)
+    @Transactional
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
         String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
@@ -115,6 +118,7 @@ public class ReplyLikeService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;

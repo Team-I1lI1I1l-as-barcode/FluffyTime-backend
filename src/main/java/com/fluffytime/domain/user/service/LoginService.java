@@ -7,6 +7,7 @@ import static com.fluffytime.global.auth.jwt.util.constants.TokenExpiry.REFRESH_
 import static com.fluffytime.global.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
 import static com.fluffytime.global.auth.jwt.util.constants.TokenName.REFRESH_TOKEN_NAME;
 
+import com.fluffytime.domain.admin.components.AdminSseEmitters;
 import com.fluffytime.domain.user.dao.PasswordChangeDao;
 import com.fluffytime.domain.user.dto.request.FindEmailRequest;
 import com.fluffytime.domain.user.dto.request.LoginUserRequest;
@@ -37,7 +38,6 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 @Slf4j
 public class LoginService {
-
     private final UserRepository userRepository;
     private final JwtTokenizer jwtTokenizer;
     private final PasswordEncoder passwordEncoder;
