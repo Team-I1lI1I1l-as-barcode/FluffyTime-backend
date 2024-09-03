@@ -68,6 +68,13 @@ public class Post {
         cascade = CascadeType.ALL,
         orphanRemoval = true
     )
+    private List<Reels> reels = new ArrayList<>();
+
+    @OneToMany(
+        mappedBy = "post",
+        cascade = CascadeType.ALL,
+        orphanRemoval = true
+    )
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(

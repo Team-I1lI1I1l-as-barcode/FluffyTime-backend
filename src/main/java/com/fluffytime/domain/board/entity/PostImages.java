@@ -39,9 +39,6 @@ public class PostImages {
     @Column(name = "mimetype", nullable = false, length = 50)
     private String mimetype;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "upload_date", nullable = false)
     private LocalDateTime uploadDate;
 
@@ -56,14 +53,12 @@ public class PostImages {
 
     @Builder
     public PostImages(Long imageId, String filename, String filepath, Long filesize,
-        String mimetype,
-        String description, LocalDateTime uploadDate, Post post) {
+        String mimetype, LocalDateTime uploadDate, Post post) {
         this.imageId = imageId;
         this.filename = filename;
         this.filepath = filepath;
         this.filesize = filesize;
         this.mimetype = mimetype;
-        this.description = description;
         this.uploadDate = uploadDate;
         this.post = post;
     }
