@@ -29,6 +29,7 @@ public class ReelsService {
     private final JwtTokenizer jwtTokenizer;
 
     // 모든 릴스를 조회하여 반환하는 메서드
+    @Transactional
     public List<ReelsResponse> getAllReels(HttpServletRequest request) {
         Long userId = getUserIdFromRequest(request); // 사용자 ID 가져오기
 
@@ -80,6 +81,7 @@ public class ReelsService {
         return jwtTokenizer.getUserIdFromToken(accessToken);
     }
 
+    @Transactional
     public void reelsUpload(Post post, User user, String filename, String filepath, String mimetype) {
         // 파일 크기 계산 (파일 시스템에 실제로 파일이 존재한다고 가정)
         File file = new File(filepath);
