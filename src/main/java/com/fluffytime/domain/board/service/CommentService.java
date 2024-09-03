@@ -38,7 +38,7 @@ public class CommentService {
     private final NotificationService notificationService;
 
     @Transactional
-    public void createComment(CommentRequest requestDto) {
+    public Comment createComment(CommentRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
         Post post = postRepository.findById(requestDto.getPostId())

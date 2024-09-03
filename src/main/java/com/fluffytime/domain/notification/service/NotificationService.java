@@ -12,9 +12,7 @@ import com.fluffytime.domain.notification.repository.NotificationRepository;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.repository.UserRepository;
-import com.fluffytime.global.auth.jwt.dto.CustomUserDetails;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.global.common.exception.global.BadRequest;
 import com.fluffytime.global.common.exception.global.UserNotFound;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -23,7 +21,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -223,6 +220,7 @@ public class NotificationService {
     }
 
     //모든 알림 조회
+    @Transactional
     @Cacheable(value = "notifications", key = "#requestDto.userId")
     public List<NotificationResponse> getAllNotifications(NotificationRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
@@ -256,11 +254,13 @@ public class NotificationService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
     }
 
+    @Transactional
     public NotificationResponse convertToDto(Notification notification) {
         Long postId = null;
         String profileImageurl = getProfileImageUrl(notification.getUser().getProfile());
