@@ -16,5 +16,6 @@ public class PostResponse {
 
     private Long postId; // 게시글 id
     private String fileUrl; // s3i 이미지 저장 url
+    private String mineType; // 마임 타입
 
 }

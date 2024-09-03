@@ -1,9 +1,10 @@
 package com.fluffytime.domain.user.service;
 
+import com.fluffytime.domain.board.entity.Bookmark;
+import com.fluffytime.domain.board.entity.enums.TempStatus;
+import com.fluffytime.domain.board.repository.BookmarkRepository;
 import com.fluffytime.domain.notification.repository.AdminNotificationRepository;
 import com.fluffytime.domain.notification.service.AdminNotificationService;
-import com.fluffytime.domain.user.exception.MyPageNotFound;
-import com.fluffytime.domain.user.exception.NoProfileImage;
 import com.fluffytime.domain.user.dto.request.ProfileRequest;
 import com.fluffytime.domain.user.dto.response.CheckUsernameResponse;
 import com.fluffytime.domain.user.dto.response.ImageResultResponse;
@@ -11,18 +12,17 @@ import com.fluffytime.domain.user.dto.response.MyPageInformationResponse;
 import com.fluffytime.domain.user.dto.response.PostResponse;
 import com.fluffytime.domain.user.dto.response.ProfileInformationResponse;
 import com.fluffytime.domain.user.dto.response.RequestResultResponse;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.ProfileImages;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.exception.MyPageNotFound;
+import com.fluffytime.domain.user.exception.NoProfileImage;
+import com.fluffytime.domain.user.repository.ProfileRepository;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.UserNotFound;
 import com.fluffytime.global.config.aws.S3Service;
-import com.fluffytime.domain.board.entity.Bookmark;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.domain.user.entity.ProfileImages;
-import com.fluffytime.domain.board.entity.enums.TempStatus;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.board.repository.BookmarkRepository;
-import com.fluffytime.domain.user.repository.ProfileRepository;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -105,7 +105,9 @@ public class MyPageService {
             .map(post -> {
                 String filePath = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
                     : post.getPostImages().getFirst().getFilepath();
-                return new PostResponse(post.getPostId(), filePath);
+                String mineType = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
+                    : post.getPostImages().getFirst().getMimetype();
+                return new PostResponse(post.getPostId(), filePath, mineType);
             })
             .collect(Collectors.toList());
     }
@@ -119,15 +121,17 @@ public class MyPageService {
                 // 첫 번째 이미지의 파일 경로를 가져옴
                 String filePath = post.getPostImages().isEmpty() ? null
                     : post.getPostImages().get(0).getFilepath();
-                // PostDto 생성
-                return new PostResponse(post.getPostId(), filePath);
+                String mineType = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
+                    : post.getPostImages().getFirst().getMimetype();
+                return new PostResponse(post.getPostId(), filePath, mineType);
             })
             .collect(Collectors.toList());
     }
 
     // MyPageInformationDto 생성 메서드
     @Transactional
-    public MyPageInformationResponse createResponseDto(String nickname, List<PostResponse> postsList,
+    public MyPageInformationResponse createResponseDto(String nickname,
+        List<PostResponse> postsList,
         List<PostResponse> bookmarkList, Profile profile) {
         return MyPageInformationResponse.builder()
             .nickname(nickname) // 닉네임
@@ -172,7 +176,8 @@ public class MyPageService {
 
     // ProfileInformationDto 생성 메서드
     @Transactional
-    public ProfileInformationResponse createResponseDto(String nickname, String email, Profile profile) {
+    public ProfileInformationResponse createResponseDto(String nickname, String email,
+        Profile profile) {
         return ProfileInformationResponse.builder()
             .nickname(nickname) // 닉네임
             .email(email) // 이메일
