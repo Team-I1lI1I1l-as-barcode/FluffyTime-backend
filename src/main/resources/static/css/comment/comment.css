@@ -199,16 +199,47 @@ button:hover {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .reply-section textarea {
-  /*width: calc(100% - 22px);*/
+  position: relative;
   width: 100%;
-  /*border: 1px solid #ddd;*/
+  height: 50px;
   padding: 10px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 12px;
   resize: none;
+  background-color: transparent; /* 배경 투명하게 설정 */
+  color: transparent; /* Hide text color to only show the preview */
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+/* 답글 내용 미리보기 스타일 */
+.contentPreview-reply {
+  position: absolute;
+  width: 90%;
+  height: 50px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px; /* Matching font size with textarea */
+  color: black; /* 텍스트 색상 */
+  background: transparent; /* 배경 투명하게 설정 */
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+/* 버튼을 포함한 컨테이너 */
+.reply-section .button-container {
+  width: 98%;
+  display: flex;
+  justify-content: flex-start; /* 버튼을 왼쪽에 붙이기 */
 }
 
 .reply-section button {
@@ -278,7 +309,7 @@ textarea#comment-content {
   background-color: transparent; /* 배경 투명하게 설정 */
   color: transparent; /* Hide text color to only show the preview */
   overflow: hidden; /* 넘치는 내용 숨김 */
-  font-size: 14px;
+  font-size: 12px;
   border: none; /* 테두리 제거 */
   outline: none; /* 포커스 시 외곽선 제거 */
 }
@@ -301,7 +332,7 @@ textarea#comment-content {
 
 .mention-text {
   color: #4848ff;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   background-color: #d3edff;
   padding: 5px 7px 5px 7px;
@@ -337,14 +368,4 @@ textarea#comment-content {
 
 .mention-item:hover {
   background-color: #f0f0f0; /* 항목을 마우스로 오버할 때의 배경색 */
-}
-
-/* 답글 내용 미리보기 스타일 */
-#contentPreview-reply {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #f9f9f9; /* Light background for contrast */
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 14px; /* Matching font size with textarea */
 }

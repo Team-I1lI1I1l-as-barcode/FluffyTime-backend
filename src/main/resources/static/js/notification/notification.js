@@ -89,7 +89,11 @@ function connectSSE(userId) {
 function createNotificationElement(notification) {
   const listItem = document.createElement('li');
   listItem.className = 'notification';
-  listItem.classList.toggle('read', notification.read);
+
+  // `read` 값이 true일 경우 `read` 클래스를 추가
+  if (notification.read) {
+    listItem.classList.add('read');
+  }
 
   const notificationBox = document.createElement('div');
   notificationBox.className = 'notification-box';
