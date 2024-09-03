@@ -244,6 +244,7 @@ public class NotificationService {
     }
 
     //모든 알림 조회
+    @Transactional
     @Cacheable(value = "notifications", key = "#requestDto.userId")
     public List<NotificationResponse> getAllNotifications(NotificationRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())

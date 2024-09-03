@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class ReelsService {
     private final ReelsRepository reelsRepository;
 
     // 모든 릴스를 조회하여 반환하는 메서드
+    @Transactional
     public List<ReelsResponse> getAllReels() {
         return reelsRepository.findAll().stream()
             .map(reels -> {
@@ -46,6 +48,7 @@ public class ReelsService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
     public void reelsUpload(Post post, String fileName, String fileUrl) {
         Reels reels = Reels.builder()
             .post(post)
