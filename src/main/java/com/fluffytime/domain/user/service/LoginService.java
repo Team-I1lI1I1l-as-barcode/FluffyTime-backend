@@ -12,13 +12,13 @@ import com.fluffytime.domain.user.dto.request.FindEmailRequest;
 import com.fluffytime.domain.user.dto.request.LoginUserRequest;
 import com.fluffytime.domain.user.dto.request.PasswordChangeRequest;
 import com.fluffytime.domain.user.dto.response.FindEmailResponse;
+import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.exception.MismatchedPassword;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.common.exception.global.UserNotFound;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -91,7 +91,8 @@ public class LoginService {
         HttpServletResponse response)
         throws IOException {
 
-        String refreshToken = jwtTokenizer.getTokenFromCookie(request, REFRESH_TOKEN_NAME.getName());
+        String refreshToken = jwtTokenizer.getTokenFromCookie(request,
+            REFRESH_TOKEN_NAME.getName());
 
         if (refreshToken == null) {
             throw new TokenNotFound();

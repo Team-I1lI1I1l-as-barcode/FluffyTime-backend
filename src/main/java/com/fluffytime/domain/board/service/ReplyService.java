@@ -34,6 +34,7 @@ public class ReplyService {
     private final NotificationService notificationService;
 
     //답글 저장
+    @Transactional
     public Reply createReply(ReplyRequest requestDto) {
         User user = userRepository.findById(requestDto.getUserId())
             .orElseThrow(UserNotFound::new);
@@ -53,6 +54,7 @@ public class ReplyService {
     }
 
     //답글 조회
+    @Transactional
     public List<ReplyResponse> getRepliesByCommentId(Long commentId, Long currentUserId) {
         List<Reply> replyList = replyRepository.findByCommentCommentId(commentId);
         return replyList.stream()
@@ -61,6 +63,7 @@ public class ReplyService {
     }
 
     //답글 수정
+    @Transactional
     public void updateReply(Long replyId, String content) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);
@@ -69,6 +72,7 @@ public class ReplyService {
     }
 
     //답글 삭제
+    @Transactional
     public void deleteReply(Long replyId) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);
@@ -76,7 +80,7 @@ public class ReplyService {
     }
 
     //accessToken으로 사용자 찾기
-    @Transactional(readOnly = true)
+    @Transactional
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
         String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
 
@@ -87,12 +91,14 @@ public class ReplyService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
     }
 
     //답글 ID로 답글 조회하기
+    @Transactional
     public ReplyResponse getReplyByReplyId(Long replyId, Long currentUserId) {
         Reply reply = replyRepository.findById(replyId)
             .orElseThrow(ReplyNotFound::new);

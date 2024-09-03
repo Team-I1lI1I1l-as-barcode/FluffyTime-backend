@@ -17,22 +17,36 @@
     </div>
     <div class="user-statistics-container">
       <div class="chart-container">
-        <h3>사용자 가입 현황</h3>
+        <div class="chart-header">
+          <h3>사용자 가입 현황</h3>
+          <button id="userChartRefreshBtn" class="refresh-btn">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+        </div>
         <canvas id="userCountChart"></canvas>
       </div>
       <div class="notice-container">
         <h3>실시간 가입자 알림</h3>
-        <div class="notice"></div>
+        <div class="notice">
+          <ul id="joinNotice" class="notification-list"></ul>
+        </div>
       </div>
     </div>
     <div class="contents-statistics-container">
       <div class="chart-container">
-        <h3>콘텐츠 업로드 현황</h3>
+        <div class="chart-header">
+          <h3>콘텐츠 업로드 현황</h3>
+          <button id="contentChartRefreshBtn" class="refresh-btn">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+        </div>
         <canvas id="contentsCountChart"></canvas>
       </div>
       <div class="notice-container">
         <h3>실시간 컨텐츠 등록 알림</h3>
-        <div class="notice"></div>
+        <div class="notice">
+          <ul id="postNotice" class="notification-list"></ul>
+        </div>
       </div>
     </div>
   </main>
@@ -40,5 +54,6 @@
 </body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:src="@{/js/admin/statistics/user.js}"></script>
+<script th:src="@{/js/admin/statistics/notification.js}" defer></script>
 <script th:src="@{/js/common/logout.js}"></script>
 </html>

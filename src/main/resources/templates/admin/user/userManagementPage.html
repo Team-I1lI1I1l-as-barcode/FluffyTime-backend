@@ -11,7 +11,26 @@
 <body>
 <div class="container">
   <th:block th:replace="~{admin/common/sidebar :: sidebar}"></th:block>
-  <main class="main-container"></main>
-</div>
+  <main class="main-container">
+    <table class="userTable">
+      <thead>
+      <tr>
+        <th>이메일</th>
+        <th>닉네임</th>
+        <th>가입일</th>
+        <th>권한</th>
+        <th><button>삭제</button></th>
+      </tr>
+      </thead>
+      <tbody class="userTableBody">
+      </tbody>
+    </table>
+    <div class="list_nav" id="pagination" style="display: none;">
+      <ul id="paginationList">
+      </ul>
+    </div>
+  </main>
+  </div>
 </body>
+<script th:src="@{/js/admin/usermanagement/paging.js}" defer></script>
 </html>

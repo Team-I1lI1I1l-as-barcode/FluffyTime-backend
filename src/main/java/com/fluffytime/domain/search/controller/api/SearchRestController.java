@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ public class SearchRestController {
 
     private final SearchService searchService;
 
+    @Transactional
     @PostMapping("/names")
     public ResponseEntity<Map<String, Object>> searchNames(
         @RequestBody SearchRequest requestDto
@@ -78,6 +80,7 @@ public class SearchRestController {
 
     }
 
+    @Transactional
     @PostMapping("/tags")
     public ResponseEntity<Map<String, Object>> searchTags(
         @RequestBody SearchRequest requestDto) {
@@ -99,7 +102,7 @@ public class SearchRestController {
 
     }
 
-
+    @Transactional
     @PostMapping("/accounts")
     public ResponseEntity<Map<String, Object>> searchAccounts(
         @RequestBody SearchRequest requestDto) {

@@ -21,14 +21,15 @@
     <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
   </div>
   <div class="chat_page_container">
-    <!-- Sidebar -->
+
+    <!-- 사이드바 - 채팅방 목록 -->
     <div class="chat_list_sidebar">
       <h3>메시지 방</h3>
       <div id="chat-room-list" class="chat-room-list">
       </div>
     </div>
 
-    <!-- Chat Area -->
+    <!-- 채팅 구역  -->
     <div class="chat-container">
       <div class="chat-header" id="chat-header">
         <img id="recipient_profile">
@@ -47,7 +48,7 @@
 
       <div id="chatMessages" class="chat-messages"></div>
 
-      <div class="chat-input">
+      <div id="chat-input" class="chat-input">
         <input type="text" id="message" placeholder="Enter message">
         <button onclick="sendMessage()">Send</button>
       </div>

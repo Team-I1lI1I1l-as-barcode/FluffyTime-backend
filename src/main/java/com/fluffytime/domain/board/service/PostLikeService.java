@@ -34,6 +34,7 @@ public class PostLikeService {
     private final NotificationService notificationService;
 
     //게시글 좋아요 등록
+    @Transactional
     public PostLikeResponse likePost(Long postId, PostLikeRequest requestDto) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
         User user = userRepository.findById(requestDto.getUserId()).orElseThrow(UserNotFound::new);
@@ -63,6 +64,7 @@ public class PostLikeService {
     }
 
     //게시글 좋아요 취소
+    @Transactional
     public PostLikeResponse unlikePost(Long postId, PostLikeRequest requestDto) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
         User user = userRepository.findById(requestDto.getUserId()).orElseThrow(UserNotFound::new);
@@ -86,6 +88,7 @@ public class PostLikeService {
     }
 
     //게시글 좋아요 한 유저 목록
+    @Transactional
     public List<PostLikeResponse> getUsersWhoLikedPost(Long postId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
 
@@ -106,6 +109,7 @@ public class PostLikeService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;

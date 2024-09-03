@@ -1,17 +1,19 @@
 package com.fluffytime.domain.notification.entity;
 
-import com.fluffytime.domain.board.entity.Comment;
 import com.fluffytime.domain.board.entity.Post;
-import com.fluffytime.domain.board.entity.Reply;
+import com.fluffytime.domain.notification.entity.enums.AdminNotificationType;
 import com.fluffytime.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -24,25 +26,22 @@ import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
-@Table(name = "notifications")
+@Table(name="admin_notification")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Notification {
-
+public class AdminNotification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notification_id", nullable = false)
     private Long notificationId;
 
-    @Column(name = "notification_msg")
+    @Column(name = "message")
     private String message;
 
-    @Column(name = "is_read")
-    private boolean isRead;
-
-    @Column(name = "notification_type")
-    private String type;
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private AdminNotificationType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -52,32 +51,20 @@ public class Notification {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "comment_id")
-    private Comment comment;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reply_id")
-    private Reply reply;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private User sender;
-
-    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @PrePersist
+    public void create() {
+        this.createdAt = LocalDateTime.now();
+    }
+
     @Builder
-    public Notification(String message, boolean isRead, User user, Post post, String type,
-        Comment comment, Reply reply, User sender) {
+    public AdminNotification(String message, AdminNotificationType type, User user, Post post) {
         this.message = message;
-        this.isRead = isRead;
+        this.type = type;
         this.user = user;
         this.post = post;
-        this.comment = comment;
-        this.reply = reply;
-        this.type = type;
-        this.sender = sender;
+
     }
 }

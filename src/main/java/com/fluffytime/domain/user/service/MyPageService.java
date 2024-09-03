@@ -1,5 +1,7 @@
 package com.fluffytime.domain.user.service;
 
+import com.fluffytime.domain.notification.repository.AdminNotificationRepository;
+import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.domain.user.exception.MyPageNotFound;
 import com.fluffytime.domain.user.exception.NoProfileImage;
 import com.fluffytime.domain.user.dto.request.ProfileRequest;
@@ -37,9 +39,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class MyPageService {
 
+    private final AdminNotificationService adminNotificationService;
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final AdminNotificationRepository adminNotificationRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
 
@@ -331,6 +335,7 @@ public class MyPageService {
         User user = findUserByNickname(nickname);
 
         if (user != null) { // 유저가 있다면 계정 삭제 진행
+            adminNotificationService.withdrawJoinNotification(user);
             log.info("AccountDelete 실행 >> 해당 유저가 존재하여 회원 탈퇴");
             userRepository.delete(user);
             // 쿠기 삭제

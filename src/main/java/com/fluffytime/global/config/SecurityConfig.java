@@ -1,7 +1,6 @@
 package com.fluffytime.global.config;
 
 import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_ADMIN;
-import static com.fluffytime.domain.user.entity.enums.RoleName.ROLE_USER;
 
 import com.fluffytime.global.auth.jwt.exception.CustomAuthenticationEntryPoint;
 import com.fluffytime.global.auth.jwt.filter.JwtAuthenticationFilter;
@@ -51,6 +50,7 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .requestMatchers(
+                    "/api/notifications/admin/**",
                     "/api/admin/**",
                     "/admin/**"
                 ).hasRole(ROLE_ADMIN.getNoneHeaderName())
@@ -88,6 +88,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("*");
         config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
         config.setAllowedMethods(List.of("GET", "POST", "DELETE", "PATCH", "OPTION", "PUT"));
         source.registerCorsConfiguration("/**", config);
         return source;

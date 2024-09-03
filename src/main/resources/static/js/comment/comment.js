@@ -23,7 +23,7 @@ async function fetchComments() {
   commentList.innerHTML = ''; // 기존 댓글 목록 초기화
   for (const comment of comments) {
 
-    // 댓글 내용
+    // 댓글 아이디
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.dataset.id = comment.commentId;
@@ -41,7 +41,7 @@ async function fetchComments() {
     //댓글 내용
     const contentSpan = document.createElement('span');
     contentSpan.className = 'text';
-    contentSpan.textContent = comment.content;
+    contentSpan.innerHTML = highlightMentions(comment.content);
 
     // 좋아요 버튼 추가
     const likeButton = document.createElement('span');
@@ -146,14 +146,21 @@ function toggleReplyInput(commentId) {
     replyTextarea.oninput = () => handleReplyInput(commentId);
 
     const replyContentPreview = document.createElement('div');
-    replyContentPreview.id = 'contentPreview-reply';
+    replyContentPreview.id = `contentPreview-reply-${commentId}`;
+    replyContentPreview.className = 'contentPreview-reply';
 
     const replyButton = document.createElement('button');
     replyButton.textContent = '답글 달기';
     replyButton.onclick = () => postReply(commentId, replyTextarea.value);
 
+    // 버튼을 감싸는 컨테이너 생성
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'button-container';
+    buttonContainer.appendChild(replyButton);
+
     replyDiv.appendChild(replyTextarea);
-    replyDiv.appendChild(replyButton);
+    replyDiv.appendChild(replyContentPreview);
+    replyDiv.appendChild(buttonContainer);
 
     const commentDiv = document.querySelector(
         `.comment[data-id='${commentId}']`);
@@ -189,7 +196,7 @@ async function fetchReplies(commentId, replyDiv) {
 
     const contentSpan = document.createElement('span');
     contentSpan.className = 'text';
-    contentSpan.textContent = reply.content;
+    contentSpan.innerHTML = highlightMentions(reply.content);
 
     // 좋아요 버튼 추가
     const likeButton = document.createElement('span');
@@ -579,6 +586,7 @@ function selectMention(nickname, commentId) {
   hideMentionSuggestions();
   textarea.focus();
   formatMentions(); // 댓글/답글 스타일 적용
+  formatReplyMentions(commentId);
 }
 
 // 멘션 스타일 적용
@@ -602,9 +610,11 @@ function formatReplyMentions(commentId) {
   const formattedContent = content.replace(/@(\w+)/g,
       '<span class="mention-text">@$1</span>');
 
-  document.getElementById(
-      'contentPreview-reply').innerHTML = formattedContent.replace(/\n/g,
-      '<br>');
+  const previewElement = document.getElementById(
+      `contentPreview-reply-${commentId}`);
+  if (previewElement) {
+    previewElement.innerHTML = formattedContent.replace(/\n/g, '<br>');
+  }
 }
 
 // 멘션 데이터 추출
@@ -657,4 +667,11 @@ function handleReplyInput(commentId) {
   }
 
   formatReplyMentions(commentId); // 스타일 적용
+}
+
+// 멘션 하이라이트 함수
+function highlightMentions(content) {
+  // '@nickname' 패턴을 찾아서 <span> 태그로 감싸기
+  return content.replace(/(@\w+)/g,
+      '<span style="color: #5a5aff; font-weight: 700;">$1</span>');
 }
