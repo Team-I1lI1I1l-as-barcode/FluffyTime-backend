@@ -1,5 +1,7 @@
 package com.fluffytime.domain.board.dto.response;
 
+import jakarta.persistence.Column;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,11 +11,17 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ReelsResponse {
     private Long reelsId;
+    private Long postId;
+    private Long userId;
     private String filename;
-    private String fileUrl;
-    private String createdAt;
-    private String postContent;
-    private String authorNickname;
-    private String profileImageUrl;
-}
+    private String filepath;
+    private Long filesize;
+    private String mimetype;
 
+    private String content;  // Post의 내용
+    private String nickname; // User의 닉네임
+    private String profileImageUrl;
+    private boolean isBookmarked;
+    private int likeCount;
+    private boolean isLiked;
+}
