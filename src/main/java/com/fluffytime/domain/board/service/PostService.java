@@ -196,12 +196,12 @@ public class PostService {
         for (MultipartFile file : videoFiles) {
             try {
                 String fileName = s3Service.uploadFile(file);
-                String fileUrl = s3Service.getFileUrl(fileName);
+                String filepath = s3Service.getFileUrl(fileName);
 
                 // 원래 게시물에 동영상 파일을 저장
                 PostImages postVideo = PostImages.builder()
                     .filename(fileName)
-                    .filepath(fileUrl)
+                    .filepath(filepath)
                     .filesize(file.getSize())
                     .mimetype(file.getContentType())
                     .post(post)
@@ -210,7 +210,11 @@ public class PostService {
                 postImagesRepository.save(postVideo);
 
                 // 릴스에 동영상 파일을 업로드
-                reelsService.reelsUpload(post, fileName, fileUrl);
+
+                User user = post.getUser(); // Post에서 User 정보를 가져옴
+                String mimetype = file.getContentType(); // 파일의 mimetype 가져오기
+
+                reelsService.reelsUpload(post, user, fileName, filepath, mimetype);
 
             } catch (Exception e) {
                 throw new FileUploadFailed();
@@ -419,7 +423,6 @@ public class PostService {
                 image.getFilepath(),
                 image.getFilesize(),
                 image.getMimetype(),
-                image.getDescription(),
                 image.getUploadDate().format(DateTimeFormatter.ISO_DATE_TIME)
             )).collect(toList()),
             tags,
