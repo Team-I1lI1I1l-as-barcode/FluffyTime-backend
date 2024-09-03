@@ -10,7 +10,7 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
-
+const chatBtn = getElement('chatBtn') // 메시지 버튼
 const unblockComment = getElement('unblock_comment'); // 차단됨 문구
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
@@ -26,12 +26,13 @@ const userPageOverlay = document.getElementById('userPage-modal-overlay');
 const closeModalButtons = document.querySelectorAll('#block_cancel');
 const blockFollow = getElement('block_follow'); // 유저 차단
 const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단
+const chat = getElement('chat') // 메시지 보내기
 
 // api  요청  함수
-function fetchUserPage(url, func) {
+function fetchUserPage(url, method, func) {
   console.log("fetchMyPage 실행");
   fetch(url, {
-    method: "GET", // GET 요청
+    method: method,
     headers: {
       'Content-Type': 'application/json'
 
@@ -127,12 +128,30 @@ async function checkFollowStatus() {
       });
 }
 
+// 채팅 보내기
+function sendMessage(nickname) {
+  // 메시지 방 생성
+  fetchUserPage(`/chat/topics/${encodeURIComponent(nickname)}`, "PUT",
+      serverResponse);
+}
+
+// 채팅관련 서버 결과를 처리하는 함수
+function serverResponse(data) {
+  if (data.success) {
+    console.log("요청 성공")
+    window.location.href = "/chat";
+  } else {
+    console.log("요청 실패")
+  }
+}
+
 // 초기화 함수
 function initialize() {
   const nickname = window.location.pathname.split('/').pop();
 
   // 초기화 - 유저페이지 정보 불러오기
   fetchUserPage(`/api/users/pages?nickname=${encodeURIComponent(nickname)}`,
+      "GET",
       handleUserData);
 
   // 초기화 - ... 버튼시 파일 선택 버튼이 눌림
@@ -149,6 +168,16 @@ function initialize() {
       userPageModal.classList.remove('show');
       userPageOverlay.style.display = 'none';
     });
+  });
+
+  // 초기화 - 메시지 보내기(모달)
+  chat.addEventListener('click', () => {
+    sendMessage(nickname);
+  });
+
+  // 초기화 - 메시지 보내기(아이콘)
+  chatBtn.addEventListener('click', () => {
+    sendMessage(nickname);
   });
 }
 

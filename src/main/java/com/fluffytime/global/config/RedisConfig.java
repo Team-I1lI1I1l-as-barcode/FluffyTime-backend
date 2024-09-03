@@ -45,9 +45,10 @@ public class RedisConfig {
         RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
-
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer()); // 해시 키 직렬화 설정
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer()); // 해시 값 직렬화 설정
 
         return template;
     }

@@ -266,7 +266,8 @@
 /* 모달 메뉴 항목 */
 #block_follow,
 #block_follow_cancel,
-#block_cancel {
+#block_cancel,
+#chat {
   display: block;
   font-size: 16px;
   font-weight: normal;
@@ -279,14 +280,16 @@
 /* 항목에 마우스 올렸을 때 */
 #block_follow:hover,
 #block_follow_cancel:hover,
-#block_cancel:hover {
+#block_cancel:hover,
+#chat:hover {
   background-color: #f5f5f5; /* 항목에 마우스를 올렸을 때 배경색 변경 */
 }
 
 /* 활성화된 상태에서 항목 강조 */
 #block_follow:active,
 #block_follow_cancel:active,
-#block_cancel:active {
+#block_cancel:active,
+#chat:active {
   background-color: #e0e0e0; /* 클릭했을 때 배경색 변경 */
 }
 
@@ -301,6 +304,14 @@
 
 #block_cancel {
   color: black;
+}
+
+#chat {
+  color: #0a84ff;
+}
+
+#chatBtn {
+  cursor: pointer;
 }
 
 /*반응형 웹 페이지 */

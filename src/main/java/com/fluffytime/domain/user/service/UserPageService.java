@@ -1,17 +1,17 @@
 package com.fluffytime.domain.user.service;
 
+import com.fluffytime.domain.board.entity.enums.TempStatus;
 import com.fluffytime.domain.user.dao.UserBlockDao;
-import com.fluffytime.domain.user.exception.UserPageNotFound;
 import com.fluffytime.domain.user.dto.response.BlockUserListResponse;
+import com.fluffytime.domain.user.dto.response.PostResponse;
 import com.fluffytime.domain.user.dto.response.UserBlockResponse;
 import com.fluffytime.domain.user.dto.response.UserPageInformationResponse;
+import com.fluffytime.domain.user.entity.Profile;
+import com.fluffytime.domain.user.entity.User;
+import com.fluffytime.domain.user.exception.UserPageNotFound;
+import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import com.fluffytime.domain.user.entity.Profile;
-import com.fluffytime.domain.board.entity.enums.TempStatus;
-import com.fluffytime.domain.user.entity.User;
-import com.fluffytime.domain.user.dto.response.PostResponse;
-import com.fluffytime.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,40 +34,6 @@ public class UserPageService {
     private final MyPageService myPageService;
     private final UserBlockDao userBlockDao;
 
-    // 사용자 조회(userId로 조회)  메서드
-    @Transactional
-    public User findUserById(Long userId) {
-        log.info("findUserById 실행");
-        return userRepository.findById(userId).orElse(null);
-    }
-
-    // 사용자 조회(nickname으로 조회)  메서드
-    @Transactional
-    public User findUserByNickname(String nickname) {
-        log.info("findUserByNickname 실행");
-        return userRepository.findByNickname(nickname).orElse(null);
-    }
-
-    // accessToken 토큰으로 사용자 찾기  메서드
-    @Transactional
-    public User findByAccessToken(HttpServletRequest httpServletRequest) {
-        log.info("findByAccessToken 실행");
-        String accessToken = jwtTokenizer.getTokenFromCookie(httpServletRequest, "accessToken");
-        if (accessToken == null) {
-            throw new TokenNotFound();
-        }
-        // accessToken값으로  UserId 추출
-        Long userId = Long.valueOf(
-            ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
-        // id(pk)에 해당되는 사용자 추출
-        return findUserById(userId);
-    }
-
-    // 접근한 사용자와 실제 권한을 가진 사용자가 동일한지 판단하는 메서드
-    @Transactional
-    public boolean isUserAuthorized(String accessNickname, String actuallyNickname) {
-        return accessNickname.equals(actuallyNickname);
-    }
 
     // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환하는 메서드
     @Transactional
@@ -104,8 +70,8 @@ public class UserPageService {
     @Transactional
     public UserPageInformationResponse createUserPageInformationDto(String nickname,
         HttpServletRequest httpServletRequest) {
-        User me = findByAccessToken(httpServletRequest);
-        User user = findUserByNickname(nickname);
+        User me = myPageService.findByAccessToken(httpServletRequest);
+        User user = myPageService.findUserByNickname(nickname);
 
         if (me == null) {
             throw new TokenNotFound();
@@ -138,7 +104,7 @@ public class UserPageService {
     public UserBlockResponse userBlock(String targetUser,
         HttpServletRequest httpServletRequest) {
         log.info("userBlock 실행");
-        String blocker = findByAccessToken(httpServletRequest).getNickname();
+        String blocker = myPageService.findByAccessToken(httpServletRequest).getNickname();
         UserBlockResponse userBlockResponse = new UserBlockResponse(true);
         if (blocker == null) {
             userBlockResponse.setUserBlockResult(false);
@@ -161,7 +127,7 @@ public class UserPageService {
     public UserBlockResponse removeUserBlock(String targetUser,
         HttpServletRequest httpServletRequest) {
         log.info("removeUserBlock 실행");
-        String blocker = findByAccessToken(httpServletRequest).getNickname();
+        String blocker = myPageService.findByAccessToken(httpServletRequest).getNickname();
         UserBlockResponse userBlockResponse = new UserBlockResponse(true);
 
         if (blocker == null) {
@@ -181,7 +147,7 @@ public class UserPageService {
         // 리스트에 목록 추가하기
         for (String nickname : blockedUsers) {
             // 프로필 객체 찾기
-            Profile profile = findUserByNickname(nickname).getProfile();
+            Profile profile = myPageService.findUserByNickname(nickname).getProfile();
             // 프로필 사진 url 찾기
             String fileUrl = myPageService.profileFileUrl(profile.getProfileImages());
             // 닉네임과 URL을 매칭하여 맵에 저장
@@ -198,7 +164,7 @@ public class UserPageService {
     @Transactional
     public BlockUserListResponse blockUserList(HttpServletRequest httpServletRequest) {
         log.info("blockUserList 실행");
-        String blocker = findByAccessToken(httpServletRequest).getNickname();
+        String blocker = myPageService.findByAccessToken(httpServletRequest).getNickname();
         if (blocker == null) {
             throw new TokenNotFound();
         }

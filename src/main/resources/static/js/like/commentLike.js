@@ -86,7 +86,7 @@ function showLikeUserModalComment(users) {
 }
 
 //모달창 닫음
-function closeModal() {
+function closeModalLike() {
   const modal = document.getElementById('like-user-modal');
   modal.style.display = 'none';
 }

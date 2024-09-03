@@ -1,0 +1,245 @@
+.page-layout {
+  display: flex;
+  height: 100vh; /* Use full viewport height */
+}
+
+.chat_page_container {
+  flex: 1;
+  padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-y: hidden; /* No vertical overflow for the main container */
+  margin-left: 250px; /* Margin for sidebar */
+  display: flex;
+}
+
+.chat_list_sidebar {
+  width: 300px;
+  background-color: #fff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat_list_sidebar h3 {
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+  background-color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+}
+
+.chat-room-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  display: flex; /* img와 p 요소를 가로로 정렬 */
+  align-items: center; /* 세로 중앙 정렬 */
+  justify-content: center;
+  padding: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #ddd; /* 각 아이템을 구분하는 선 */
+}
+
+.chat-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 12px; /* 이미지와 텍스트 사이 간격 */
+  object-fit: cover;
+  flex-shrink: 0; /* 이미지가 축소되지 않도록 설정 */
+}
+
+.chat-item p {
+  margin: 0; /* p 태그의 기본 margin을 제거 */
+  flex: 1; /* 텍스트가 남은 공간을 차지하도록 설정 */
+}
+
+
+.chat-item:hover,
+.chat-item.active {
+  background-color: #e0e0e0;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+}
+
+.recent_chat {
+  font-size: 13px;
+  color: #888;
+}
+
+.chat-header {
+  display: none;
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+}
+
+.chat-header img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+  background-color: #ddd;
+}
+
+.chat-header .username {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.chat-header .user-id {
+  font-size: 14px;
+  color: #888;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  width: 100%;
+  background-color: #f7f7f7; /* 배경색을 밝은 회색으로 변경 */
+  display: flex;
+  flex-direction: column; /* 메시지들을 수직으로 배치 */
+  gap: 10px; /* 각 메시지 간의 간격 */
+}
+
+.chat-messages p {
+  max-width: 60%; /* 메시지의 최대 너비 설정 */
+  padding: 10px 15px; /* 메시지 내용의 여백 */
+  border-radius: 20px; /* 메시지 버블의 모서리를 둥글게 */
+  line-height: 1.5; /* 텍스트의 줄 간격 설정 */
+  font-size: 14px; /* 텍스트 크기 설정 */
+  position: relative; /* 화살표 위치 조정을 위해 relative 설정 */
+}
+
+/* 송신자 메시지 스타일 */
+.chat-messages p.sender {
+  align-self: flex-end; /* 송신자의 메시지를 오른쪽에 정렬 */
+  background-color: #0084ff; /* 송신자 메시지의 배경색 (인스타 블루) */
+  color: #fff; /* 텍스트 색상 흰색으로 설정 */
+}
+
+/* 수신자 메시지 스타일 */
+.chat-messages p.receiver {
+  align-self: flex-start; /* 수신자의 메시지를 왼쪽에 정렬 */
+  background-color: #e4e6eb; /* 수신자 메시지의 배경색 (밝은 회색) */
+  color: #000; /* 텍스트 색상 검정으로 설정 */
+}
+
+/* 송신자 메시지의 화살표 */
+.chat-messages p.sender::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent transparent transparent #0084ff;
+}
+
+/* 수신자 메시지의 화살표 */
+.chat-messages p.receiver::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  transform: translateY(-50%);
+  border-width: 10px;
+  border-style: solid;
+  border-color: transparent #e4e6eb transparent transparent;
+}
+
+.chat-messages p.sent {
+  margin-left: auto;
+  background-color: #fce28b;
+}
+
+.chat-input {
+  display: flex;
+  border-top: 1px solid #ddd;
+  padding: 15px;
+  background-color: #f7f7f7;
+  width: 100%;
+}
+
+.chat-input input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.chat-input button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  border: none;
+  background-color: #fbc02d;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-input button:hover {
+  background-color: #f9a825;
+}
+
+.empty-message {
+  text-align: center;
+  color: #888;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.empty-message img {
+  width: 100px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+.empty-message h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+  font-weight: normal;
+}
+
+.empty-message p {
+  margin: 10px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.empty-message button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #fbc02d;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.empty-message button:hover {
+  background-color: #f9a825;
+}
