@@ -111,16 +111,33 @@ function renderPosts(posts) {
 
   posts.forEach(post => {
     if (post.fileUrl != null) {
-      const img = document.createElement('img'); // <img> 요소 생성
-      img.src = post.fileUrl; // 이미지 URL 설정
-      img.alt = post.postId;
+      if (post.mineType === "video/mp4") {
+        const video = document.createElement('video'); // <img> 요소 생성
+        video.src = post.fileUrl;
+        // 비디오 자동 재생 끄기
+        video.addEventListener('play', function (event) {
+          event.preventDefault();
+          this.pause();
+        });
+        // 비디오 클릭시 해당 게시물 상세보기 모달창 열기
+        video.addEventListener('click', event => {
 
-      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
-      img.addEventListener('click', event => {
-        console.log(img.alt + "게시물 클릭 ");
-        window.location.href = `/posts/detail/${img.alt}`;
-      });
-      postListElement.appendChild(img); // <img>를 섹션에 추가
+          window.location.href = `/posts/detail/${post.postId}`;
+        });
+        postListElement.appendChild(video); // <video>를 섹션에 추가
+
+      } else {
+        const img = document.createElement('img'); // <img> 요소 생성
+        img.src = post.fileUrl; // 이미지 URL 설정
+        img.alt = post.postId;
+
+        // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+        img.addEventListener('click', event => {
+          console.log(img.alt + "게시물 클릭 ");
+          window.location.href = `/posts/detail/${img.alt}`;
+        });
+        postListElement.appendChild(img); // <img>를 섹션에 추가
+      }
     }
   });
 }

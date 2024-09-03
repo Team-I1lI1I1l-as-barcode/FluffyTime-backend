@@ -275,11 +275,13 @@ public class NotificationService {
     }
 
     //사용자 조회
+    @Transactional
     public Optional<User> findUserById(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         return user;
     }
 
+    @Transactional
     public NotificationResponse convertToDto(Notification notification) {
         Long postId = null;
         Long commentId = null;

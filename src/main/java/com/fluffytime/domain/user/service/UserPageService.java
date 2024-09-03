@@ -45,7 +45,9 @@ public class UserPageService {
             .map(post -> {
                 String filePath = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
                     : post.getPostImages().getFirst().getFilepath();
-                return new PostResponse(post.getPostId(), filePath);
+                String mineType = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
+                    : post.getPostImages().getFirst().getMimetype();
+                return new PostResponse(post.getPostId(), filePath, mineType);
             })
             .collect(Collectors.toList());
     }

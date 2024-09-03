@@ -68,6 +68,7 @@ public class ChatServcie {
     }
 
     // RecipientInfoResponse dto 생성
+    @Transactional
     public ChatRoomListResponse createResponseDto(Set<String> recipient, Set<String> chatRoomList,
         Set<String> profileImages, List<String> recentChatList) {
         log.info("createResponseDto 실행 >>> ChatRoomListResponse Dto 생성");
@@ -199,6 +200,7 @@ public class ChatServcie {
     }
 
     // RecipientInfoResponse dto 생성
+    @Transactional
     public ChatResponse createResponseDto(String chatRoomName, boolean success) {
         log.info("createResponseDto 실행 >>> ChatResponse Dto 생성");
         return ChatResponse.builder()
@@ -257,6 +259,7 @@ public class ChatServcie {
     }
 
     // RecipientInfoResponse dto 생성
+    @Transactional
     public RecipientInfoResponse createResponseDto(Profile profile, String nickname,
         String fileUrl) {
         log.info("createResponseDto 실행 >>> RecipientInfoResponse Dto 생성");
@@ -278,6 +281,7 @@ public class ChatServcie {
     }
 
     // ChatLogResponse dto 생성
+    @Transactional
     public ChatLogResponse createResponseDto(String roomName, String sender, List<String> chatLog) {
         log.info("createResponseDto 실행 >>> ChatLogResponse Dto 생성");
         return ChatLogResponse.builder()

@@ -207,6 +207,16 @@
   min-height: 150px; /* 최소 높이 설정으로 이미지가 사라지는 것을 방지 */
 }
 
+/* 게시글 비디오 */
+.posts video {
+  width: 100%; /* 그리드 셀에 맞게 너비 조정 */
+  height: 30vh;
+  object-fit: cover; /* 이미지 잘림 방지 */
+  border: 1px solid #ccc;
+  cursor: pointer;
+  min-height: 150px; /* 최소 높이 설정으로 이미지가 사라지는 것을 방지 */
+}
+
 
 #no_post {
   display: none;
