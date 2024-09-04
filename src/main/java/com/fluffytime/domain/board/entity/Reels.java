@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,9 @@ public class Reels {
 
     @Column(name = "mimetype", nullable = false, length = 50)
     private String mimetype;
+
+    @Column(name = "upload_date", nullable = false)
+    private LocalDateTime uploadDate = LocalDateTime.now(); // 기본값 설정
 
     @Builder
     public Reels(Post post, User user, String filename, String filepath, Long filesize, String mimetype) {
