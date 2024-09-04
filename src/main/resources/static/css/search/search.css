@@ -59,6 +59,7 @@ body {
   display: flex;
   align-items: center;
   gap: 15px;
+  cursor: pointer;
 }
 
 .results li img {
