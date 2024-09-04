@@ -21,7 +21,7 @@ async function loadStatisticsData() {
 async function getDailyCountStatistics(url) {
   try {
     const response = await fetch(url, {
-      method: 'POST'
+      method: 'GET'
     });
 
     if (!response.ok) {
