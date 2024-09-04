@@ -11,9 +11,6 @@ const img = getElement('img'); // 이미지 미리보기
 const profileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
 const bookmark = getElement('bookmark');
 
-// const follower_count = getElement("follower_count"); // 팔로워 수
-// const follow_count = getElement("follow_count");// 팔로우 수
-
 // 기본 api  요청  함수
 function fetchMyPage(url, method, func) {
   console.log("fetchMyPage 실행");
@@ -76,7 +73,6 @@ function handleProfileData(data) {
   console.log("fetchMyPage 응답 Success");
 
   getElement("nickname").innerText = data.nickname;
-
   posts_count.innerText = data.postsList === null ? 0 : data.postsList.length;
   pet_name.innerText = data.petName;
   pet_sex.innerText = data.petSex === "none" ? " " : data.petSex;
