@@ -28,6 +28,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private final SocialTempUserDao socialTempUserDao;
     private final RefreshTokenDao refreshTokenDao;
 
+    // auth 인증 성공 시 토큰 쿠기 발행 메서드
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException, ServletException {

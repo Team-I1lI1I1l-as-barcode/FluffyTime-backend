@@ -1,17 +1,15 @@
 package com.fluffytime.domain.user.interceptor;
 
-import static com.fluffytime.global.auth.jwt.util.constants.TokenClaimsKey.ROLES;
 import static com.fluffytime.global.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
 
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+// 이미 로그인한 사용자 확인 인터셉터
 @Slf4j
 @RequiredArgsConstructor
 public class LoginCheckInterceptor implements HandlerInterceptor {

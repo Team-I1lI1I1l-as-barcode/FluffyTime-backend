@@ -49,9 +49,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // token 값을 가지고 인증 절차 진행
     private void doAuthentication(HttpServletRequest request ,String token) {
         try {
-            // accessToken을 사용하여 사용자 인증 정보를 가져오는 메서드를 호출
             getAuthentication(token);
         } catch (ExpiredJwtException e) {
             request.setAttribute("exception", "EXPIRED_TOKEN");
@@ -79,41 +79,31 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // getToken()을 통해 사용자의 인증 정보를 가져오고,
     // JWT에서 추출한 Claim으로 getGrantedAuthorities()로 권한을 가져와 SecurityContextHolder 설정
     private void getAuthentication(String token) {
-        // JWT 토큰을 파싱하여 클레임(claim)들을 추출합니다.
+
         Claims claims = jwtTokenizer.parseAccessToken(token);
 
-        // 클레임에서 사용자 정보 추출
         String email = claims.getSubject();
         Long userId = claims.get(USER_ID.getKey(), Long.class);
         String nickname = claims.get(NICKNAME.getKey(), String.class);
 
-        // JWT에서 추출한 Claim으로 토큰에 권한 추출
         List<GrantedAuthority> authorities = getGrantedAuthorities(claims);
 
-        // CustomUserDetails 객체 생성
         CustomUserDetails userDetails = new CustomUserDetails(userId, email, "", nickname,
             authorities.stream().map(GrantedAuthority::getAuthority).collect(
                 Collectors.toList()));
 
-        // Authentication 생성 (권한 목록, 사용자 정보, 인증여부)
         Authentication authentication = new JwtAuthenticationToken(authorities,userDetails,null);
 
-
-        // SecurityContextHolder에 인증 정보 설정
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     // Claims 객체에서 사용자의 권한 추출하여 리스트로 반환
     private List<GrantedAuthority> getGrantedAuthorities(Claims claims) {
-        // 클레임에서 "roles" 정보를 추출(사용자가 가지고 있는 권한 목록)
         List<String> roles = (List<String>) claims.get(ROLES.getKey());
-        // 권한 정보를 담을 리스트를 생성
         List<GrantedAuthority> authorities = new ArrayList<>();
-        // 각 역할(role)을 GrantedAuthority 객체로 변환하여 리스트에 추가
         for (String role : roles) {
             authorities.add(() -> role);
         }
-        // 권한 목록을 반환
         return authorities;
     }
 }

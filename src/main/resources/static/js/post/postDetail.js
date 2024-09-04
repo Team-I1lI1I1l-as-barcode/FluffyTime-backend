@@ -492,5 +492,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 function highlightMentions(content) {
   // '@nickname' 패턴을 찾아서 <span> 태그로 감싸기
   return content.replace(/(@\w+)/g,
-      '<span style="color: #5a5aff; font-weight: 700;">$1</span>');
+      '<span style="color: #0078e8; font-weight: 500;">$1</span>');
 }

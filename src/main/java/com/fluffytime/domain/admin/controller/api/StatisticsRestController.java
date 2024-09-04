@@ -20,12 +20,13 @@ public class StatisticsRestController {
     private final UserStatisticsService userStatisticsService;
     private final PostStatisticsService postStatisticsService;
 
+    // 유저 일일 통계 정보 불러오기
     @PostMapping("/user")
     public ResponseEntity<DailyCountStatisticsResponse> userStatistics() {
         DailyCountStatisticsResponse dailyUserCountsResponse = userStatisticsService.getDailyUserCounts();
         return ResponseEntity.status(HttpStatus.OK).body(dailyUserCountsResponse);
     }
-
+    // 콘텐츠 일일 통계 정보 불러오기
     @PostMapping("/contents")
     public ResponseEntity<DailyCountStatisticsResponse> contentsStatistics() {
         DailyCountStatisticsResponse dailyCountStatisticsResponse = postStatisticsService.getDailyPostCount();

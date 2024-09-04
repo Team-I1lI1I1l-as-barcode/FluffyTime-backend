@@ -386,11 +386,11 @@ public class PostService {
             contentType.equals("image/jpeg") ||
             contentType.equals("image/png") ||
             contentType.equals("image/webp") ||
-            contentType.equals("image/avif") ||  // AVIF 형식 추가
+            contentType.equals("image/avif") ||
             // 비디오 파일 형식
-            contentType.equals("video/mp4") ||  // MP4 동영상 파일 허용
-            contentType.equals("video/mpeg") ||  // MPEG 동영상 파일 허용
-            contentType.equals("video/quicktime") // MOV 형식
+            contentType.equals("video/mp4") ||
+            contentType.equals("video/mpeg") ||
+            contentType.equals("video/quicktime")
         );
     }
 

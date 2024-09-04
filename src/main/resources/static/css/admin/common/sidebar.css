@@ -61,7 +61,7 @@ li {
 
 .logout {
   position: absolute;
-  bottom: 0; /* 사이드바 하단에 위치 */
+  bottom: 0;
   width: 100%;
   margin-bottom: 2rem;
   display: flex;
@@ -76,12 +76,12 @@ li {
 }
 
 .logout .material-symbols-rounded {
-  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+  margin-right: 15px;
 }
 
 .home {
   position: absolute;
-  bottom: 3rem; /* 사이드바 하단에 위치 */
+  bottom: 3rem;
   width: 100%;
   margin-bottom: 2rem;
   display: flex;
@@ -96,6 +96,6 @@ li {
 }
 
 .home .material-symbols-rounded {
-  margin-right: 15px; /* 아이콘과 텍스트 간의 간격 */
+  margin-right: 15px;
 }
 

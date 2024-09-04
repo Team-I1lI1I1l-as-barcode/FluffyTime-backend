@@ -39,6 +39,7 @@ public class JoinService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AdminNotificationService adminNotificationService;
 
+    // 회원가입 유저 정보 임시 저장 서비스
     @Transactional
     public JoinResponse tempJoin(JoinRequest joinUser) {
         TempUser tempUser = TempUser.builder()
@@ -57,6 +58,7 @@ public class JoinService {
             .build();
     }
 
+    // 임시 저장된 유저 정보를 가지고 최종 회원가입 하는 서비스
     @Transactional
     public JoinResponse join(String email) {
 
@@ -100,6 +102,7 @@ public class JoinService {
             .build();
     }
 
+    // 소셜 회원가입 서비스
     @Transactional
     public JoinResponse socialJoin(JoinRequest joinUser) {
 
@@ -139,6 +142,7 @@ public class JoinService {
             .build();
     }
 
+    // 이메일 중복 확인 서비스
     @Transactional
     public CheckDuplicationResponse checkExistsEmail(
         String email) {
@@ -151,6 +155,7 @@ public class JoinService {
                 .build();
     }
 
+    // 닉네임 중복 확인 서비스
     @Transactional
     public CheckDuplicationResponse checkExistsNickname(
         String nickname) {
@@ -163,8 +168,8 @@ public class JoinService {
             .build();
     }
 
+    // 이메일 인증 서비스
     @Transactional
-    // 인증 성공 or 실패 응답을 구현해야함
     public SucceedCertificationResponse certificateEmail(String email) {
         TempUser user = emailCertificationDao.getTempUser(email)
             .orElseThrow(TempUserNotFound::new);

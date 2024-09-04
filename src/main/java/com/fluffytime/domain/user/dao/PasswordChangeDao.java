@@ -14,6 +14,7 @@ public class PasswordChangeDao {
 
     private final RedisTemplate<String, String> redisTemplate;
 
+    // 비밀번호 변경 ttl 저장하는 메서드
     public void saveChangePasswordTtl(String email) {
         redisTemplate.opsForValue().set(
             PASSWORD_KEY_HEADER + email,
@@ -22,10 +23,12 @@ public class PasswordChangeDao {
         );
     }
 
+    // key(email)이 존재하는지 확인하는 메서드
     public boolean hasKey(String email) {
         return Boolean.TRUE.equals(redisTemplate.hasKey(PASSWORD_KEY_HEADER + email));
     }
 
+    // 비밀번호 변경 ttl 제거하는 메서드
     public void removePasswordChangeTtl(String email) {
         redisTemplate.delete(PASSWORD_KEY_HEADER + email);
     }

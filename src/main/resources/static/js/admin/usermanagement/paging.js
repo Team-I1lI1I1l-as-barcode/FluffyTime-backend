@@ -26,7 +26,6 @@ function updatePage(data) {
   const pagination = document.getElementById('pagination');
   const paginationList = document.getElementById('paginationList');
 
-  // Clear existing content
   userTableBody.innerHTML = '';
   paginationList.innerHTML = '';
 
@@ -42,7 +41,6 @@ function updatePage(data) {
     userTableBody.appendChild(row);
   })
 
-  // Update pagination
   for (let i = 0; i < data.totalPages; i++) {
     const li = document.createElement('li');
     li.innerHTML = `<a href="#" onclick="fetchData(${i})">${i+1}</a>`;

@@ -107,6 +107,7 @@ button:hover {
   border-radius: 50%;
   margin-right: 12px;
   object-fit: cover;
+  cursor: pointer;
 }
 
 .comment .nickname {
@@ -368,4 +369,14 @@ textarea#comment-content {
 
 .mention-item:hover {
   background-color: #f0f0f0; /* 항목을 마우스로 오버할 때의 배경색 */
+}
+
+.load-more-button {
+  color: #7f7f7f;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  margin-right: 10px;
 }

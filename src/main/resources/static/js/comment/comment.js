@@ -33,6 +33,12 @@ async function fetchComments() {
     profileImg.src = comment.profileImageurl || '/image/profile/profile.png'; // 프로필 이미지 가져오기
     profileImg.className = 'profile-img';
 
+    // 프로필 사진 클릭 시 유저페이지로 이동
+    profileImg.addEventListener('click', () => {
+      const nickname = comment.nickname;
+      window.location.href = `/userpages/${nickname}`;
+    })
+
     //닉네임
     const nicknameSpan = document.createElement('span');
     nicknameSpan.className = 'nickname';
@@ -179,7 +185,16 @@ async function fetchReplies(commentId, replyDiv) {
     return;
   }
   const replies = await response.json();
-  for (const reply of replies) {
+
+  // 처음엔 최대 2개의 답글만 표시
+  const initialReplies = replies.slice(0, 2);
+
+  const loadMoreButton = document.createElement('span');
+  loadMoreButton.textContent = '더보기';
+  loadMoreButton.className = 'load-more-button';
+
+  // 답글 렌더링
+  function renderReply(reply) {
     const replyElement = document.createElement('div');
     replyElement.className = 'reply';
     replyElement.dataset.id = reply.replyId;
@@ -188,6 +203,12 @@ async function fetchReplies(commentId, replyDiv) {
     const profileImg = document.createElement('img');
     profileImg.src = reply.profileImageurl || '/image/profile/profile.png'; // 프로필 이미지 가져오기
     profileImg.className = 'profile-img';
+
+    // 프로필 사진 클릭 시 유저페이지로 이동
+    profileImg.addEventListener('click', () => {
+      const nickname = reply.nickname;
+      window.location.href = `/userpages/${nickname}`;
+    })
 
     // 닉네임 및 답글 내용
     const nicknameSpan = document.createElement('span');
@@ -265,6 +286,31 @@ async function fetchReplies(commentId, replyDiv) {
     replyElement.appendChild(profileContentDiv);
     replyDiv.appendChild(replyElement);
     replyElement.appendChild(editDeleteButtonsDiv);
+  }
+
+  // 초기 답글 렌더링 및 더보기 기능
+  initialReplies.forEach(renderReply);
+
+  if (replies.length > 2) {
+    loadMoreButton.addEventListener('click', () => {
+      const remainingReplies = replies.slice(2);
+
+      if (loadMoreButton.textContent === '더보기') {
+        remainingReplies.forEach(renderReply);
+        loadMoreButton.textContent = '접기';
+      } else {
+        const replyElements = replyDiv.querySelectorAll('.reply');
+        replyElements.forEach((replyElement, index) => {
+          if (index >= 2) {
+            replyElement.remove();
+          }
+        });
+        loadMoreButton.textContent = '더보기';
+      }
+      replyDiv.appendChild(loadMoreButton);
+    });
+
+    replyDiv.appendChild(loadMoreButton);
   }
 }
 
@@ -673,5 +719,5 @@ function handleReplyInput(commentId) {
 function highlightMentions(content) {
   // '@nickname' 패턴을 찾아서 <span> 태그로 감싸기
   return content.replace(/(@\w+)/g,
-      '<span style="color: #5a5aff; font-weight: 700;">$1</span>');
+      '<span style="color: #0078e8; font-weight: 500;">$1</span>');
 }

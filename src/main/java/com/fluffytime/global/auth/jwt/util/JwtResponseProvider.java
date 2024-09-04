@@ -22,10 +22,8 @@ public class JwtResponseProvider {
         HashMap<String, Object> errorInfo = new HashMap<>();
         errorInfo.put("code", exceptionCode.getCode());
         errorInfo.put("message", exceptionCode.getMessage());
-        // Gson 객체를 사용하여 HashMap을 JSON 문자열로 변환
         Gson gson = new Gson();
         String responseJson = gson.toJson(errorInfo);
-        // 변환된 JSON 문자열을 응답으로 출력
         response.getWriter().print(responseJson);
     }
 

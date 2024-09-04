@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+//모든 컨트롤러에서 발생하는 예외를 잡아줌
 @Slf4j
-@RestControllerAdvice//모든 컨트롤러에서 발생하는 예외를 잡아줌
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(HandlerMethodValidationException.class)
@@ -46,7 +47,6 @@ public class GlobalExceptionHandler {
         log.error("AuthException = {}", e.getMessage());
         return createErrorResponseEntity(e.getErrorCode());
     }
-
 
     private ResponseEntity<ErrorResponse> createErrorResponseEntity(ErrorCode code) {
         return ResponseEntity.status(code.getHttpStatus()).body(ErrorResponse.of(code));

@@ -50,7 +50,6 @@ input:focus {
 #joinForm {
   display: flex;
   flex-direction: column;
-  /*justify-content: center;*/
   align-items: center;
   background-color: #ffffff;
   width: 550px;
@@ -70,8 +69,8 @@ button {
 }
 
 button:active {
-  transform: scale(0.95); /* 클릭 시 버튼을 살짝 작게 만듦 */
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* 클릭 시 그림자 변화 */
+  transform: scale(0.95);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
 .checkBtn {
@@ -80,12 +79,12 @@ button:active {
 }
 
 .submit {
-  transition: background 2s ease-in-out; /* 부드러운 배경 색상 전환 */
+  transition: background 2s ease-in-out;
 }
 
 .submit:active {
-  transform: scale(0.98); /* 클릭 시 버튼을 살짝 작게 만듦 */
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* 클릭 시 그림자 변화 */
+  transform: scale(0.98);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
 .hidden {

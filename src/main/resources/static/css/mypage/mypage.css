@@ -179,6 +179,7 @@
 #user_information_container nav a {
   color: var(--text-color);
   text-decoration: none;
+  cursor: pointer;
 }
 
 #user_information_container nav a:hover {

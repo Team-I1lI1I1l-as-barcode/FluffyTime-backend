@@ -1,23 +1,16 @@
 document.addEventListener('DOMContentLoaded', (event) => {
-  // 현재 화면 URL을 가져옵니다.
   const currentUrl = window.location.href;
 
-// URL 객체를 생성합니다.
   const url = new URL(currentUrl);
 
-// URLSearchParams 객체를 사용하여 쿼리 파라미터를 추출합니다.
   const queryParams = new URLSearchParams(url.search);
 
-// 'redirectURL' 쿼리 파라미터 추출
   const email = queryParams.get('email');
 
-  // 이메일 필드 가져오기
   const emailField = document.getElementById('email');
 
-  // 이메일 필드에 미리 값 설정
   emailField.value = email;
 
-  // 이메일 필드를 비활성화 상태로 만들기
   emailField.disabled = true;
 });
 
@@ -39,7 +32,6 @@ const usernamePattern = /^[a-zA-Z0-9_-]+$/;
 async function socialJoin(event) {
   event.preventDefault()
 
-  // 폼 데이터 수집
   const formElement = document.getElementById("joinForm");
 
   const email = formElement.email.value;
@@ -48,7 +40,7 @@ async function socialJoin(event) {
   const nickname = formElement.nickname.value;
 
   if (!formElement.checkValidity()) {
-    formElement.reportValidity(); // 브라우저의 기본 검증 메시지 표시
+    formElement.reportValidity();
     return;
   }
 
@@ -65,7 +57,6 @@ async function socialJoin(event) {
     nicknameNoticeElement.classList.add('hidden')
   }
 
-  // 비밀번호 유효성 검사
   if (!passwordPattern.test(password)) {
     passwordNoticeElement.innerText = "비밀번호는 8자 이상 20자 이하, 숫자, 문자, 특수문자를 포함해야 합니다.";
     passwordNoticeElement.classList.add('error');
@@ -89,7 +80,6 @@ async function socialJoin(event) {
     return
   }
 
-  // 폼 데이터를 JSON으로 변환
   const jsonData = {
     email: email,
     password: password,
