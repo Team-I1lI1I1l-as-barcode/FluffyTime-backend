@@ -83,6 +83,11 @@
   font-size: 15px;
 }
 
+#follower_list_modal,
+#following_list_modal {
+  cursor: pointer;
+}
+
 /* 애완동물 정보 폰트 사이즈 조정 - 이름, 성별, 나이*/
 #profile_information_pet p {
   font-size: 15px;
