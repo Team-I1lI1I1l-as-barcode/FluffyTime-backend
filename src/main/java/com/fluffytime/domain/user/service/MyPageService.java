@@ -48,22 +48,21 @@ public class MyPageService {
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
 
-
-    // 사용자 조회(userId로 조회)  메서드
+    // 사용자 조회(userId로 조회) 메서드
     @Transactional
     public User findUserById(Long userId) {
         log.info("findUserById 실행");
         return userRepository.findById(userId).orElse(null);
     }
 
-    // 사용자 조회(nickname으로 조회)  메서드
+    // 사용자 조회(nickname으로 조회) 메서드
     @Transactional
     public User findUserByNickname(String nickname) {
         log.info("findUserByNickname 실행");
         return userRepository.findByNickname(nickname).orElse(null);
     }
 
-    // accessToken 토큰으로 사용자 찾기  메서드
+    // accessToken 토큰으로 사용자 찾기 메서드
     @Transactional
     public User findByAccessToken(HttpServletRequest httpServletRequest) {
         log.info("findByAccessToken 실행");
@@ -71,7 +70,7 @@ public class MyPageService {
         if (accessToken == null) {
             throw new TokenNotFound();
         }
-        // accessToken값으로  UserId 추출
+        // accessToken값으로 UserId 추출
         Long userId = Long.valueOf(
             ((Integer) jwtTokenizer.parseAccessToken(accessToken).get("userId")));
         // id(pk)에 해당되는 사용자 추출
@@ -79,13 +78,11 @@ public class MyPageService {
     }
 
     // 접근한 사용자와 실제 권한을 가진 사용자가 동일한지 판단하는 메서드
-    @Transactional
     public boolean isUserAuthorized(String accessNickname, String actuallyNickname) {
         return accessNickname.equals(actuallyNickname);
     }
 
-    // 프로필 사진 url 조회  메서드
-    @Transactional
+    // 프로필 사진 url 조회 메서드
     public String profileFileUrl(ProfileImages profileImages) {
         if (profileImages == null) {
             log.info("createProfileResponseDto 실행 >> 프로필 사진 미등록 상태");
@@ -97,7 +94,6 @@ public class MyPageService {
     }
 
     // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환하는 메서드
-    @Transactional
     public List<PostResponse> postList(User user) {
         return user.getPostList().stream()
             // TempStatus가 TEMP가 아닌것만 필터링(임시저장글 제외)
@@ -116,8 +112,7 @@ public class MyPageService {
             }));
     }
 
-    // 북마크 게시물 리스트  메서드
-    @Transactional
+    // 북마크 게시물 리스트 메서드
     public List<PostResponse> bookmarkList(List<Bookmark> bookmarks) {
         return bookmarks.stream()
             .map(Bookmark::getPost) // 북마크에서 게시글을 가져옴
@@ -133,7 +128,6 @@ public class MyPageService {
     }
 
     // MyPageInformationDto 생성 메서드
-    @Transactional
     public MyPageInformationResponse createResponseDto(String nickname,
         List<PostResponse> postsList,
         List<PostResponse> bookmarkList, Profile profile) {
@@ -180,7 +174,6 @@ public class MyPageService {
     }
 
     // ProfileInformationDto 생성 메서드
-    @Transactional
     public ProfileInformationResponse createResponseDto(String nickname, String email,
         Profile profile) {
         return ProfileInformationResponse.builder()
@@ -214,14 +207,12 @@ public class MyPageService {
     }
 
     // 닉네임 중복 여부 검증 메서드
-    @Transactional
     public CheckUsernameResponse nicknameExists(String nickname) {
         log.info("nicknameExists 실행 >> CheckUsernameDto 구성");
         return CheckUsernameResponse.builder()
             .result(userRepository.existsByNickname(nickname))
             .build();
     }
-
 
     // 프로필 업데이트 메서드
     @Transactional
@@ -320,7 +311,6 @@ public class MyPageService {
         return imageResultResponse;
     }
 
-
     // 쿠기 삭제 메서드
     @Transactional
     public void deleteCookie(HttpServletResponse response) {
@@ -358,7 +348,7 @@ public class MyPageService {
             return RequestResultResponse.builder()
                 .result(false)
                 .build();
-
         }
     }
 }
+
