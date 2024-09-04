@@ -19,6 +19,9 @@ let roomRecipient = null; // 현재 채널 방 주인(본인)이 누구인지 �
 // 웹소켓
 let ws;
 
+// 전역 상태로 각 채팅방의 최근 메시지를 저장
+const recentMessages = {};
+
 // 초기화
 function initialize() {
   // 초기화 채팅 목록 가져오기
@@ -28,7 +31,7 @@ function initialize() {
 
 window.onload = initialize;
 
-// 메시지방 만들기 클릭시 검색으로 이동
+// 메시지방 만들기 클릭 시 검색으로 이동
 sendMessageBtn.addEventListener("click", () => {
   window.location.href = "/search";
 });
@@ -70,29 +73,36 @@ function chatRoomInfo(data) {
     roomList.innerHTML = '';
     // 채팅방 리스트 출력하기
     data.chatRoomList.forEach(roomName => {
-      const recipient = data.recipient[count]; // 수신자 이름 설정
+      const chatRoomDiv = document.createElement('div'); // 채팅방 정보를 담을 div(프로필사진, 수신자, 최근 채팅 내역)
+      const chatRoom = document.createElement('p'); // 수신자 명(ui에서 보이는 채팅방 이름)
+      const recentChat = document.createElement('p'); // 최근 채팅 내역
+      const profileImage = document.createElement('img'); // 프로필 이미지
+      let recipient = data.recipient[count]; // 수신자 이름 설정
 
-      // 웹소켓 실시간 메시징 기능 설정
-      setupWebSocket(roomName, recipient);
+      // 태그에 class 추가
+      chatRoomDiv.classList.add('chat-item');
+      profileImage.classList.add('profile_Image');
+      recentChat.classList.add('recent_chat');
 
-      // 각 채팅방별 수신자 이름, 메시지방, 프로필 사진, 최근 채팅 내역 가져오기
-      count = loadChatRoomList(data, count, roomList);
+      // 각 채팅방별 수신자이름, 메시지방, 프로필 사진, 최근 채팅 내역 가져오기
+      count = loadChatRoomList(data, count, chatRoomDiv, chatRoom, recentChat,
+          profileImage, roomList);
 
-      // 각 채팅방 영역 클릭시
-
+      // 각 채팅방 영역 클릭 시
       chatRoomDiv.addEventListener('click', () => {
+        // WebSocket 실시간 메시징 기능
+        setupWebSocket(roomName, recipient, recentChat);
         // 메시지 출력 구역 보이기
         chatMessages.style.display = "flex";
         // 채팅 입력바 보이기
         getElement('chat-input').style.display = "flex";
         // 선택된 채팅방 배경 변경
-        RoomChangeColor(chatRoomDiv, recipient);
+        RoomChangeColor(chatRoomDiv, recentChat, recipient);
 
         // 수신자의 정보 불러오기
         fetchChat(`/chat/recipient/${encodeURIComponent(recipient)}`, 'GET',
             recipientInfo);
 
-        // --------------- //
         // 메시지 리스트 가져오기
         fetchChat(`/chat/log/${encodeURIComponent(roomName)}`, 'GET', chatLog);
 
@@ -100,45 +110,36 @@ function chatRoomInfo(data) {
         fetchChat(`/chat/topics/${encodeURIComponent(roomName)}`, "GET",
             ServerResponse);
       });
+
+      // 초기 로드 시에도 recentMessages를 업데이트
+      recentMessages[roomName] = data.recentChat[count];
     });
   }
 }
 
 // 채팅 목록 불러오기 함수
-function loadChatRoomList(data, count, roomList) {
-  const chatRoomDiv = document.createElement('div');
-  const chatRoom = document.createElement('p');
-  const recentChat = document.createElement('p');
-  const profileImage = document.createElement('img');
-
-  // 클래스 추가
-  chatRoomDiv.classList.add('chat-item');
-  profileImage.classList.add('profile_Image');
-  recentChat.classList.add('recent_chat');
+function loadChatRoomList(data, count, chatRoomDiv, chatRoom, recentChat,
+    profileImage, roomList) {
 
   chatRoom.textContent = data.recipient[count]; // 메시지방 이름 설정
-  // 프로필 사진 설정
   fetchChat(`/chat/recipient/${encodeURIComponent(data.recipient[count])}`,
       'GET', (imageData) => {
         profileImage.src = imageData.fileUrl;
       });
-  recentChat.textContent = data.recentChat[count]; // 최근 채팅 내역 설정
+  recentChat.textContent = recentMessages[data.chatRoomList[count]]
+      || data.recentChat[count]; // 최근 채팅 내역 설정
 
   chatRoomDiv.appendChild(profileImage);
   chatRoomDiv.appendChild(chatRoom);
   chatRoomDiv.appendChild(recentChat);
+  chatRoomDiv.dataset.roomName = data.chatRoomList[count]; // 채팅방 이름을 데이터 속성으로 저장
   roomList.appendChild(chatRoomDiv);
   count += 1;
-
   return count;
 }
 
-function Image(data) {
-  profileImage.src = data.fileUrl;
-}
-
-// 채팅방 클릭시 해당 채팅방 영역 배경 색 변경(사용자가 어떤 방에 속했는지 알기 위함) 함수
-function RoomChangeColor(chatRoomDiv, recipient) {
+// 채팅방 클릭 시 해당 채팅방 영역 배경색 변경 함수
+function RoomChangeColor(chatRoomDiv, recentChat, recipient) {
   // 이전에 선택된 chatRoomDiv 배경색 초기화
   if (currentSelectedChatItem && currentSelectedChatItem !== chatRoomDiv) {
     currentSelectedChatItem.style.background = null;
@@ -158,7 +159,6 @@ function recipientInfo(data) {
 
   emptyMessage.style.display = "none";
   chatHeader.style.display = "flex";
-  return data.fileUrl;
 }
 
 // 메시지 내역을 가져오는 API 응답 처리 함수
@@ -185,40 +185,39 @@ function ServerResponse(data) {
   console.log(data.success ? "요청 성공" : "요청 실패");
 }
 
-// WebSocket을 사용하여 실시간으로 메시지를 주고 받는 기능 구현 함수
-function setupWebSocket(roomName, recipient) {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    console.warn('WebSocket is already connected.');
-    return; // 이미 연결된 경우 새로운 연결을 시도하지 않음
+// 웹소켓을 사용하여 실시간으로 메시지를 주고 받는 기능 구현 함수
+function setupWebSocket(roomName, recipient, recentChatElement) {
+  if (ws) {
+    ws.close(); // 기존 WebSocket 연결 종료
   }
-
   ws = new WebSocket(`ws://fluffytime.kro.kr:8080/ws?room=${roomName}`);
 
   ws.onmessage = function (event) {
     console.log('Message received: ', event.data);
     const sender = event.data.split(':')[0].trim(); // 메시지 발신자
     const text = event.data.split(":").pop().trim(); // 메시지 내용
-    const messageElement = document.createElement("p");
-    messageElement.innerText = text;
-    const recentChat = document.querySelector(
-        `.chat-item[data-room="${roomName}"] .recent_chat`);
-    if (recentChat) {
-      recentChat.innerText = text;
-    }
 
-    if (roomRecipient && roomRecipient !== recipient) {
-      roomRecipient.className = '';
-    }
-    roomRecipient = recipient;
+    // 최근 메시지 업데이트
+    recentMessages[roomName] = text;
 
-    if (sender === roomRecipient) { // 메시지를 보내는 사람과 수신자가 같다면
-      messageElement.classList.add('receiver');
+    // UI 업데이트: 현재 채팅방이 열려 있을 때만
+    if (currentSelectedChatItem && currentSelectedChatItem.dataset.roomName
+        === roomName) {
+      recentChatElement.innerText = text;
+
+      const messageElement = document.createElement("p");
+      messageElement.innerText = text;
+      if (sender === recipient) { // 메시지를 보내는 사람과 수신자가 같다면
+        messageElement.classList.add('receiver');
+      } else {
+        messageElement.classList.add('sender');
+      }
+
+      chatMessages.appendChild(messageElement);
+      chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤을 자동으로 내리기
     } else {
-      messageElement.classList.add('sender');
+      // 채팅방이 열려 있지 않을 때, 필요 시 알림 처리
     }
-
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // 스크롤을 자동으로 내리기
   };
 
   ws.onopen = function () {
@@ -229,14 +228,14 @@ function setupWebSocket(roomName, recipient) {
     console.error('WebSocket error: ', error);
   };
 
-  ws.onclose = function () {
-    console.log('WebSocket connection closed.');
+  ws.onclose = function (event) {
+    console.log('WebSocket connection closed. Reason:', event.reason);
   };
 }
 
 // 메시지 전송 함수
 function sendMessage() {
-  const message = document.getElementById("message").value;
+  const message = getElement("message").value;
   if (message.trim() !== "") {
     if (ws && ws.readyState === WebSocket.OPEN) {
       ws.send(message);
@@ -251,8 +250,7 @@ function sendMessage() {
 // 엔터를 치면 메시지 전송
 getElement("message").addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
-    event.preventDefault();
     sendMessage();
+    event.preventDefault();
   }
 });
-
