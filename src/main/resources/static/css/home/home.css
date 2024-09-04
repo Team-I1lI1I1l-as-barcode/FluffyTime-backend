@@ -17,6 +17,7 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  cursor: pointer;
 }
 
 .home-post-header img {
@@ -27,6 +28,7 @@
 
 .home-post-content {
   padding-bottom: 2rem;
+  cursor: pointer;
 }
 
 .home-post-content p {
@@ -72,4 +74,11 @@
 
 .comment-text {
   color: #555;
+}
+
+.no-more-posts-message {
+  font-weight: 600;
+  color: #bdbdbd;
+  text-align: center;
+  margin-top: 2rem;
 }
