@@ -334,23 +334,19 @@ async function postReply(commentId, content) {
       // 멘션을 서버로 전송
       if (mentions.length > 0) {
         const {replyId} = await response.json(); // 서버에서 반환된 replyId 사용
-        for (const nickname of mentions) {
-          const mentionRequest = {
-            mentionedUserNickname: nickname,
-            replyId: replyId, // 서버에서 반환된 replyId 사용
-            content: content
-          };
+        const mentionRequest = {
+          mentions: mentions,
+          replyId: replyId,
+          content: content
+        };
 
-          console.log(mentionRequest);
-
-          await fetch('/api/mentions/reg', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(mentionRequest)
-          });
-        }
+        await fetch('/api/mentions/reg', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(mentionRequest)
+        });
       }
 
       await fetchComments(postId); // 댓글 목록 갱신
@@ -451,21 +447,19 @@ async function postComment() {
 
     // 멘션을 서버로 전송
     if (mentions.length > 0) {
-      for (const nickname of mentions) {
-        const mentionRequest = {
-          mentionedUserNickname: nickname,
-          commentId: commentId,
-          content: content
-        };
+      const mentionRequest = {
+        mentions: mentions,
+        commentId: commentId,
+        content: content
+      };
 
-        await fetch('/api/mentions/reg', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(mentionRequest)
-        });
-      }
+      await fetch('/api/mentions/reg', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mentionRequest)
+      });
     }
 
     if (response.ok) {
@@ -666,12 +660,12 @@ function formatReplyMentions(commentId) {
 // 멘션 데이터 추출
 function extractMentions(text) {
   const mentionPattern = /@(\w+)/g;
-  const mentions = [];
+  const mentions = new Set();
   let match;
   while ((match = mentionPattern.exec(text)) !== null) {
-    mentions.push(match[1]);
+    mentions.add(match[1]);
   }
-  return mentions;
+  return Array.from(mentions);
 }
 
 function handleReplyInput(commentId) {

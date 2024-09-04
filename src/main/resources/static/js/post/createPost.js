@@ -179,12 +179,12 @@ function formatMentions() {
 // 멘션 데이터 추출
 function extractMentions(text) {
   const mentionPattern = /@(\w+)/g;
-  const mentions = [];
+  const mentions = new Set();
   let match;
   while ((match = mentionPattern.exec(text)) !== null) {
-    mentions.push(match[1]);
+    mentions.add(match[1]);
   }
-  return mentions;
+  return Array.from(mentions);
 }
 
 // 프로필 정보를 ~~
@@ -448,20 +448,18 @@ async function submitPost(event) {
 
   // 멘션을 서버로 전송
   if (mentions.length > 0) {
-    for (const nickname of mentions) {
-      const mentionRequest = {
-        mentionedUserNickname: nickname,
-        postId: data,
-        content: content
-      };
-      await fetch('/api/mentions/reg', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(mentionRequest)
-      });
-    }
+    const mentionRequest = {
+      mentions: mentions,
+      postId: data,
+      content: content
+    };
+    await fetch('/api/mentions/reg', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(mentionRequest)
+    });
   }
 
   document.querySelector('.post-right-content').style.display = 'none'; // 게시물 작성 부분 숨기기
