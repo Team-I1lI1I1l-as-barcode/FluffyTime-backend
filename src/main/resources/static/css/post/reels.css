@@ -35,7 +35,7 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: flex-end; /* 오버레이가 동영상 하단에 위치하도록 설정 */
-  background-color: #fff;
+  /*background-color: #fff;*/
   margin-bottom: 2px;
 }
 
