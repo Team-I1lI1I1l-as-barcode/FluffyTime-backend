@@ -120,7 +120,6 @@ public class LoginService {
 
         response.addCookie(refreshTokenCookie);
         response.addCookie(accessTokencookie);
-        response.sendRedirect("/login");
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
