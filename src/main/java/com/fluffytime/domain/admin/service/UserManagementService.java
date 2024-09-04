@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserManagementService {
     private final UserRepository userRepository;
 
+    // 유저 전체 목록 불러오기 서비스 (페이징 처리)
     @Transactional
     public Page<UserInfoResponse> findAll(Pageable pageable) {
         Pageable sortedByDescId = PageRequest.of(pageable.getPageNumber(), 2, Sort.by(Direction.DESC, "registrationAt"));

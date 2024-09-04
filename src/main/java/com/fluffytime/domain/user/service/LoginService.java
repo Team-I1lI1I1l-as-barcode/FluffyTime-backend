@@ -44,6 +44,7 @@ public class LoginService {
     private final RefreshTokenDao refreshTokenDao;
     private final PasswordChangeDao passwordChangeDao;
 
+    // 로그인 서비스
     @Transactional
     public void loginProcess(HttpServletResponse response, LoginUserRequest loginUser) {
 
@@ -86,6 +87,7 @@ public class LoginService {
         log.info("로그인에 성공하였습니다.");
     }
 
+    // 로그아웃 서비스
     @Transactional
     public ResponseEntity<Void> logoutProcess(HttpServletRequest request,
         HttpServletResponse response)
@@ -122,6 +124,7 @@ public class LoginService {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    // 이메일 찾기 서비스
     @Transactional
     public ResponseEntity<FindEmailResponse> findEmail(FindEmailRequest findEmailRequest) {
         FindEmailResponse findEmailResponse = FindEmailResponse.builder()
@@ -131,21 +134,25 @@ public class LoginService {
         return ResponseEntity.status(HttpStatus.OK).body(findEmailResponse);
     }
 
+    // email로 가입된 유저가 존재하는지 확인
     @Transactional
     public boolean existsUserByEmail(String email) {
         return userRepository.existsUserByEmail(email);
     }
 
+    // 비밀번호 변경 ttl 저장
     @Transactional
     public void savePasswordChangeTtl(String email) {
         passwordChangeDao.saveChangePasswordTtl(email);
     }
 
+    // 비밀번호 변경 ttl key 존재 여부 확인
     @Transactional
     public boolean findPasswordChangeTtl(String email) {
         return passwordChangeDao.hasKey(email);
     }
 
+    // 비밀번호 변경
     @Transactional
     public void changePassword(PasswordChangeRequest passwordChangeRequest) {
         String email = passwordChangeRequest.getEmail();
@@ -158,6 +165,7 @@ public class LoginService {
         userRepository.save(findUser);
     }
 
+    // 비밀번호 변경 ttl 제거
     @Transactional
     public void removePasswordChangeTtl(String email) {
         passwordChangeDao.removePasswordChangeTtl(email);

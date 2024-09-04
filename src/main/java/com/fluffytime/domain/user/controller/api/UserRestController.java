@@ -153,6 +153,7 @@ public class UserRestController {
             .body(joinService.certificateEmail(email));
     }
 
+    // 이메일 찾기
     @PostMapping("/find-email")
     public ResponseEntity<FindEmailResponse> findEmail(
         @RequestBody @Valid FindEmailRequest findEmailRequest
@@ -177,6 +178,7 @@ public class UserRestController {
         }
     }
 
+    // 비밀번호 변경하기
     @PostMapping("/change/password")
     public ResponseEntity<Void> changePassword(
         @RequestBody @Valid PasswordChangeRequest passwordChangeRequest

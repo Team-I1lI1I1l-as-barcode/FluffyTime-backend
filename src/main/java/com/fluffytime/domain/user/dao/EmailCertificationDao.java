@@ -16,6 +16,7 @@ public class EmailCertificationDao {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+    // 이메일 인증에 들어간 회원가입 유저의 정보를 임시 저장하는 메서드
     public void saveEmailCertificationTempUser(TempUser user) {
         redisTemplate.opsForValue().set(
             EMAIL_CERTIFICATION_KEY_HEADER + user.getEmail(),
@@ -24,16 +25,13 @@ public class EmailCertificationDao {
         );
     }
 
+    // 임지 저장된 유저정보를 가져오는 메서드
     public Optional<TempUser> getTempUser(String email) {
         TempUser tempUser = (TempUser) redisTemplate.opsForValue().get(EMAIL_CERTIFICATION_KEY_HEADER + email);
         return Optional.ofNullable(tempUser);
     }
 
-
-    public boolean hasKey(String email) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(EMAIL_CERTIFICATION_KEY_HEADER + email));
-    }
-
+    // 임시 저장된 유저 정보를 제거하는 메서드
     public void removeTempUser(String email) {
         redisTemplate.delete(EMAIL_CERTIFICATION_KEY_HEADER + email);
     }

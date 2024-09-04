@@ -50,16 +50,19 @@ public class UserController {
         return "join/joinFail";
     }
 
+    // 이메일 찾기 화면
     @GetMapping("/login/find-email")
     public String findUserPage() {
         return "login/findEmail";
     }
 
+    // 비밀번호 찾기 화면
     @GetMapping("/login/find-password")
     public String findPasswordPage() {
         return "login/findPassword";
     }
 
+    // 비밀번호 변경하기 화면
     @GetMapping("/login/change-password")
     public String changePasswordPage() {
      return "login/changePassword";

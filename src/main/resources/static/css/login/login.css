@@ -11,7 +11,6 @@ body {
   flex-direction: column;
   align-items: center;
   width: 750px;
-  /*height: 800px;*/
   background-color: var(--primary-color);
   border-radius: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
@@ -29,7 +28,6 @@ h1 {
 #loginForm {
   display: flex;
   flex-direction: column;
-  /*justify-content: space-around;*/
   align-items: center;
   background-color: #ffffff;
   width: 550px;
@@ -50,8 +48,8 @@ button {
 }
 
 button:active {
-  transform: scale(0.99); /* 클릭 시 버튼을 살짝 작게 만듦 */
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* 클릭 시 그림자 변화 */
+  transform: scale(0.99);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
 .nav-container {
@@ -68,8 +66,8 @@ button:active {
 }
 
 .nav-container:active {
-  transform: scale(0.99); /* 클릭 시 버튼을 살짝 작게 만듦 */
-  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3); /* 클릭 시 그림자 변화 */
+  transform: scale(0.99);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
 }
 
 .nav-join {

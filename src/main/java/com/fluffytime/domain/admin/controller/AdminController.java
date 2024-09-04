@@ -11,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @RequestMapping("/admin")
 public class AdminController {
+    // 관리자 페이지 홈
     @GetMapping
     public String adminPage() {
         return "admin/admin";
     }
 
+    // 관리자 페이지 사용자 관라 화면
     @GetMapping("/user")
     public String userManagementPage() {
         return "admin/user/userManagementPage";

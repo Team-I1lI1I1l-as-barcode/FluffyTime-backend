@@ -1,11 +1,12 @@
 package com.fluffytime.global.common.smtp.builder;
 
+// 가입 인증 링크 메일 Content
 public class CertificationEmailContent implements EmailContentBuilder {
 
     @Override
     public String getContent(String email) {
         String certificationLink =
-            "http://localhost:8080/join/email-certificate/result/" + email;
+            "http://fluffytime.kro.kr/join/email-certificate/result/" + email;
         String certificationMessage = "";
         certificationMessage += "<h1 style='text-align: center;'>[ FluffyTime - 반려동물 전용 SNS ] 가입 인증 메일</h1>";
         certificationMessage += "<h3 style='text-align: center;'>이메일 인증을 완료하세요:</h3>";

@@ -18,6 +18,7 @@ public class UserManagementRestController {
 
     private final UserManagementService userManagementService;
 
+    // 사용자 관리 -> 유저 목록 불러오기 (페이징 처리)
     @GetMapping("/users")
     public ResponseEntity<Page<UserInfoResponse>> getAllUsers(Pageable pageable) {
         Page<UserInfoResponse> users = userManagementService.findAll(pageable);

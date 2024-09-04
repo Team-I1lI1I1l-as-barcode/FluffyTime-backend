@@ -7,16 +7,12 @@ const passwordPattern = /^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\d)(?=.*\W).{8,20}$/;
 async function changePassword(event) {
   event.preventDefault();
 
-  // 현재 화면 URL을 가져옵니다.
   const currentUrl = window.location.href;
 
-  // URL 객체를 생성합니다.
   const url = new URL(currentUrl);
 
-  // URLSearchParams 객체를 사용하여 쿼리 파라미터를 추출합니다.
   const queryParams = new URLSearchParams(url.search);
 
-  // 'redirectURL' 쿼리 파라미터 추출
   const email = queryParams.get('email');
 
   const formElement = document.getElementById('changePasswordForm');
@@ -26,7 +22,6 @@ async function changePassword(event) {
   const password = formElement.password.value;
   const checkPassword = formElement.checkPassword.value;
 
-  // 비밀번호 유효성 검사
   if (!passwordPattern.test(password)) {
     passwordErrorElement.innerText = "비밀번호는 8자 이상 20자 이하, 숫자, 문자, 특수문자를 포함해야 합니다.";
     passwordErrorElement.classList.remove('hidden');

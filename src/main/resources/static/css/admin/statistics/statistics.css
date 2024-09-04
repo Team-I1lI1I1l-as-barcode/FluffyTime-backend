@@ -39,7 +39,7 @@ h3 {
   width: 80%;
   border: 1px solid var(--primary-color);
   border-radius: 10px;
-  box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.1); /* 기본 그림자 */
+  box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
 }
 
@@ -97,17 +97,15 @@ h3 {
   font-size: 16px;
   cursor: pointer;
   transition: box-shadow 0.1s ease, transform 0.1s ease;
-  border-radius: 5px; /* 버튼 모서리를 둥글게 합니다. */
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* 기본 그림자 효과 */
+  border-radius: 5px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .refresh-btn:active {
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4); /* 눌렸을 때 그림자 효과를 더 진하게 변경 */
-  transform: scale(0.95); /* 버튼이 눌렸을 때 약간 작아지는 효과 */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+  transform: scale(0.95);
 }
 
-
-/* Define the fade-in animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
