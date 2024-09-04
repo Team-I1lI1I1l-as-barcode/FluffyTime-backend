@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8"/>
+  <title>프로필 편집</title>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+  <script th:src="@{/js/mypage/profiles/profile.js}" defer></script>
+  <link rel="stylesheet" href="/css/mypage/profiles/profile.css"/>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/post/createPost.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/post/createPost.js}" defer></script>
+</head>
+<body>
+<div class="container">
+  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+</div>
+<div id="my_profile_container1">
+  <div id="my_profile_container2">
+    <p id="profile_title">프로필 편집 </p>
+    <!-- HTML 폼으로 이미지 파일을 업로드하는 폼 -->
+    <form id="profileImageForm" method="post" enctype="multipart/form-data">
+      <!-- 이미지 파일 입력 필드 -->
+      <input type="file" id="profile-images" name="images" style="display: none;"/>
+      <!-- 이미지 업로드 버튼 -->
+    </form>
+
+    <div id="profile_preview">
+      <!-- 이미지 미리보기 및 출력 영역 -->
+      <div id="Profile-image-Preview">
+        <img src="../../../image/profile/profile.png" id="img">
+      </div>
+
+      <p id="nickname"></p>
+      <button id="imageBtn">사진 변경</button>
+    </div>
+
+    <div id="email_container">
+      <p id="email_label">이메일</p>
+      <p id="email"></p>
+    </div>
+
+
+    <form id="profile_edit_form" method=post>
+      <!-- 프로필 사진 편집 관련 모달 오버레이 -->
+      <div id="profile-modal-overlay" class="profile-modal-overlay"></div>
+
+      <!-- 프로필 사진 편집 관련 모달 창 -->
+      <div id="profile-modal" class="profile-modal">
+        <div class="profile-modal-content">
+          <p id="modal_title">프로필 사진 바꾸기</p>
+          <a id="profile_image_upload">사진 업로드</a>
+          <a id="profile_image_delete">현재 사진 삭제</a>
+          <a id="profile_image_cancel">취소</a>
+        </div>
+      </div>
+
+      <div id="profile_user">
+        <label for="username">유저명</label>
+        <div class="input-group">
+          <input type="text" id="username" max="100"/>
+          <button id="check_username_Btn">중복확인</button>
+        </div>
+      </div>
+
+      <label for="intro">소개</label><br/>
+      <input type="text" id="intro" max="300"/><br/><br/>
+
+      <label for="pet_name">반려동물 이름</label><br/>
+      <input type="text" id="pet_name" max="100"/><br/><br/>
+
+      <label for="pet_sex">반려동물 성별</label><br/>
+      <select id="pet_sex">
+        <option value="none" id="noSex" selected>==선택==</option>
+        <option value="♂️" id="male">♂️</option>
+        <option value="♀️" id="female">♀️</option>
+      </select>
+
+      <label for="pet_age">반려동물 나이</label><br/>
+      <select id="pet_age"></select>
+
+      <label for="pet_category">반려동물 카테고리</label><br/>
+      <select id="pet_category">
+        <option value="none" id="noCategory" selected>==선택==</option>
+        <option value="강아지" id="dog">강아지</option>
+        <option value="고양이" id="cat">고양이</option>
+        <option value="도마뱀" id="lizard">도마뱀</option>
+        <option value="앵무새" id="parrot">앵무새</option>
+      </select>
+
+      <div id="account_status">
+        <label for="public_status">계정 공개</label>
+        <input hidden type="checkbox" id="public_status"/><label
+          for="public_status"
+          id="switch"
+      ></label>
+      </div>
+      <input type="submit" value="제출" id="submit">
+    </form>
+
+
+    <!-- 차단된 유저 리스트 관련 모달 오버레이 -->
+    <div id="block-user-list-modal-overlay" class="block-user-list-modal-overlay"></div>
+
+    <!-- 차단된 유저 리스트 관련 모달 창 -->
+    <div id="block-user-list-modal" class="block-user-list-modal">
+      <div class="block-user-list-modal-content">
+      </div>
+    </div>
+
+    <div id="block">
+      <p>차단 계정</p>
+      <button id="block_user_list">리스트</button>
+    </div>
+    <div id="account_delete">
+      <p>계정 삭제</p>
+      <button id="delete_account">삭제</button>
+    </div>
+  </div>
+</div>
+
+<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+<!-- 임시 저장 모달 -->
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
+
+<script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
+</body>
+</html>

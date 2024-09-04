@@ -1,182 +1,371 @@
-/* 댓글 목록 컨테이너 스타일 */
+/* 기본적인 글꼴 및 색상 설정 */
+body {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  color: #262626;
+  background-color: #fafafa; /* 배경색을 밝게 유지 */
+  padding: 20px; /* 페이지 여백 */
+  margin: 0;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: var(--hover-color);
+}
+
+
+/* 댓글 목록 전체 스타일 */
 #comment-list {
-  margin-top: 20px;
+  list-style: none;
+  padding: 20px 20px;
+  height: 100%;
+  border-bottom: 1px solid #ccc;
+  overflow-y: auto; /* 세로 스크롤 자동 표시 */
+  scrollbar-width: none; /* Firefox에서 스크롤바 숨기기 */
+  -ms-overflow-style: none; /* IE 및 Edge에서 스크롤바 숨기기 */
 }
 
-.comment, .reply {
-  max-width: 100%; /* 부모 요소의 너비를 초과하지 않도록 설정 */
-  box-sizing: border-box; /* 패딩과 보더가 전체 너비에 포함되도록 설정 */
-  overflow-wrap: break-word; /* 긴 단어가 줄 바꿈되도록 설정 */
+/* Chrome, Safari, Edge에서 스크롤바 숨기기 */
+#comment-list::-webkit-scrollbar {
+  display: none;
 }
 
-/* 각 댓글 스타일 */
-.comment {
+.comment-form {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  font-family: Arial, sans-serif;
+  align-items: center;
+}
+
+#comment-content {
+  flex-grow: 1;
+  /*margin-right: 10px; !* 버튼과의 간격 *!*/
+  border: none;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+#commentButton {
+  /*padding: 5px 10px; !* padding을 조정하여 글씨가 세로로 나오지 않게 함 *!*/
+  white-space: nowrap; /* 버튼의 텍스트가 강제로 한 줄에 나오도록 설정 */
+  /*height: 100%; !* 버튼의 높이를 textarea와 맞추기 위해 추가 *!*/
+  background-color: unset;
+  padding: 0 12px;
+  color: var(--primary-color);
+  line-height: 1;
+  box-sizing: border-box;
   font-size: 14px;
 }
 
-/* 프로필 이미지 스타일 */
+/* 댓글 스타일 */
+.comment {
+  display: flex;
+  flex-direction: column; /* 댓글 본문과 버튼을 수직으로 배치 */
+  margin-bottom: 20px; /* 댓글 간 간격 */
+  /*padding: 12px;*/
+  border-radius: 5px;
+  background-color: #fff; /* 배경색 흰색 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* 가벼운 그림자 효과 */
+}
+
+.profile-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nickname-content {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.default-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+}
+
 .comment .profile-img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 10px;
+  margin-right: 12px;
   object-fit: cover;
 }
 
-/* 댓글 내용 컨테이너 스타일 */
-.comment .comment-content {
-  flex: 1;
-}
-
-/* 닉네임 스타일 */
 .comment .nickname {
   font-weight: bold;
-  color: #262626;
-  margin-right: 5px;
-}
-
-/* 댓글 내용 스타일 */
-.comment .text {
-  color: #595959;
-}
-
-/* 댓글 버튼 스타일 */
-.comment button {
-  background-color: transparent;
-  border: none;
-  color: var(--primary-color);
   font-size: 14px;
+  color: #262626;
+  margin-right: 8px;
+}
+
+.comment .timestamp {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-left: 8px;
+}
+
+.comment .text {
+  font-size: 14px;
+  color: #262626;
+  margin: 4px 0;
+}
+
+.comment .buttons {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--primary-color);
+}
+
+.edit-delete-buttons {
+  /*width: 160px;*/
+  display: flex;
+  justify-content: end;
+  /*justify-content: space-between;*/
+  /*margin-left: 3.3rem;*/
+  margin-top: 0.5rem;
+}
+
+.edit-delete-buttons button {
+  margin: 0 5px;
+}
+
+.comment .buttons button {
+  background: none;
+  border: none;
   cursor: pointer;
-  margin-left: 10px;
+  padding: 0;
 }
 
-.comment button:hover {
-  color: #d89900;
+.comment .buttons button:hover {
+  text-decoration: underline;
 }
 
-/* 댓글 입력창 스타일 */
-#comment-content {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+/* 답글 섹션 스타일 */
+.replies {
   margin-top: 10px;
-  box-sizing: border-box;
+  padding-left: 48px; /* 답글 들여쓰기 */
 }
 
-.comment-form {
+.reply {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-/* 댓글 버튼 스타일 */
-#commentButton {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  cursor: pointer;
-  margin-top: 10px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-#commentButton:hover {
-  background-color: #d89900;
-}
-
-.reply {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 5px;
-  font-size: 14px;
-  display: flex; /* 답글을 flex로 나열 */
-  flex-direction: column; /* 열 방향으로 정렬 */
-  max-width: 100%;
-  box-sizing: border-box; /* 여백 포함 */
-}
-
-/* 답글 입력 영역 스타일 */
-.reply-section {
-  margin-top: 10px;
-  padding: 10px;
-  border-top: 1px solid #ddd;
-  max-width: 100%; /* 너비를 100%로 설정 */
-  box-sizing: border-box; /* 패딩 및 테두리 포함 */
-}
-
-.reply-section textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-.reply-section button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 8px;
-  cursor: pointer;
-  margin-top: 5px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-.reply-section button:hover {
-  background-color: #d89900;
-}
-
-/* 답글 스타일 */
-.reply {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 5px;
-  font-size: 14px;
-  display: flex; /* flex 레이아웃 사용 */
-  flex-direction: column; /* 열 방향으로 정렬 */
-  max-width: calc(100% - 20px); /* 최대 너비 조정 */
-  box-sizing: border-box; /* 여백 포함 */
+.reply .profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 8px;
+  object-fit: cover;
 }
 
 .reply .nickname {
   font-weight: bold;
+  font-size: 13px;
   color: #262626;
 }
 
 .reply .text {
-  color: #595959;
+  font-size: 13px;
+  color: #262626;
+  margin-top: 4px;
 }
 
-.reply button {
-  background-color: transparent;
+/* 답글 입력 및 수정 섹션 */
+.reply-section {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reply-section textarea {
+  position: relative;
+  width: 100%;
+  height: 50px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  resize: none;
+  background-color: transparent; /* 배경 투명하게 설정 */
+  color: transparent; /* Hide text color to only show the preview */
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+/* 답글 내용 미리보기 스타일 */
+.contentPreview-reply {
+  position: absolute;
+  width: 90%;
+  height: 50px;
+  padding: 10px;
+  border-radius: 8px;
   border: none;
-  color: var(--primary-color);
-  font-size: 14px;
+  font-size: 12px; /* Matching font size with textarea */
+  color: black; /* 텍스트 색상 */
+  background: transparent; /* 배경 투명하게 설정 */
+  z-index: 1;
+  box-sizing: border-box;
+}
+
+/* 버튼을 포함한 컨테이너 */
+.reply-section .button-container {
+  width: 98%;
+  display: flex;
+  justify-content: flex-start; /* 버튼을 왼쪽에 붙이기 */
+}
+
+.reply-section button {
+  margin-top: 8px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 10px;
   cursor: pointer;
-  margin-left: 10px;
 }
 
-.reply button:hover {
-  color: #d89900;
+.reply-section button:hover {
+  background-color: var(--hover-color);
 }
 
-/* 프로필 이미지 스타일 */
-.reply .profile-img {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-  object-fit: cover;
+.edit-delete-buttons-reply {
+  /*width: 106px;*/
+  display: flex;
+  /*justify-content: space-between;*/
+  justify-content: end;
+  /*margin-left: 2.5rem;*/
+  margin-top: 0.5rem;
+}
+
+.edit-delete-buttons-reply button {
+  margin: 0 5px;
+}
+
+/* 댓글/답글 수정 칸 */
+textarea {
+  /*width: calc(100% - 22px);*/
+  width: 100%;
+  /*border: 1px solid #ddd;*/
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 10px;
+  resize: none;
+}
+
+.comment-edit-button {
+  width: 70px;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.comment-cancel-button {
+  width: 70px;
+  margin-top: 0.5rem;
+  text-align: center;
+  margin-left: 5px;
+}
+
+.save-cancle-button-box {
+  display: flex;
+}
+
+/*멘션 관련*/
+
+textarea#comment-content {
+  position: relative;
+  z-index: 2; /* Preview보다 위에 위치하게 설정 */
+  width: calc(100% - 20px);
+  height: 50px; /* 필요한 높이로 조정 */
+  padding: 15px;
+  background-color: transparent; /* 배경 투명하게 설정 */
+  color: transparent; /* Hide text color to only show the preview */
+  overflow: hidden; /* 넘치는 내용 숨김 */
+  font-size: 12px;
+  border: none; /* 테두리 제거 */
+  outline: none; /* 포커스 시 외곽선 제거 */
+}
+
+/* 댓글 입력창 미리보기 */
+.content-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 20px); /* textarea와 동일한 너비 설정 */
+  height: 100%;
+  padding: 15px; /* textarea와 동일한 패딩 설정 */
+  color: black; /* 텍스트 색상 */
+  background: transparent; /* 배경 투명하게 설정 */
+  white-space: pre-wrap;
+  z-index: 1; /* textarea 아래에 위치 */
+  pointer-events: none; /* 상호작용 비활성화 */
+  box-sizing: border-box; /* 패딩 및 보더를 포함하여 박스 크기 계산 */
+}
+
+.mention-text {
+  color: #4848ff;
+  font-size: 12px;
+  font-weight: 700;
+  background-color: #d3edff;
+  padding: 5px 7px 5px 7px;
+  border-radius: 20px;
+}
+
+.mention-suggestions {
+  position: absolute;
+  bottom: 10%; /* Position below the textarea */
+  left: 10px;
+  width: calc(100% - 20px);
+  max-height: 200px; /* Maximum height for the suggestions box */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  background: white; /* Background color for suggestions */
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for better visibility */
+  z-index: 3; /* Ensure suggestions box is above other content */
+}
+
+.mention-suggestion {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-suggestion:hover {
+  background-color: #f0f0f0; /* Highlight color on hover */
+}
+
+.mention-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-item:hover {
+  background-color: #f0f0f0; /* 항목을 마우스로 오버할 때의 배경색 */
 }

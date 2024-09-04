@@ -44,15 +44,37 @@ async function loginProcess(event) {
     return;
   }
 
+
   // 폼 데이터를 JSON으로 변환
   const jsonData = {
     email: email,
     password: password
   };
 
+  // 현재 화면 URL을 가져옵니다.
+  const currentUrl = window.location.href;
+
+  // URL 객체를 생성합니다.
+  const url = new URL(currentUrl);
+
+  // URLSearchParams 객체를 사용하여 쿼리 파라미터를 추출합니다.
+  const queryParams = new URLSearchParams(url.search);
+
+  // 'redirectURL' 쿼리 파라미터 추출
+  const redirectURL = queryParams.get('redirectURL');
+
+  let loginApiUri;
+
+  // target API URI
+  if (redirectURL) {
+    loginApiUri = `/api/users/login?redirectURL=${redirectURL}`;
+  } else {
+    loginApiUri = '/api/users/login';
+  }
+
   try {
     const response = await fetch(
-        '/api/users/login', {
+        loginApiUri, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -60,19 +82,14 @@ async function loginProcess(event) {
           body: JSON.stringify(jsonData)
         });
 
-    const res = await response.json();
-
     if (!response.ok) {
-      if(res.code === "JWTE-007") {
-        emailErrorElement.innerText = "아이디, 비밀번호를 확인해주세요."
-        emailErrorElement.classList.remove('hidden')
-        return
-      }
-      alert("로그인 에러")
+      emailErrorElement.innerText = "아이디, 비밀번호를 확인해주세요."
+      emailErrorElement.classList.remove('hidden')
       return;
     }
     console.log("로그인 성공")
-    window.location.href = '/';
+    localStorage.setItem('lastRefreshTime', new Date().getTime());
+    window.location.href = response.headers.get("Location"); // 원하는 URL로 변경;
 
   } catch (error) {
     console.error(error);

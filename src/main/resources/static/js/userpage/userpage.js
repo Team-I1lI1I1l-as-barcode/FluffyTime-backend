@@ -10,22 +10,29 @@ const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
-
-// 모달 관련 요소
-const blockFollow = getElement('block_follow'); // 유저 차단
-// const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단 해제
-const modal = document.getElementById('modal');
-const overlay = document.getElementById('modal-overlay');
-const closeModalButtons = document.querySelectorAll('#block_cancel');
-
+const chatBtn = getElement('chatBtn') // 메시지 버튼
+const unblockComment = getElement('unblock_comment'); // 차단됨 문구
 // const follower_count = getElement("follower_count"); // 팔로워 수
 // const follow_count = getElement("follow_count");// 팔로우 수
 
+// div 영역
+const noPost = getElement('no_post'); // 게시물이 없을시 나올 div
+const privateAccount = getElement('private_account'); // 비공개 계정일시 나올 div
+const blockAccount = getElement('block_account'); // 차단된 게정일시 나올 div
+
+// 모달 관련 요소
+const userPageModal = document.getElementById('userPage-modal');
+const userPageOverlay = document.getElementById('userPage-modal-overlay');
+const closeModalButtons = document.querySelectorAll('#block_cancel');
+const blockFollow = getElement('block_follow'); // 유저 차단
+const blockFollowCancel = getElement('block_follow_cancel'); // 유저 차단
+const chat = getElement('chat') // 메시지 보내기
+
 // api  요청  함수
-function fetchMyPage(url, func) {
+function fetchUserPage(url, method, func) {
   console.log("fetchMyPage 실행");
   fetch(url, {
-    method: "GET", // GET 요청
+    method: method,
     headers: {
       'Content-Type': 'application/json'
 
@@ -35,7 +42,7 @@ function fetchMyPage(url, func) {
     if (!response.ok) {
       return response.json().then(errorData => {
         // 에러 메시지 포함하여 alert 호출
-        console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
+        console.log("fetchUserPage 응답 에러 발생 >> " + errorData.message);
         alert('Error: ' + errorData.message);
         window.location.href = "/";
       });
@@ -53,33 +60,39 @@ function handleUserData(data) {
   // 성공적인 응답 시
   console.log("handleUserData 응답 Success");
   nickName.innerText = data.nickname;
-  if (data.postsList === null) {
-    posts_count.innerText = 0;
-  } else {
-    posts_count.innerText = data.postsList.length;
-  }
+  posts_count.innerText = data.postsList === null ? 0 : data.postsList.length;
   pet_name.innerText = data.petName;
-  if (data.petSex === "none") {
-    pet_sex.innerText = " ";
-  } else {
-    pet_sex.innerText = data.petSex;
-  }
-  if (data.petAge === null || data.petAge === 0) {
-    pet_age.innerText = " ";
-  } else {
-    pet_age.innerText = data.petAge + "살";
-  }
-  if (data.fileUrl !== null) {
-    console.log("등록된 프로필 사진을 불러옵니다.");
-    img.src = data.fileUrl;
-  }
+  pet_sex.innerText = data.petSex === "none" ? " " : data.petSex;
+  pet_age.innerText = (data.petAge === null || data.petAge === 0) ? " "
+      : data.petAge + "살";
   intro.innerText = data.intro;
 
-  // 해당 유저의 게시글이 있을시 렌더링 처리
-  if (data.postsList !== null) {
-    renderPosts(data.postsList);
-  } else { // 게시글이 없을시 관련 문구 출력
-    getElement('no_post').style.display = 'flex';
+  if (data.fileUrl !== null) {
+    console.log("등록된 프로필 사진 로드");
+    img.src = data.fileUrl;
+  }
+  // 해당 유저를 차단 했을때
+  if (data.isUserBlocked) {
+    blockAccount.style.display = "flex"; // 차단한 계정  div 활성화
+    blockFollow.style.display = "none"; // (모달) 유저 차단 비활성화
+    blockFollowCancel.style.display = "block"; // (모달) 유저 차단 해제 활성화
+    followBtn.style.display = "none"; // 팔로우 버튼 비활성화
+    unblockComment.style.display = "inline-flex"; // 유저 차단된 문구 활성화
+  } else {
+    // 해당 유저의 계정이 공개 계정일때
+    if (data.publicStatus === "1") {
+      (data.postsList !== null) ? renderPosts(data.postsList)
+          : noPost.style.display = 'flex';
+
+    } else { // 해당 유저의 계정이 비공개 계정일때
+      // 추후 팔로우 관계일시에는 게시물이 보이게 변경할 예정
+      // if (data.postsList !== null) {
+      //   renderPosts(data.postsList);
+      // } else {
+      // 게시글이 없을시 문구 출력
+      privateAccount.style.display = 'flex';
+      // }
+    }
   }
 }
 
@@ -89,42 +102,99 @@ function renderPosts(posts) {
   const postListElement = document.querySelector('#post_list');
 
   posts.forEach(post => {
-    const img = document.createElement('img'); // <img> 요소 생성
-    img.src = post.imageUrl; // 이미지 URL 설정
-    img.alt = post.postId;
+    if (post.fileUrl != null) {
+      if (post.mineType === "video/mp4") {
+        const video = document.createElement('video'); // <img> 요소 생성
+        video.src = post.fileUrl;
+        // 비디오 자동 재생 끄기
+        video.addEventListener('play', function (event) {
+          event.preventDefault();
+          this.pause();
+        });
+        // 비디오 클릭시 해당 게시물 상세보기 모달창 열기
+        video.addEventListener('click', event => {
 
-    // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
-    img.addEventListener('click', event => {
-      console.log(img.alt + "게시물 클릭 ");
-      window.location.href = `/posts/detail/${img.alt}`;
-    });
+          window.location.href = `/posts/detail/${post.postId}`;
+        });
+        postListElement.appendChild(video); // <video>를 섹션에 추가
 
-    postListElement.appendChild(img); // <img>를 섹션에 추가
+      } else {
+        const img = document.createElement('img'); // <img> 요소 생성
+        img.src = post.fileUrl; // 이미지 URL 설정
+        img.alt = post.postId;
+
+        // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+        img.addEventListener('click', event => {
+          console.log(img.alt + "게시물 클릭 ");
+          window.location.href = `/posts/detail/${img.alt}`;
+        });
+        postListElement.appendChild(img); // <img>를 섹션에 추가
+      }
+    }
   });
+}
+
+async function checkFollowStatus() {
+  console.log("checkFollowStatus() 실행")
+  const response = await fetch(
+      '/api/follow/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+}
+
+// 채팅 보내기
+function sendMessage(nickname) {
+  // 메시지 방 생성
+  fetchUserPage(`/chat/topics/${encodeURIComponent(nickname)}`, "PUT",
+      serverResponse);
+}
+
+// 채팅관련 서버 결과를 처리하는 함수
+function serverResponse(data) {
+  if (data.success) {
+    console.log("요청 성공")
+    window.location.href = "/chat";
+  } else {
+    console.log("요청 실패")
+  }
 }
 
 // 초기화 함수
 function initialize() {
   const nickname = window.location.pathname.split('/').pop();
 
-  // 초기화 - 마이페이지 정보 불러오기
-  fetchMyPage(`/api/users/pages?nickname=${encodeURIComponent(nickname)}`,
+  // 초기화 - 유저페이지 정보 불러오기
+  fetchUserPage(`/api/users/pages?nickname=${encodeURIComponent(nickname)}`,
+      "GET",
       handleUserData);
 
   // 초기화 - ... 버튼시 파일 선택 버튼이 눌림
   more.addEventListener('click', event => {
     event.preventDefault();
     // 모달 창 열기
-    overlay.style.display = 'block';
-    modal.classList.add('show');
+    userPageOverlay.style.display = 'block';
+    userPageModal.classList.add('show');
   });
-// 모달 닫기
+//초기화 - 모달 닫기
   closeModalButtons.forEach(button => {
     button.addEventListener('click', (event) => {
       event.preventDefault();
-      modal.classList.remove('show');
-      overlay.style.display = 'none';
+      userPageModal.classList.remove('show');
+      userPageOverlay.style.display = 'none';
     });
+  });
+
+  // 초기화 - 메시지 보내기(모달)
+  chat.addEventListener('click', () => {
+    sendMessage(nickname);
+  });
+
+  // 초기화 - 메시지 보내기(아이콘)
+  chatBtn.addEventListener('click', () => {
+    sendMessage(nickname);
   });
 }
 

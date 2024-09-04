@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+  <script th:src="@{/js/chat/chat.js}" defer></script>
+  <link rel="stylesheet" href="/css/chat/chat.css">
+  <link rel="stylesheet" href="/css/post/createPost.css">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/post/createPost.js}" defer></script>
+</head>
+
+<body>
+<div class="page-layout">
+  <div class="container">
+    <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+  </div>
+  <div class="chat_page_container">
+
+    <!-- 사이드바 - 채팅방 목록 -->
+    <div class="chat_list_sidebar">
+      <h3>메시지 방</h3>
+      <div id="chat-room-list" class="chat-room-list">
+      </div>
+    </div>
+
+    <!-- 채팅 구역  -->
+    <div class="chat-container">
+      <div class="chat-header" id="chat-header">
+        <img id="recipient_profile">
+        <div>
+          <div class="username" id="recipient"></div>
+          <div class="user-id" id="recipient_pet_name"></div>
+        </div>
+      </div>
+
+      <div class="empty-message" id="empty-message">
+        <img src="https://cdn-icons-png.flaticon.com/512/2983/2983785.png" alt="Empty Icon">
+        <h2>내 메시지</h2>
+        <p>친구나 그룹에 메시지를 보내거나 메시지를 보내보세요</p>
+        <button id="sendMessage">메시지방 만들기</button>
+      </div>
+
+      <div id="chatMessages" class="chat-messages"></div>
+
+      <div id="chat-input" class="chat-input">
+        <input type="text" id="message" placeholder="Enter message">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+  <th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+  <!-- 임시 저장 모달 -->
+  <th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
+</div>
+<script th:src="@{/js/mypage/mypageNav.js}"></script>
+</body>
+</html>

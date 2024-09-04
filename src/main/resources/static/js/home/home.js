@@ -45,20 +45,39 @@ document.addEventListener('DOMContentLoaded', function () {
       const postElement = document.createElement('div');
       postElement.classList.add('home-post');
 
-      postElement.innerHTML = `
+      const fileExtension = post.imageUrl.split('.').pop().toLowerCase(); // 파일 확장자 추출
+
+      // 파일 확장자에 따라 img 또는 video 요소를 생성
+      if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
+          === 'webm') {
+        postElement.innerHTML = `
         <div class="home-post-header">
-          <img src="${post.userImage
-      || 'https://via.placeholder.com/40'}" alt="${post.userName || 'User'}">
-          <strong>${post.userName || 'Anonymous'}</strong>
+          <img src="${post.profileImageUrl}" alt="${post.nickname}">
+          <strong>${post.nickname || 'Anonymous'}</strong>
         </div>
         <div class="home-post-content">
-          <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
+          <video controls class="active" src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
           <p>${post.content || ''}</p>
         </div>
         <div class="home-post-footer">
           <div id="comment-list-${post.postId}">Loading comments...</div>
         </div>
       `;
+      } else {
+        postElement.innerHTML = `
+          <div class="home-post-header">
+            <img src="${post.profileImageUrl}" alt="${post.nickname}">
+            <strong>${post.nickname || 'Anonymous'}</strong>
+          </div>
+          <div class="home-post-content">
+            <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
+            <p>${post.content || ''}</p>
+          </div>
+          <div class="home-post-footer">
+            <div id="comment-list-${post.postId}">Loading comments...</div>
+          </div>
+        `;
+      }
 
       //게시글 클릭 시 상세 페이지로 이동
       postElement.addEventListener('click', () => {
@@ -134,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetchPosts(currentPage).then(posts => {
       if (posts.length > 0) {
+        console.log(posts)
         renderPosts(posts);
         currentPage++;
         console.log(posts.length);

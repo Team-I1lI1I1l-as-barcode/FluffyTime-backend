@@ -1,4 +1,4 @@
-.modal, .draft-modal {
+.modal {
   display: none;
   position: fixed;
   top: 0;
@@ -8,6 +8,7 @@
   background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
+  z-index: 2;
 }
 
 .modal-content, .draft-modal-content {
@@ -37,24 +38,21 @@
 
 .post-left-content {
   flex: 3.5;
-  border-right: 1px solid #ccc;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 0;
   position: relative;
+  height: 100%;
 }
 
 .post-left-content img {
-  max-width: 100%;
-  max-height: 100%;
-  margin-bottom: 20px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  object-fit: cover; /* 이미지를 꽉 차게 */
 }
 
 .post-left-content.fullscreen img {
@@ -120,6 +118,9 @@
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
 }
 
 .profile {
@@ -135,14 +136,14 @@
   margin-right: 10px;
 }
 
-.post-right-content textarea {
-  resize: none;
-  width: calc(100% - 20px);
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-  border: none;
-}
+/*.post-right-content textarea {*/
+/*  resize: none;*/
+/*  width: calc(100% - 20px);*/
+/*  margin-bottom: 10px;*/
+/*  padding: 10px;*/
+/*  border-radius: 4px;*/
+/*  border: none;*/
+/*}*/
 
 .post-right-content input[type="text"] {
   width: calc(100% - 20px);
@@ -241,9 +242,8 @@ input:checked + .slider:before {
 }
 
 .complete {
-  display: none;
   text-align: center;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .post-textarea {
@@ -264,9 +264,10 @@ hr {
 
 .temp-posts {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* 세로로 정렬 */
   align-items: center;
   margin-top: 20px;
+  width: 100%; /* 부모 요소의 너비에 맞추기 */
 }
 
 .temp-post {
@@ -279,15 +280,26 @@ hr {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
   width: 80%;
-  word-wrap: break-word;
-  white-space: pre-wrap;
 }
 
-.temp-post p {
-  margin: 0;
+.post-details {
+  display: flex;
+  flex-direction: row; /* 가로로 정렬 */
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.post-content {
   flex: 1;
-  overflow-wrap: break-word;
+  display: flex;
+  align-items: center;
   word-break: break-all;
+}
+
+.post-date {
+  margin-left: 10px;
+  white-space: nowrap;
 }
 
 .delete-link {
@@ -300,57 +312,150 @@ hr {
   text-decoration: underline;
 }
 
-.delete-icon {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: url('/static/image/post/trash.jpg') no-repeat center center;
-  background-size: contain;
-  width: 30px;
-  height: 30px;
-  border: none;
-  cursor: pointer;
+#complete-container {
+  display: none; /* 기본적으로 숨겨두기 */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000; /* 다른 요소들 위에 표시되도록 설정 */
+  text-align: center; /* 텍스트 가운데 정렬 */
 }
-
-.post-details {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: center;
-}
-
-.post-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.post-date {
-  margin-left: 10px;
-  white-space: nowrap;
-}
-
 
 .tag-list {
   margin-top: 10px;
+  max-height: 150px; /* 최대 높이 설정 */
+  overflow-y: auto; /* 세로 스크롤바 추가 */
 }
 
 .tag {
   display: inline-block;
-  background-color: #e0f7fa;
-  color: #007bff;
+  align-items: center;
+  background-color: rgba(255, 204, 0, 0.2);
+  color: #7f7f7f;
   padding: 5px 10px;
   margin: 5px;
-  border-radius: 20px;
+  border-radius: 10px;
   font-size: 14px;
+  position: relative;
   cursor: pointer;
 }
 
-.tag:hover {
-  background-color: #b2ebf2;
-}
-
-.tag .remove-tag {
+.remove-btn {
+  background: none;
+  border: none;
+  color: #CCCCCC;
+  font-weight: bold;
   margin-left: 8px;
   cursor: pointer;
+  font-size: 14px;
+}
+
+.remove-btn:hover {
+  color: #cc0000;
+}
+
+.modal-content .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content .header h3 {
+  margin: 20px;
+}
+
+#tempPostsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.post-left-content video {
+  width: 100%; /* 비디오의 너비를 100%로 설정 */
+  height: 100%; /* 비디오의 높이를 100%로 설정 */
+  object-fit: cover; /* 비디오가 컨테이너에 맞게 잘리도록 설정 */
+  aspect-ratio: 1/1; /* 비디오를 1:1 비율로 설정 */
+}
+
+.post-textarea-container {
+  position: relative; /* 부모 요소를 기준으로 절대 위치 설정 */
+}
+
+/*멘션 관련*/
+.textarea-wrapper {
+  position: relative;
+}
+
+textarea.post-textarea {
+  resize: none;
+  width: calc(100% - 20px);
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  border: none;
+  background: transparent; /* Transparent background to see the preview beneath */
+  color: transparent; /* Hide text color to only show the preview */
+  overflow: hidden; /* Hide overflow to match with preview */
+  white-space: pre-wrap; /* Preserve whitespace and line breaks */
+  position: relative;
+  z-index: 2; /* Ensure textarea is above the preview */
+}
+
+.content-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 20px);
+  height: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: none;
+  background: white; /* Background color for the preview */
+  color: black; /* Text color in the preview */
+  z-index: 1; /* Behind the textarea */
+  pointer-events: none; /* Prevent interaction with the preview div */
+  overflow: hidden; /* Hide overflow */
+  white-space: pre-wrap; /* Preserve whitespace and line breaks */
+}
+
+.mention-text {
+  color: #4848ff;
+  font-size: 16px;
+  font-weight: 700;
+  background-color: #d3edff;
+  padding: 5px 7px 5px 7px;
+  border-radius: 20px;
+}
+
+.mention-suggestions {
+  position: absolute;
+  top: 60%; /* Position below the textarea */
+  left: 0;
+  width: calc(100% - 20px);
+  max-height: 200px; /* Maximum height for the suggestions box */
+  overflow-y: auto; /* Enable vertical scrolling if needed */
+  background: white; /* Background color for suggestions */
+  border-radius: 4px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Shadow for better visibility */
+  z-index: 3; /* Ensure suggestions box is above other content */
+}
+
+.mention-suggestion {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-suggestion:hover {
+  background-color: #f0f0f0; /* Highlight color on hover */
+}
+
+.mention-item {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.mention-item:hover {
+  background-color: #f0f0f0; /* 항목을 마우스로 오버할 때의 배경색 */
 }

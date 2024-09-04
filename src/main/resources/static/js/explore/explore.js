@@ -65,23 +65,36 @@ async function populateGrid() {
     if (list.length === 0) {
       console.log('모든 데이터를 불러왔습니다. 더 이상 로드하지 않습니다.');
       // 플래그 설정하여 무한 스크롤을 멈춤
-      isLoading = true;  // 로드를 멈추기 위해 isLoading을 true로 유지합니다.
+      isLoading = true;  // 로드를 멈추기 위해 isLoading을 true로 유지한다.
       hideSpinner();
       return;
     }
 
     list.forEach(item => {
-      const img = document.createElement('img');
-      img.src = item.imageUrl;
-      img.alt = item.content; //혹시 에레로 이미지가 없으면 게시물 내용이 대신 나타나게 함
-      img.className = 'grid-item';
+      // const img = document.createElement('img');
+      let mediaElement;
+      const fileExtension = item.imageUrl.split('.').pop().toLowerCase(); // 파일 확장자 추출
+
+      // 파일 확장자에 따라 img 또는 video 요소를 생성
+      if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
+          === 'webm') {
+        mediaElement = document.createElement('video'); // 동영상 요소 생성
+        mediaElement.controls = true; // 동영상 컨트롤러 표시
+        mediaElement.classList.add('video-preview'); // .video-preview 클래스 추가
+      } else {
+        mediaElement = document.createElement('img'); // 이미지 요소 생성
+      }
+
+      mediaElement.src = item.imageUrl;
+      mediaElement.alt = item.content; //혹시 에레로 이미지가 없으면 게시물 내용이 대신 나타나게 함
+      mediaElement.className = 'grid-item';
 
       // 이미지 클릭 이벤트 리스너 추가
-      img.addEventListener('click', () => {
-        openPopup(item.imageUrl);
+      mediaElement.addEventListener('click', () => {
+        window.location.href = `posts/detail/${item.postId}`;
       });
 
-      gridContainer.appendChild(img);
+      gridContainer.appendChild(mediaElement);
     });
     currentPage++;
   } catch (error) {
@@ -134,56 +147,6 @@ function hideSpinner() {
   console.log('hideSpinner() 함수 실행');
 
 }
-
-// 팝업을 열고 이미지를 표시하는 함수
-function openPopup(imageUrl) {
-  const popup = document.getElementById('popup');
-  const popupImage = document.getElementById('popup-image');
-  popupImage.src = imageUrl;
-  popup.style.display = 'flex';
-}
-
-// 팝업을 닫는 함수
-function closePopup() {
-  const popup = document.getElementById('popup');
-  popup.style.display = 'none';
-}
-
-// 팝업 닫기 버튼에 이벤트 리스너 추가
-document.getElementById('popup-close').addEventListener('click', closePopup);
-document.getElementById('popup').addEventListener('click', (event) => {
-  if (event.target.id === 'popup') {
-    closePopup();
-  }
-});
-
-// 사이드바 마이페이지 코드
-document.getElementById("mypageBtn").addEventListener('click', event => {
-  //window.location.href = "/mypage/test";
-  fetch("/api/mypage/info", {
-    method: "GET", // GET 요청
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => {
-    if (!response.ok) {
-      return response.json().then(errorData => {
-        // 에러 메시지 포함하여 alert 호출
-        console.log("fetchMyPage 응답 에러 발생 >> " + errorData.message);
-        alert('Error: ' + errorData.message);
-        window.location.href = "/";
-      });
-    }
-    return response.json();
-  })  // 서버에서 보낸 응답을 JSON 형식으로 변환
-  .then(data => {
-    window.location.href = `/mypage/${data.nickname}`;
-  })
-  .catch(error => {
-    console.log("서버 오류 발생:" + error);
-  });
-});
 
 // 페이지 로드 시작 시 그리드를 채움
 window.onload = async () => {

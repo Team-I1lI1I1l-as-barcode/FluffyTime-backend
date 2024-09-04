@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>게시물 작성하기</title>
+</head>
+<body>
+<div th:fragment="createModal" class="modal" id="postModal" style="display: none;">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closePostCreationModal()">&times;</button> <!-- 모달 닫기 버튼 -->
+    <div class="post-header">새 게시물 만들기</div>
+    <form id="postForm" class="post-content" enctype="multipart/form-data" method="post">
+      <div class="post-left-content" id="leftContent">
+        <div id="imagePreviewContainer">
+          <img id="imagePreview" src="/image/post/photo.jpg">
+        </div>
+        <p id="dragDropText">사진과 동영상을 여기에 끌어다 놓으세요</p>
+        <input type="file" id="images" name="images" accept="image/*,video/*" multiple
+               onchange="previewImages(event)" style="display: none;"> <!-- 이미지 및 동영상 파일 선택 입력 -->
+        <button type="button" class="share-button" id="shareButton"
+                onclick="document.getElementById('images').click()">이미지 선택
+        </button>
+        <button class="nav-button prev" id="prevButton" style="display: none;"
+                onclick="prevImage(event)">&#10094;
+        </button>
+        <button class="nav-button next" id="nextButton" style="display: none;"
+                onclick="nextImage(event)">&#10095;
+        </button>
+      </div>
+      <div class="post-right-content">
+        <div>
+          <div class="profile">
+            <img id="profileImage" src="" alt="사용자의 프로필 이미지">
+            <span id="nicknameDisplay"></span>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea id="content" name="content" class="post-textarea" rows="10"
+                      placeholder="내용을 입력하세요" maxlength="2200" required
+                      oninput="handleInput()"></textarea>
+            <!-- 멘션 기능을 위한 사용자 목록 컨테이너 -->
+            <div id="contentPreview" class="content-preview"></div>
+            <div id="mentionSuggestions" class="mention-suggestions"></div>
+          </div>
+          <div class="char-count" id="charCount">0 / 2200</div>
+          <hr>
+          <!--태그-->
+          <div class="tags-container">
+            <div id="tagList" class="tag-list"></div>
+            <input type="text" id="tagsInput" name="tags" class="post-textarea"
+                   placeholder="#태그 입력 후 엔터를 누르세요" maxlength="20">
+          </div>
+
+          <hr>
+          <div class="toggle">
+            <label for="hideLikes">다른 사람에게 좋아요 수 숨기기</label>
+            <label class="switch">
+              <input type="checkbox" name="hideLikes" id="hideLikes">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <hr>
+          <div class="toggle">
+            <label for="disableComments">댓글 기능 해제</label>
+            <label class="switch">
+              <input type="checkbox" name="disableComments" id="disableComments">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <hr>
+        <div class="options">
+          <a href="javascript:void(0);" onclick="openDraftModal()">임시 저장 글 불러오기</a>
+          <a href="javascript:void(0);" onclick="saveAsTemp(event)">임시저장</a>
+          <a href="javascript:void(0);" onclick="submitPost(event)">공유하기</a>
+        </div>
+      </div>
+    </form>
+    <div class="complete" id="complete-container" style="display: none;">
+      <img src="/image/post/complete.jpg">
+      <p>게시물 등록이 완료되었습니다!</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

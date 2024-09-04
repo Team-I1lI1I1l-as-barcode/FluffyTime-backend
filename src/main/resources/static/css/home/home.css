@@ -33,7 +33,8 @@
   padding: 0.5rem 0 0 0.2rem;
 }
 
-.home-post-content img {
+.home-post-content img,
+.home-post-content video {
   width: 100%;
   max-width: 600px;
   height: auto;

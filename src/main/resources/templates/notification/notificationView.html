@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>알림</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/post/createPost.css">
+  <link rel="stylesheet" href="/css/notification/notification.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+  <script th:src="@{/js/post/createPost.js}" defer></script>
+</head>
+<body>
+<div class="container">
+  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+  <main class="content-container">
+    <div class="content">
+      <h2 class="notification-title">알림</h2>
+      <div id="all" class="tab-content active">
+        <ul id="allNotificationList" class="notification-list"></ul>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="/js/notification/notification.js"></script>
+<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+<!-- 임시 저장 모달 -->
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
+
+<script th:src="@{/js/home/home.js}"></script>
+<script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
+</body>
+</html>

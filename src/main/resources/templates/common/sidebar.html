@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>sidebar</title>
+</head>
+<body>
+<aside class="sidebar" th:fragment="sidebar">
+  <h2><a href="/">FluffyTime</a></h2>
+  <ul>
+    <li>
+      <span class="material-symbols-rounded">home</span>
+      <a href="/">홈</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">search</span>
+      <a href="/search">검색</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">explore</span>
+      <a href="/explore">탐색 탭</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">slideshow</span>
+      <a href="/reels">릴스</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">add_box</span>
+      <a href="javascript:void(0);" id="openModalBtn">만들기</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">person</span>
+      <a id="mypageBtn">프로필</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">favorite</span>
+        <a href="/notifications">알림</a>
+    </li>
+    <li>
+      <span class="material-symbols-rounded">mail</span>
+      <a href="/chat">DM</a>
+     </li>
+  </ul>
+  <div class="adminPageBtn hidden">
+    <span class="material-symbols-rounded">shield_person</span>
+    <a href="/admin" id="adminPageBtn">관리자페이지</a>
+  </div>
+  <div class="logout">
+    <span class="material-symbols-rounded">logout</span>
+    <a id="logout">로그아웃</a>
+  </div>
+  <div class="more-menu">
+    <span class="material-symbols-rounded">menu</span>
+    <a href="#">더보기</a>
+  </div>
+</aside>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>FluffyTime 관리자페이지 - 통계</title>
+  <link rel="stylesheet" href="/css/admin/statistics/statistics.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+</head>
+<body>
+<div class="container">
+  <th:block th:replace="~{admin/common/sidebar :: sidebar}"></th:block>
+  <main class="main-container statistics">
+    <div class="header">
+      <h2>FluffyTime 관리자 페이지 - 통계</h2>
+    </div>
+    <div class="user-statistics-container">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>사용자 가입 현황</h3>
+          <button id="userChartRefreshBtn" class="refresh-btn">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+        </div>
+        <canvas id="userCountChart"></canvas>
+      </div>
+      <div class="notice-container">
+        <h3>실시간 가입자 알림</h3>
+        <div class="notice">
+          <ul id="joinNotice" class="notification-list"></ul>
+        </div>
+      </div>
+    </div>
+    <div class="contents-statistics-container">
+      <div class="chart-container">
+        <div class="chart-header">
+          <h3>콘텐츠 업로드 현황</h3>
+          <button id="contentChartRefreshBtn" class="refresh-btn">
+            <span class="material-symbols-rounded">refresh</span>
+          </button>
+        </div>
+        <canvas id="contentsCountChart"></canvas>
+      </div>
+      <div class="notice-container">
+        <h3>실시간 컨텐츠 등록 알림</h3>
+        <div class="notice">
+          <ul id="postNotice" class="notification-list"></ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:src="@{/js/admin/statistics/user.js}"></script>
+<script th:src="@{/js/admin/statistics/notification.js}" defer></script>
+<script th:src="@{/js/common/logout.js}"></script>
+</html>

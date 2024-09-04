@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>가입하기</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/join/join.css">
+</head>
+<body>
+<div class="container">
+  <h1>회원가입</h1>
+  <form method="post" id="joinForm">
+    <p class="email-notice notice hidden"></p>
+    <div class="input">
+      <label for="email"></label>
+      <input type="text" id="email" name="email" required placeholder="이메일을 입력해주세요.">
+      <button type="button" id="checkEmailBtn" class="checkBtn">중복확인</button>
+    </div>
+
+    <p class="password-notice notice hidden"></p>
+    <div class="input">
+      <label for="password"></label>
+      <input type="password" id="password" name="password" required placeholder="비밀번호를 입력해주세요.">
+    </div>
+
+    <div class="input">
+      <label for="checkPassword"></label>
+      <input type="password" id="checkPassword" name="checkPassword" required placeholder="비밀번호 확인">
+    </div>
+
+    <p class="nickname-notice notice hidden"></p>
+    <div class="input">
+      <label for="nickname"></label>
+      <input type="text" id="nickname" name="nickname" required placeholder="사용할 유저명을 입력해주세요.">
+      <button type="button" id="checkNicknameBtn" class="checkBtn">중복확인</button>
+    </div>
+
+    <button type="submit" id="joinBtn" class="btn submit">회원가입</button>
+  </form>
+</div>
+<script th:src="@{/js/join/join.js}"></script>
+</body>
+</html>

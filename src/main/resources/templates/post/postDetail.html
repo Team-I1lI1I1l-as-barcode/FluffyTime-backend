@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시물 상세보기</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/post/postDetail.css">
+  <link rel="stylesheet" href="/css/comment/comment.css">
+  <link rel="stylesheet" href="/css/like/like.css">
+  <link rel="stylesheet" href="/css/follow/follow.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+  <script th:src="@{/js/post/postDetail.js}" defer></script>
+  <script th:src="@{/js/follow/follow.js}" defer></script>
+  <script th:src="@{/js/comment/comment.js}"></script>
+  <script th:src="@{/js/like/commentLike.js}"></script>
+  <script th:src="@{/js/like/replyLike.js}"></script>
+  <script th:src="@{/js/like/postLike.js}"></script>
+</head>
+<body>
+<div class="modal" id="postModal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closePostDetailModal()">&times;</button> <!-- 모달 닫기 버튼 -->
+    <div class="left-content">
+      <div id="imageContainer" class="image-slider"></div>
+      <button class="nav-button prev" id="prevButton" onclick="prevImage(event)"
+              style="display: none;">&#10094;
+      </button>
+      <button class="nav-button next" id="nextButton" onclick="nextImage(event)"
+              style="display: none;">&#10095;
+      </button>
+    </div>
+    <div class="right-content">
+      <div class="header">
+        <div id="profile-linkBox" class="profile">
+          <img id="profileImage" src="/image/profile/profile.png" alt="사용자의 프로필 이미지">
+          <!-- 기본 이미지 -->
+          <div class="profile-info">
+            <div>
+              <span id="nicknameDisplay"></span>
+              <span><button class="follow_button">팔로우</button></span>
+            </div>
+            <div id="petInfo">
+              <span id="petNameDisplay"></span>
+              <span id="petSexDisplay"></span>
+              <div id="petAgeWrapper">
+                <span id="petAgeDisplay"></span>살
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="more-options" onclick="toggleDropdownMenu()">⋮</div> <!-- 더보기 옵션 버튼 -->
+      </div>
+      <div id="postContent" class="post-content"></div><!-- 게시물 내용 컨테이너 -->
+      <div id="tagList" class="tag-list"></div><!--태그 목록-->
+      <div id="comment-list" class="comment-list"></div> <!-- 댓글 목록 -->
+      <div class="postDetail-footer-box">
+        <div class="liked-box-post">
+          <!-- 좋아요 버튼 및 유저 목록 모달을 호출하는 부분 -->
+          <span id="likeButton" class="like-button material-icons"
+                onclick="toggleLikePost(postId, this, document.getElementById('likeCountSpan'))">
+          favorite_border
+        </span>
+          <span id="likeCountSpan" class="like-count"
+                onclick="fetchUsersWhoLikedPost(postId).then(showLikeUserModalPost)">0</span>
+        </div>
+        <div class="bookmark-section">
+          <img id="bookmarkIcon"
+               src="https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/bookmark/default/24px.svg"
+               alt="북마크 아이콘" onclick="toggleBookmark()">
+        </div>
+      </div>
+      <div class="comment-form">
+        <div style="position: relative; width: 100%;">
+              <textarea id="comment-content" placeholder="댓글 달기 .." required
+                        oninput="handleInput()"></textarea>
+          <div id="contentPreview" class="content-preview"></div>
+        </div>
+        <button id="commentButton">작성</button>
+      </div>
+      <div id="mentionSuggestions" class="mention-suggestions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="dropdown-menu" id="dropdownMenu"> <!-- 드롭다운 메뉴 -->
+  <a href="javascript:void(0);" class="delete" style="display:none;" onclick="deletePost()">삭제</a>
+  <a href="javascript:void(0);" class="edit" style="display:none;" onclick="editPost()">수정</a>
+  <a href="javascript:void(0);" class="like-hide" style="display:none;" onclick="toggleLikeVisibility()">다른 사람에게 좋아요 수 숨기기</a>
+  <a href="javascript:void(0);" class="comment-toggle" style="display:none;" onclick="toggleComments()">댓글 기능 해제</a>
+
+  <a href="javascript:void(0);" class="report" style="display: none;">신고</a>
+  <a href="javascript:void(0);" class="copy-link" onclick="copyLinkToClipboard()">링크 복사</a>
+  <a href="javascript:void(0);" onclick="toggleDropdownMenu()">취소</a>
+</div>
+
+<div id="like-user-modal" class="modal-like">
+  <div class="modal-content-like">
+    <div class="like-modal-top">
+      <h2>좋아요</h2>
+      <span class="close-like" onclick="closeModalLike()">&times;</span>
+    </div>
+    <div class="user-list">
+      <!-- 유저 목록이 동적으로 추가됩니다 -->
+    </div>
+  </div>
+</div>
+</body>
+</html>

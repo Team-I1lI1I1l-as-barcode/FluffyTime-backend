@@ -1,0 +1,151 @@
+.modal-like {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.like-modal-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1px solid #bfbfbf;
+  padding: 10px 20px 10px 20px;
+}
+
+.like-modal-top h2 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+
+.like-modal-top .close-like {
+  position: absolute;
+  right: 5%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  font-weight: bold;
+  color: #aaa;
+  cursor: pointer;
+}
+
+.modal-content-like {
+  background-color: #fefefe;
+  margin: 12% auto;
+  border: 1px solid #888;
+  width: 400px;
+  border-radius: 20px;
+  height: 500px;
+}
+
+.close-like:hover,
+.close-like:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.user-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #bfbfbf;
+  padding: 10px 20px 10px 20px;
+}
+
+.user .profile-img {
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.user .nickname {
+  font-size: 18px;
+}
+
+.liked-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+}
+
+.liked-box-post {
+  display: flex;
+  align-items: center;
+}
+
+/* like-button 스타일 */
+.like-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+  color: #b0b0b0; /* 기본 회색 색상 */
+}
+
+.like-count {
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 0.5rem;
+}
+
+.liked-box-post .like-count {
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 0.5rem;
+  margin-top: 0.1rem;
+}
+
+.like-button.liked {
+  color: #ed4956; /* 인스타그램 좋아요 색상 (빨간색) */
+  animation: like-animation 0.5s forwards;
+}
+
+.like-button:hover {
+  transform: scale(1.1);
+  background: none;
+}
+
+/* 좋아요 애니메이션 */
+@keyframes like-animation {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.nickname-intro {
+  display: flex;
+  flex-direction: column;
+}
+
+.follow-button {
+  margin-left: auto;
+}

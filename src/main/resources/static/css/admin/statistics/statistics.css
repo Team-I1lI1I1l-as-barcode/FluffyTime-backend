@@ -1,0 +1,135 @@
+@import url('../common/adminStyles.css');
+@import url('../common/sidebar.css');
+
+h2 {
+  font-family: "Sansita One", sans-serif;
+  font-size: 1.5em;
+  font-weight: 800;
+  font-style: normal;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 1rem 0;
+}
+
+h3 {
+  font-family: "Sansita One", sans-serif;
+  font-size: 1.5em;
+  font-weight: 800;
+  font-style: normal;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.header {
+  width: 80%;
+}
+
+/*사용자 통계 박스 css*/
+/*컨텐츠 통계 박스 css*/
+
+.user-statistics-container,
+.contents-statistics-container
+{
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding: 1rem;
+  margin: 1rem 0;
+  height: 600px;
+  width: 80%;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.1); /* 기본 그림자 */
+  box-sizing: border-box;
+}
+
+.user-statistics-container .chart-container,
+.contents-statistics-container .chart-container
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  width: 70%;
+  margin-right: 1.5rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.user-statistics-container .notice-container,
+.contents-statistics-container .notice-container
+{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 30%;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--primary-color);
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.notification-list {
+  margin: 10px 0;
+  overflow-x: auto;
+  max-height: 450px;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+}
+
+.refresh-btn {
+  margin: 0 10px;
+  border: none;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  transition: box-shadow 0.1s ease, transform 0.1s ease;
+  border-radius: 5px; /* 버튼 모서리를 둥글게 합니다. */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2); /* 기본 그림자 효과 */
+}
+
+.refresh-btn:active {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4); /* 눌렸을 때 그림자 효과를 더 진하게 변경 */
+  transform: scale(0.95); /* 버튼이 눌렸을 때 약간 작아지는 효과 */
+}
+
+
+/* Define the fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-item {
+  box-sizing: border-box;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+
+
+
