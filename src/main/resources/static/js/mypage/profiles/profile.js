@@ -13,7 +13,8 @@ const petCategory = getElement("pet_category");
 const publicStatus = getElement("public_status");
 const deleteAccountBtn = getElement("delete_account");
 const img = getElement('img'); // 이미지 미리보기
-
+const usernamePattern = /^[a-zA-Z0-9_-]+$/;
+const nicknameCheck = getElement('nickname_check');
 // 프로필 사진 관련 모달 요소
 const profileImageUpload = getElement('profile_image_upload'); // 사진 업로드 a태그
 const profileImageDelete = getElement('profile_image_delete'); // 현재 사진 삭제 a태그
@@ -31,6 +32,8 @@ const blockUserListBtn = getElement('block_user_list'); // 차단 유저 리스�
 // 입력 값 변화 체크 요소
 let originalIntroValue = ""; // intro 필드의 원래 값
 let originalPetNameValue = ""; // pet_name 필드의 원래 값
+let checkUsernameResult;
+let lastUsername;
 
 // 반려동물 나이 옵션 설정 함수
 function setPetAgeOptions(maxAge) {
@@ -44,12 +47,21 @@ function petOptionsStatus(status) {
   petSex.disabled = !status;
   petAge.disabled = !status;
   petCategory.disabled = !status;
+
 }
 
 //  유저명 변경시 중복 버튼 활성화
 username.addEventListener('keyup', () => {
   checkUsernameBtn.disabled = false;
 });
+
+// 다른 정보가 바뀌고 + 유저명이 바뀔시 유저명 중복 확인 했는지 확인
+function check() {
+  console.log(username.value);
+  console.log(lastUsername);
+  return (username.value !== lastUsername)
+      && checkUsernameResult
+}
 
 // 프로필 수정 요청 DTO 구성
 function createRequestDto(nickname) {
@@ -153,6 +165,7 @@ function handleProfileData(data) {
   petAge.value = data.petAge;
   petCategory.value = data.petCategory;
   publicStatus.checked = data.publicStatus === "1";
+  lastUsername = data.nickname;
 
   if (data.fileUrl !== null) {
     console.log("등록된 프로필 사진을 불러옵니다.");
@@ -222,10 +235,13 @@ function saveProfileData(data, nickname) {
 // 중복 확인 함수
 function checkUsername(data) {
   if (data.result) {
+    checkUsernameResult = false;
     alert("이미 존재합니다.");
   } else {
     alert("사용 가능합니다");
+    checkUsernameResult = true;
     submitBtn.disabled = false; // 제출하기 버튼 활성화
+
   }
 }
 
@@ -320,17 +336,26 @@ function initialize() {
   // 초기화 - 중복 버튼 클릭시 api 요청
   checkUsernameBtn.addEventListener('click', event => {
     event.preventDefault();
-    fetchProfile("GET", checkUsername,
-        `/api/mypage/profiles/check-username?nickname=${encodeURIComponent(
-            username.value)}`);
+    if (usernamePattern.test(createRequestDto(nickname).username)) {
+      fetchProfile("GET", checkUsername,
+          `/api/mypage/profiles/check-username?nickname=${encodeURIComponent(
+              username.value)}`);
+    } else {
+      nicknameCheck.style.display = "flex";
+    }
   });
 
   // 초기화 - 제출 버튼 클릭시 프로필 정보 업데이트
   submitBtn.addEventListener('click', event => {
     event.preventDefault();
-    const nickname = window.location.pathname.split('/').pop();
-    fetchProfileJson("PATCH", saveProfileData, "/api/mypage/profiles/edit",
-        createRequestDto(nickname));
+    if (check()) {
+      const nickname = window.location.pathname.split('/').pop();
+
+      fetchProfileJson("PATCH", saveProfileData, "/api/mypage/profiles/edit",
+          createRequestDto(nickname));
+    } else {
+      alert('유저명이 변경되었습니다. 중복확인을 진행해주세요.');
+    }
   });
 
   // 초기화 - 회원 탈퇴 클릭시 회원 탈퇴

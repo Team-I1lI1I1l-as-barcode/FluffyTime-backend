@@ -26,6 +26,7 @@ import com.fluffytime.global.config.aws.S3Service;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -109,7 +110,10 @@ public class MyPageService {
                     : post.getPostImages().getFirst().getMimetype();
                 return new PostResponse(post.getPostId(), filePath, mineType);
             })
-            .collect(Collectors.toList());
+            .collect(Collectors.collectingAndThen(Collectors.toList(), list -> { // 역순
+                Collections.reverse(list);
+                return list;
+            }));
     }
 
     // 북마크 게시물 리스트  메서드

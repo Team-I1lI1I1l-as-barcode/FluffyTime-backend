@@ -14,6 +14,7 @@ import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,10 @@ public class UserPageService {
                     : post.getPostImages().getFirst().getMimetype();
                 return new PostResponse(post.getPostId(), filePath, mineType);
             })
-            .collect(Collectors.toList());
+            .collect(Collectors.collectingAndThen(Collectors.toList(), list -> { // 역순
+                Collections.reverse(list);
+                return list;
+            }));
     }
 
     // UserPageInformationDto 생성 메서드

@@ -132,7 +132,6 @@
 .input-group {
   display: flex;
   align-items: center; /* 요소들을 수직 가운데 정렬 */
-  margin-bottom: 1.2rem;
 }
 
 .input-group input[type="text"] {
@@ -246,6 +245,14 @@ select {
 #public_status:checked + label::before {
   color: #fff;
   left: 5px;
+}
+
+/*닉네임 체크 결과*/
+#nickname_check {
+  display: none;
+  color: red;
+  font-size: 13px;
+  margin-bottom: 1rem;
 }
 
 /* 제출 버튼 */
@@ -535,7 +542,6 @@ select {
   /* 입력 필드 그룹 */
   .input-group input[type="text"] {
     margin-right: 0;
-    margin-bottom: 1rem;
   }
 
   /* 계정 공개 스위치 */
@@ -601,7 +607,6 @@ select {
   /* 입력 필드 그룹 */
   .input-group input[type="text"] {
     padding: 0.5rem;
-    margin-bottom: 0.8rem;
   }
 
   /* 계정 공개 스위치 */
