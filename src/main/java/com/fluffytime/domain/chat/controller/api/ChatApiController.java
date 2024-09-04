@@ -56,6 +56,7 @@ public class ChatApiController {
         return ResponseEntity.status(HttpStatus.OK).body(recipientInfoResponse);
     }
 
+
     // 채팅 내역 가져오기
     @GetMapping("/log/{roomName}")
     public ResponseEntity<ChatLogResponse> chatLog(

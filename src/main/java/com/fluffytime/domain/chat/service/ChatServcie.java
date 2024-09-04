@@ -75,7 +75,6 @@ public class ChatServcie {
         return ChatRoomListResponse.builder()
             .recipient(recipient)
             .chatRoomList(chatRoomList)
-            .profileImages(profileImages)
             .recentChat(recentChatList)
             .build();
     }

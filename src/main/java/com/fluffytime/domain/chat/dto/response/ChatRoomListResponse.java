@@ -18,6 +18,5 @@ public class ChatRoomListResponse {
 
     private Set<String> recipient; // 수신자
     private Set<String> chatRoomList; // 채널 이름
-    private Set<String> profileImages; // 수신자 프로필 사진
     private List<String> recentChat; // 각 채널별 최근 메시지
 }
