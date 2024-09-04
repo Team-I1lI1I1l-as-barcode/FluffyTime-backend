@@ -2,9 +2,9 @@ package com.fluffytime.domain.search.controller.api;
 
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.board.entity.PostImages;
-import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.board.entity.enums.TempStatus;
 import com.fluffytime.domain.search.service.ExploreService;
+import com.fluffytime.domain.user.entity.Profile;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +81,7 @@ public class ExploreRestController {
 
             item.put("imageUrl", imageUrl);
 
-            String profileImageUrl = "https://via.placeholder.com/40";
+            String profileImageUrl = "/image/profile/profile.png";
 //            위에 프로필 사진 없는 경우 기본 이미지 넣기
 
             Profile profile = post.getUser().getProfile();

@@ -110,6 +110,7 @@ li {
   font-size: 16px;
   line-height: 24px;
   padding-top: 0.04rem;
+  cursor: pointer;
 }
 
 .sidebar ul li a:hover {
@@ -129,7 +130,7 @@ li {
 
 .logout {
   position: absolute;
-  bottom: 3rem; /* 사이드바 하단에 위치 */
+  bottom: 0; /* 사이드바 하단에 위치 */
   width: 100%;
   margin-bottom: 2rem;
   display: flex;
@@ -140,7 +141,7 @@ li {
 
 .adminPageBtn {
   position: absolute;
-  bottom: 6rem; /* 사이드바 하단에 위치 */
+  bottom: 3rem; /* 사이드바 하단에 위치 */
   width: 100%;
   margin-bottom: 2rem;
   display: flex;
@@ -177,6 +178,7 @@ li {
   font-size: 16px;
   line-height: 24px;
   padding-top: 0.07rem;
+  cursor: pointer;
 }
 
 .adminPageBtn a {
