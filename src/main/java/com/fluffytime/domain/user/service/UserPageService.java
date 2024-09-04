@@ -146,6 +146,7 @@ public class UserPageService {
     }
 
     // 유저 차단 목록 생성  메서드
+    @Transactional
     public List<Map<String, String>> BlockList(Set<String> blockedUsers) {
         // 사용자명 - 프로필 사진 url를 담을 리스트
         List<Map<String, String>> userBlockList = new ArrayList<>();

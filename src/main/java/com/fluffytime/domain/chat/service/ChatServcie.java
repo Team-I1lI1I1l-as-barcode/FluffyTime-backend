@@ -78,6 +78,7 @@ public class ChatServcie {
     }
 
     // nickname(로그인한 유저)을 기준으로 모든 채팅방에서 나와 채팅중인 사람을 찾아 Set에 저장
+    @Transactional
     public Set<String> findRecipientList(String nickname) {
         log.info("findRecipientList 실행");
         // 수신자가 없다면 null 값 반환
@@ -86,6 +87,7 @@ public class ChatServcie {
     }
 
     // nickname(로그인한 유저)을 기준으로 본인이 속한 채팅방을 찾아 Set에 저장
+    @Transactional
     public Set<String> findChatRoomList(String nickname) {
         log.info("findChatRoomList 실행");
         // 채팅방이 없다면 null 값 반환
@@ -109,6 +111,7 @@ public class ChatServcie {
     }
 
     // 각 채팅방별로 마지막 채팅 내역 가져오기
+    @Transactional
     public String recentChatLog(String roomName) {
         log.info("recentChatLog 실행");
         Long chatRoomId = findByRoomId(roomName);
@@ -125,6 +128,7 @@ public class ChatServcie {
     }
 
     // 모든 채팅 내역 가져오기
+    @Transactional
     public ChatLogResponse chatLog(String roomName, HttpServletRequest request) {
         log.info("chatLog 실행");
         List<String> chatLog = new ArrayList<>();
@@ -151,6 +155,7 @@ public class ChatServcie {
     }
 
     // 토픽 목록 불러오기
+    @Transactional
     public ChatRoomListResponse getTopicList(HttpServletRequest request) {
         log.info("getTopicList 실행");
         // 로그인한 유저의 닉네임 가져오기
@@ -244,6 +249,7 @@ public class ChatServcie {
     }
 
     // 수신자 정보 불러오기
+    @Transactional
     public RecipientInfoResponse recipientInfo(String nickname) {
         log.info("RecipientInfoResponse 실행");
         User user = myPageService.findUserByNickname(nickname);

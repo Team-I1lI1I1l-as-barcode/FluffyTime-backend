@@ -207,6 +207,7 @@ public class MyPageService {
     }
 
     // 닉네임 중복 여부 검증 메서드
+    @Transactional
     public CheckUsernameResponse nicknameExists(String nickname) {
         log.info("nicknameExists 실행 >> CheckUsernameDto 구성");
         return CheckUsernameResponse.builder()
