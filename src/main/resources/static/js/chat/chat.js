@@ -8,11 +8,11 @@ const emptyMessage = getElement('empty-message'); // 메시지방에 접속 안�
 const chatHeader = getElement('chat-header'); // 채팅 구역 div
 
 const sendMessageBtn = getElement('sendMessage'); // 메시지방 만들기 버튼
-const recipientProfile = getElement('recipient_profile'); //  수신자 프로필 사진
+const recipientProfile = getElement('recipient_profile'); // 수신자 프로필 사진
 const recipient = getElement('recipient'); // 수신자 이름
 const recipientPetName = getElement('recipient_pet_name'); // 수신자 반려동물 이름
 
-// 추적를 위한 temp
+// 추적을 위한 temp
 let currentSelectedChatItem = null; // 현재 선택된 chatItem을 추적하는 변수
 let roomRecipient = null; // 현재 채널 방 주인(본인)이 누구인지 추적하는 변수
 
@@ -28,12 +28,12 @@ function initialize() {
 
 window.onload = initialize;
 
-// 메시지방 만들기 클릭시 검색으로 이동
+// 메시지방 만들기 클릭 시 검색으로 이동
 sendMessageBtn.addEventListener("click", () => {
-  window.location.href = "/search"
+  window.location.href = "/search";
 });
 
-// api 요청 함수
+// API 요청 함수
 function fetchChat(url, method, func) {
   console.log("fetchChat 실행");
   fetch(url, {
@@ -58,19 +58,9 @@ function fetchChat(url, method, func) {
   });
 }
 
-// 토픽 목록 블러오기 api 응답 처리 함수 - chat 페이지에 관련된 모든 내용 불러오기
+// 토픽 목록 불러오기 API 응답 처리 함수 - chat 페이지에 관련된 모든 내용 불러오기
 function chatRoomInfo(data) {
-  const chatRoomDiv = document.createElement('div'); // 채팅방 정보를  div(프로필사진, 수신자, 최근 채팅 내역)
-  const chatRoom = document.createElement('p'); // 수신자 명(ui에서 보이는 채팅방 이름)
-  const recentChat = document.createElement('p'); // 최근 채팅 내역
-  const profileImage = document.createElement('img'); // 프로필 이미지
-  let recipient; // 수신자(채팅내역에서 어느 사람이 수신자인지 가려내기 위한 변수)
   let count = 0;
-
-  // 태그에 class 추가
-  chatRoomDiv.classList.add('chat-item');
-  profileImage.classList.add('profile_Image');
-  recentChat.classList.add('recent_chat');
 
   // 채팅방이 없을 경우
   if (data.chatRoomList === null) {
@@ -80,19 +70,30 @@ function chatRoomInfo(data) {
     roomList.innerHTML = '';
     // 채팅방 리스트 출력하기
     data.chatRoomList.forEach(roomName => {
-      recipient = data.recipient[count]; // 수신자 이름 설정
+      const chatRoomDiv = document.createElement('div'); // 채팅방 정보를 담을 div(프로필사진, 수신자, 최근 채팅 내역)
+      const chatRoom = document.createElement('p'); // 수신자 명(ui에서 보이는 채팅방 이름)
+      const recentChat = document.createElement('p'); // 최근 채팅 내역
+      const profileImage = document.createElement('img'); // 프로필 이미지
+      let recipient = data.recipient[count]; // 수신자 이름 설정
+
+      // 태그에 class 추가
+      chatRoomDiv.classList.add('chat-item');
+      profileImage.classList.add('profile_Image');
+      recentChat.classList.add('recent_chat');
+
       if (ws) {
         ws.close(); // 기존 WebSocket 연결 종료
       }
-      // websocket 실시간 메시징 기능
+      // WebSocket 실시간 메시징 기능
       setupWebSocket(roomName, recipient, recentChat);
+
       // 각 채팅방별 수신자이름, 메시지방, 프로필 사진, 최근 채팅 내역 가져오기
       count = loadChatRoomList(data, count, chatRoomDiv, chatRoom, recentChat,
-          profileImage, recipient);
+          profileImage, roomList);
 
-      // 각 채팅방 영역 클릭시
+      // 각 채팅방 영역 클릭 시
       chatRoomDiv.addEventListener('click', () => {
-        //메시지 출력 구역 보이기
+        // 메시지 출력 구역 보이기
         chatMessages.style.display = "flex";
         // 채팅 입력바 보이기
         getElement('chat-input').style.display = "flex";
@@ -116,7 +117,7 @@ function chatRoomInfo(data) {
 
 // 채팅 목록 불러오기 함수
 function loadChatRoomList(data, count, chatRoomDiv, chatRoom, recentChat,
-    profileImage, recipient) {
+    profileImage, roomList) {
 
   chatRoom.textContent = data.recipient[count]; // 메시지방 이름 설정
   profileImage.src = data.profileImages[count]; // 수신자 프로필 사진 설정
@@ -130,7 +131,7 @@ function loadChatRoomList(data, count, chatRoomDiv, chatRoom, recentChat,
   return count;
 }
 
-// 채팅방 클릭시 해당 채팅방 영역 배경 색 변경(사용자가 어떤 방에 속했는지 알기 위함) 함수
+// 채팅방 클릭 시 해당 채팅방 영역 배경색 변경 함수
 function RoomChangeColor(chatRoomDiv, recentChat, recipient) {
   // 이전에 선택된 chatRoomDiv 배경색 초기화
   if (currentSelectedChatItem && currentSelectedChatItem !== chatRoomDiv) {
@@ -143,7 +144,7 @@ function RoomChangeColor(chatRoomDiv, recentChat, recipient) {
   console.log(`${recipient}와 채팅을 시작합니다.`);
 }
 
-// 수신자 정보 가져오는 api 응답 처리 함수
+// 수신자 정보 가져오는 API 응답 처리 함수
 function recipientInfo(data) {
   recipient.innerText = data.nickname;
   recipientPetName.innerText = data.petName;
@@ -151,10 +152,9 @@ function recipientInfo(data) {
 
   emptyMessage.style.display = "none";
   chatHeader.style.display = "flex";
-
 }
 
-// 메시지 내역을 가져오는 api 응답 처리 함수
+// 메시지 내역을 가져오는 API 응답 처리 함수
 function chatLog(data) {
   chatMessages.innerHTML = '';
   if (data.chatLog != null) {
@@ -162,7 +162,7 @@ function chatLog(data) {
     data.chatLog.forEach(log => {
       const messageElement = document.createElement("p");
       messageElement.innerText = log.split(":").pop().trim();
-      if (data.sender === log.split(":")[0].trim()) {// 메시지를 보내는 사람과 실제 채널에서 발신자와 같다면
+      if (data.sender === log.split(":")[0].trim()) { // 메시지를 보내는 사람과 실제 채널에서 발신자와 같다면
         messageElement.classList.add('sender');
       } else {
         messageElement.classList.add('receiver');
@@ -173,17 +173,13 @@ function chatLog(data) {
   }
 }
 
-// 채팅과 관련해서 요청 보낸 api 응답 처리 함수(채팅방 참여 여부)
+// 채팅과 관련해서 요청 보낸 API 응답 처리 함수(채팅방 참여 여부)
 function ServerResponse(data) {
   console.log(data.success ? "요청 성공" : "요청 실패");
 }
 
 // 웹소켓을 사용하여 실시간으로 메시지를 주고 받는 기능 구현 함수
 function setupWebSocket(roomName, recipient, recentChat) {
-  if (ws) {
-    ws.close(); // 기존 WebSocket 연결 종료
-  }
-  // ws = new WebSocket(`ws://${window.location.hos}/ws?room=${roomName}`);
   ws = new WebSocket(`wss://fluffytime.kro.kr/ws?room=${roomName}`);
 
   ws.onmessage = function (event) {
