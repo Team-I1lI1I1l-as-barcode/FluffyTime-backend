@@ -49,7 +49,7 @@ body, html {
 /* 오버레이 스타일 */
 .reels-overlay {
   position: absolute;
-  bottom: 0;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%); /* 오버레이를 동영상 중앙에 맞추기 위해 사용 */
   width: 50vh; /* 동영상 너비와 동일하게 설정 */
@@ -93,9 +93,32 @@ body, html {
   height: 150px;
   cursor: pointer;
   position: absolute;
-  bottom: 10px; /* 아래쪽에 위치 */
+  bottom: -60px; /* 아래쪽에 위치 */
   right: -40px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
   z-index: 10; /* 동영상 위에 표시되도록 설정 */
+}
+
+/* 좋아요 아이콘과 개수 스타일 */
+.like-container {
+  position: absolute;
+  bottom: 40px; /* 북마크 바로 위에 배치 */
+  right: -37.5px; /* 북마크와 같은 오른쪽 위치 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 11; /* 북마크보다 더 위에 표시 */
+}
+
+.like-button {
+  font-size: 30px; /* 아이콘 크기 설정 */
+  color: black; /* 아이콘 색상 */
+  cursor: pointer;
+}
+
+.like-count {
+  font-size: 14px; /* 좋아요 개수 글자 크기 */
+  color: black; /* 글자 색상 */
+  margin-top: 4px; /* 좋아요 버튼과 개수 사이의 간격 */
 }
 
 /* 토글 아이콘 스타일 */
@@ -104,7 +127,7 @@ body, html {
   height: 10px;
   cursor: pointer;
   position: absolute;
-  bottom: 40px; /* 북마크 아이콘 바로 아래에 위치 */
+  bottom: -30px; /* 북마크 아이콘 바로 아래에 위치 */
   right: -40px;
   z-index: 10;
 }
