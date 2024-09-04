@@ -4,7 +4,7 @@ const postNotice = document.getElementById('postNotice')
 
 window.addEventListener("load",async () => {
   console.log("Page loaded, initializing...");
-  connect(); // SSE 연결
+  connect();
   await loadNotifications("api/notifications/admin/joinNotification", joinNotice);
   await loadNotifications("api/notifications/admin/postNotification", postNotice);
 })
@@ -23,13 +23,13 @@ function connect() {
 
   eventSource.addEventListener("connect", (e) => {
     const {data: receivedConnectData } = e;
-    console.log("connect event data: ", receivedConnectData); // 'connected'
+    console.log("connect event data: ", receivedConnectData);
   })
 
   eventSource.addEventListener("notification", async (e) => {
     const notification = JSON.parse(e.data);
 
-    console.log("connect event data: ", notification); // 'connected'
+    console.log("connect event data: ", notification);
     if (notification["type"] === "JOIN_NOTIFICATION") {
       addNotification(notification, joinNotice)
 
@@ -40,7 +40,7 @@ function connect() {
 
   eventSource.onclose = () => {
     console.log("SSE connection closed");
-    eventSource = null; // 연결이 닫힌 후에는 eventSource를 null로 설정하여 추적 초기화
+    eventSource = null;
   };
 }
 

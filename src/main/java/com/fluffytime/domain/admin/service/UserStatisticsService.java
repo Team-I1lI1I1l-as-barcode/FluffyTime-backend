@@ -1,5 +1,6 @@
 package com.fluffytime.domain.admin.service;
 
+import static com.fluffytime.domain.admin.util.constants.StatisticsDateRange.USER_DAILY_DATE;
 import static com.fluffytime.domain.admin.util.convertor.StatisticsConvertor.convertToDate;
 
 import com.fluffytime.domain.admin.dto.response.DailyCountStatisticsResponse;
@@ -15,10 +16,11 @@ public class UserStatisticsService {
 
     private final UserRepository userRepository;
 
+    // 일일 유저 가입자 수 불러오기 (31일)
     @Transactional
     public DailyCountStatisticsResponse getDailyUserCounts() {
         LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusDays(31);
+        LocalDateTime startDate = endDate.minusDays(USER_DAILY_DATE.getDate());
 
         return DailyCountStatisticsResponse.builder()
             .dailyCountsStatistics(

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class StatisticsConvertor {
+    // LocalDateTime -> LocalDate 변경 메서드
     public static HashMap<LocalDate, Long> convertToDate(List<DailyCount> dailyCounts) {
         HashMap<LocalDate, Long> convertedData = new HashMap<>();
         dailyCounts.forEach(dailyCount -> {

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+// 역할 확인 정보 반환 인터셉터 (admin 역할 확인)
 @Slf4j
 @RequiredArgsConstructor
 public class AdminCheckInterceptor implements HandlerInterceptor {

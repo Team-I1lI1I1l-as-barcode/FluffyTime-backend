@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class EmailService {
     private final JavaMailSender javaMailSender;
 
+    // html 메일 전송 메서드
     public SucceedSendEmailResponse sendHtmlMail(String email, String subject,
         EmailContentBuilder emailBuilder) {
 
