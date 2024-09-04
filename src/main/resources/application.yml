@@ -12,11 +12,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    #    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-#        enable_lazy_load_no_trans: true
+    #        enable_lazy_load_no_trans: true
     open-in-view: false
 
   mail:
@@ -41,14 +41,14 @@ spring:
       #  mongo 설정
     mongodb:
       uri: ${MONGO_URI}
-      
+
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
 
-#oauth2
-#registration
+  #oauth2
+  #registration
   security:
     oauth2:
       client:

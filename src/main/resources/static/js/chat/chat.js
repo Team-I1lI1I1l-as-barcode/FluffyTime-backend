@@ -81,6 +81,9 @@ function chatRoomInfo(data) {
     // 채팅방 리스트 출력하기
     data.chatRoomList.forEach(roomName => {
       recipient = data.recipient[count]; // 수신자 이름 설정
+      if (ws) {
+        ws.close(); // 기존 WebSocket 연결 종료
+      }
       // websocket 실시간 메시징 기능
       setupWebSocket(roomName, recipient, recentChat);
       // 각 채팅방별 수신자이름, 메시지방, 프로필 사진, 최근 채팅 내역 가져오기
@@ -180,9 +183,8 @@ function setupWebSocket(roomName, recipient, recentChat) {
   if (ws) {
     ws.close(); // 기존 WebSocket 연결 종료
   }
-
   // ws = new WebSocket(`ws://${window.location.hos}/ws?room=${roomName}`);
-  ws = new WebSocket(`ws://fluffytime.kro.kr:8080/ws?room=${roomName}`);
+  ws = new WebSocket(`ws://fluffytime.kro.kr/ws?room=${roomName}`);
 
   ws.onmessage = function (event) {
     console.log('Message received: ', event.data);
