@@ -6,7 +6,6 @@ btn.addEventListener('click', async () => {
         '/api/users/logout', {
           method: 'POST'
         });
-    window.location.href = "/login"
   } catch (error) {
     console.error(error);
   }
