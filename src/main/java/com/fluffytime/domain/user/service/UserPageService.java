@@ -35,9 +35,8 @@ public class UserPageService {
     private final MyPageService myPageService;
     private final UserBlockDao userBlockDao;
 
-
     // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환하는 메서드
-    @Transactional
+
     public List<PostResponse> postList(User user) {
         return user.getPostList().stream()
             // TempStatus가 TEMP가 아닌것만 필터링(임시저장글 제외)
@@ -121,7 +120,7 @@ public class UserPageService {
     }
 
     // 유저 차단 여부  메서드
-    @Transactional
+
     public boolean isUserBlocked(String blocker, String targetUser) {
         log.info("isUserBlocked 실행");
         Set<String> blockedUsers = userBlockDao.getUserBlockList(blocker);
