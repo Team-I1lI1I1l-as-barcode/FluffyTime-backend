@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function () {
           === 'webm') {
         postElement.innerHTML = `
         <div class="home-post-header">
-          <img src="${post.profileImageUrl}" alt="${post.nickname}">
+          <img src="${post.profileImageUrl
+        || '/image/profile/profile.png'}" alt="${post.nickname}">
           <strong>${post.nickname || 'Anonymous'}</strong>
         </div>
         <div class="home-post-content">
@@ -67,7 +68,8 @@ document.addEventListener('DOMContentLoaded', function () {
       } else {
         postElement.innerHTML = `
           <div class="home-post-header">
-            <img src="${post.profileImageUrl}" alt="${post.nickname}">
+            <img src="${post.profileImageUrl
+        || '/image/profile/profile.png'}" alt="${post.nickname}">
             <strong>${post.nickname || 'Anonymous'}</strong>
           </div>
           <div class="home-post-content">
