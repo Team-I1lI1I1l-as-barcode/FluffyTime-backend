@@ -17,7 +17,7 @@ function connect() {
     eventSource.close();
   }
 
-  eventSource = new EventSource("https://fluffytime.kro.kr/api/notifications/admin/connect")
+  eventSource = new EventSource("/api/notifications/admin/connect")
 
   eventSource.onopen = () => console.log("SSE connection opened")
 

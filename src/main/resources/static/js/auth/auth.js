@@ -78,4 +78,4 @@ window.addEventListener("beforeunload", () => {
 });
 
 console.log('Script loaded');
-window.addEventListener("load", onPageLoad);
+window.addEventListener("DOMContentLoaded", onPageLoad);
