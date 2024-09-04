@@ -190,7 +190,7 @@ function setupWebSocket(roomName, recipient, recentChatElement) {
   if (ws) {
     ws.close(); // 기존 WebSocket 연결 종료
   }
-  ws = new WebSocket(`ws://fluffytime.kro.kr:8080/ws?room=${roomName}`);
+  ws = new WebSocket(`wss://fluffytime.kro.kr/ws?room=${roomName}`);
 
   ws.onmessage = function (event) {
     console.log('Message received: ', event.data);
