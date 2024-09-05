@@ -12,7 +12,7 @@ const img = getElement('img'); // 이미지 미리보기
 const more = getElement('more'); // ``` 버튼
 const chatBtn = getElement('chatBtn') // 메시지 버튼
 const unblockComment = getElement('unblock_comment'); // 차단됨 문구
-
+const mention = getElement('mention'); // 멘션된 게시물 리스트
 // div 영역
 const noPost = getElement('no_post'); // 게시물이 없을시 나올 div
 const privateAccount = getElement('private_account'); // 비공개 계정일시 나올 div
@@ -81,6 +81,12 @@ function handleUserData(data) {
     if (data.publicStatus === "1") {
       (data.postsList !== null) ? renderPosts(data.postsList)
           : noPost.style.display = 'flex';
+      // 저장됨 클릭시 멘션된 게시글 렌더링 처리
+      mention.addEventListener('click', (event) => {
+        const postListElement = document.querySelector('#post_list');
+        postListElement.innerHTML = ''; // 기존 리스트 비우기
+        renderPosts(data.tagePostList);
+      });
 
     } else { // 해당 유저의 계정이 비공개 계정일때
       // 게시글이 없을시 문구 출력

@@ -10,6 +10,7 @@ const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
 const profileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
 const bookmark = getElement('bookmark');
+const mention = getElement('mention');
 
 // 기본 api  요청  함수
 function fetchMyPage(url, method, func) {
@@ -97,6 +98,13 @@ function handleProfileData(data) {
     const postListElement = document.querySelector('#post_list');
     postListElement.innerHTML = ''; // 기존 리스트 비우기
     renderPosts(data.bookmarkList);
+  });
+
+  // 저장됨 클릭시 멘션된 게시글 렌더링 처리
+  mention.addEventListener('click', (event) => {
+    const postListElement = document.querySelector('#post_list');
+    postListElement.innerHTML = ''; // 기존 리스트 비우기
+    renderPosts(data.tagePostList);
   });
 }
 
