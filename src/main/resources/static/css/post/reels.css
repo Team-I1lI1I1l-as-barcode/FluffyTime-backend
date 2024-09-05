@@ -35,7 +35,6 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: flex-end; /* 오버레이가 동영상 하단에 위치하도록 설정 */
-  /*background-color: #fff;*/
   margin-bottom: 2px;
 }
 
@@ -87,24 +86,31 @@ body, html {
   color: white; /* 대비를 위해 색상 설정 */
 }
 
+.reelsBtn-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: -50px; /* 아래쪽에 위치 */
+  right: -35px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
+  z-index: 10; /* 동영상 위에 표시되도록 설정 */
+}
+
 /* 북마크 아이콘 스타일 - 동영상 오른쪽 옆에 위치 */
 .bookmark-icon {
   width: 30px;
-  height: 150px;
+  margin: 5px 0;
   cursor: pointer;
-  position: absolute;
-  bottom: -60px; /* 아래쪽에 위치 */
-  right: -40px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
   z-index: 10; /* 동영상 위에 표시되도록 설정 */
 }
 
 .like-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 30px;
-  height: 150px;
   cursor: pointer;
-  position: absolute;
-  bottom: -10px; /* 아래쪽에 위치 */
-  right: -43px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
   z-index: 10; /* 동영상 위에 표시되도록 설정 */
   color: black; /* 기본 회색 색상 */
 }
@@ -134,11 +140,9 @@ body, html {
 
 .like-count {
   width: 30px;
-  height: 150px;
+  text-align: center;
   cursor: pointer;
-  position: absolute;
-  bottom: -95px; /* 아래쪽에 위치 */
-  right: -51.5px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
+  margin-bottom: 5px;
   z-index: 10; /* 동영상 위에 표시되도록 설정 */
   color: black; /* 기본 회색 색상 */
   font-size: 12px;
@@ -149,9 +153,6 @@ body, html {
   width: 30px;
   height: 10px;
   cursor: pointer;
-  position: absolute;
-  bottom: -30px; /* 북마크 아이콘 바로 아래에 위치 */
-  right: -40px;
   z-index: 10;
 }
 
@@ -159,7 +160,7 @@ body, html {
 .reels-toggle-menu {
   position: absolute;
   bottom: 0; /* 토글 아이콘 바로 아래에 위치 */
-  right: -180px;
+  right: -130px;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

@@ -42,6 +42,7 @@ public class SecurityConfig {
                     "/join/**",
                     "/api/users/**",
                     "/api/auth/**",
+                    "/api/notifications/**",
                     "/error",
                     "/static/**",
                     "/js/**",
@@ -50,7 +51,6 @@ public class SecurityConfig {
                     "/favicon.ico"
                 ).permitAll()
                 .requestMatchers(
-                    "/api/notifications/admin/**",
                     "/api/admin/**",
                     "/admin/**"
                 ).hasRole(ROLE_ADMIN.getNoneHeaderName())

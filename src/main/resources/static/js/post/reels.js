@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', function() {
     profileContainer.appendChild(nickname);
     overlay.appendChild(profileContainer);
     overlay.appendChild(content);
-    overlay.appendChild(bookmarkIcon);
 
     // 좋아요 버튼 생성
     const likeButton = document.createElement('button');
@@ -104,6 +103,9 @@ document.addEventListener('DOMContentLoaded', function() {
     likeButton.addEventListener('click', () => {
       toggleLikePost(reel.postId, likeButton);
     });
+
+    const reelsBtnContainer = document.createElement("div");
+    reelsBtnContainer.className = "reelsBtn-container"
 
     // 좋아요 수 표시
     const likeCountSpan = document.createElement('span');
@@ -135,10 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
       toggleMenu.classList.toggle('reels-hidden'); // 메뉴의 표시/숨기기 토글
     });
 
-    overlay.appendChild(likeButton); // 좋아요 버튼 추가
-    overlay.appendChild(likeCountSpan); // 좋아요 수 추가
-    overlay.appendChild(toggleIcon); // 토글 아이콘 추가
-    overlay.appendChild(toggleMenu); // 토글 메뉴 추가
+    reelsBtnContainer.appendChild(likeButton); // 좋아요 버튼 추가
+    reelsBtnContainer.appendChild(likeCountSpan); // 좋아요 수 추가
+    reelsBtnContainer.appendChild(bookmarkIcon);
+    reelsBtnContainer.appendChild(toggleIcon); // 토글 아이콘 추가
+    reelsBtnContainer.appendChild(toggleMenu); // 토글 메뉴 추가
+    overlay.appendChild(reelsBtnContainer)
     reelItem.appendChild(video);
     reelItem.appendChild(overlay);
     reelsContainer.appendChild(reelItem); // 완성된 릴스 항목을 컨테이너에 추가

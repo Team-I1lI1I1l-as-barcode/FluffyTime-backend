@@ -67,7 +67,7 @@ function connectSSE(userId) {
   eventSource.onerror = event => {
     console.error("SSE connection error:", event);
     eventSource.close();
-    setTimeout(connectSSE, 10000); // 연결 오류 시 10초 후 재연결 시도
+    setTimeout(connectSSE(userId), 10000); // 연결 오류 시 10초 후 재연결 시도
   };
 
   eventSource.addEventListener('notification', event => {

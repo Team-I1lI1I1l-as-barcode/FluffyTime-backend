@@ -97,6 +97,7 @@ public class ChatServcie {
 
 
     // nickname(로그인한 유저)을 기준으로 본인이 속한 모든 채팅방의 최신 채팅 내역을 찾아  List에 저장
+    @Transactional
     public List<String> findChatLog(Set<String> chatRoomList) {
         log.info("findChatLog 실행");
         List<String> recentChatList = new ArrayList<>();
