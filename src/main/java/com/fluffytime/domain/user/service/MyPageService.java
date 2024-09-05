@@ -1,9 +1,10 @@
 package com.fluffytime.domain.user.service;
 
 import com.fluffytime.domain.board.entity.Bookmark;
+import com.fluffytime.domain.board.entity.Mention;
 import com.fluffytime.domain.board.entity.enums.TempStatus;
 import com.fluffytime.domain.board.repository.BookmarkRepository;
-import com.fluffytime.domain.notification.repository.AdminNotificationRepository;
+import com.fluffytime.domain.board.repository.MentionRepository;
 import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.domain.user.dto.request.ProfileRequest;
 import com.fluffytime.domain.user.dto.response.CheckUsernameResponse;
@@ -28,6 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,9 +46,9 @@ public class MyPageService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final AdminNotificationRepository adminNotificationRepository;
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
+    private final MentionRepository mentionRepository;
 
     // 사용자 조회(userId로 조회) 메서드
     @Transactional
@@ -114,27 +116,60 @@ public class MyPageService {
 
     // 북마크 게시물 리스트 메서드
     public List<PostResponse> bookmarkList(List<Bookmark> bookmarks) {
-        return bookmarks.stream()
+        List<PostResponse> postResponses = bookmarks.stream()
             .map(Bookmark::getPost) // 북마크에서 게시글을 가져옴
             .map(post -> {
-                // 첫 번째 이미지의 파일 경로를 가져옴
+                // 첫 번째 이미지의 파일 경로와 MIME 타입을 가져옴
                 String filePath = post.getPostImages().isEmpty() ? null
                     : post.getPostImages().get(0).getFilepath();
-                String mineType = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
-                    : post.getPostImages().getFirst().getMimetype();
-                return new PostResponse(post.getPostId(), filePath, mineType);
+                String mimeType = post.getPostImages().isEmpty() ? null // 이미지가 없을 경우 null 저장
+                    : post.getPostImages().get(0).getMimetype(); // 수정: getFirst() -> get(0)
+
+                // PostResponse 객체로 변환
+                return new PostResponse(post.getPostId(), filePath, mimeType);
             })
             .collect(Collectors.toList());
+
+        // 역순으로 정렬
+        Collections.reverse(postResponses);
+
+        return postResponses;
     }
+
+
+    // 태그된 게시물 리스트 메서드
+    public List<PostResponse> tagePostList(List<Mention> mentions) {
+        List<PostResponse> postResponses = mentions.stream()
+            .map(Mention::getPost) // Mention에서 Post 객체를 가져옴
+            .filter(Objects::nonNull) // Post가 null이 아닌 것만 처리
+            .map(post -> {
+                // 첫 번째 이미지의 파일 경로와 MIME 타입을 가져옴
+                String filePath = post.getPostImages().isEmpty() ? null
+                    : post.getPostImages().get(0).getFilepath();
+                String mimeType = post.getPostImages().isEmpty() ? null
+                    : post.getPostImages().get(0).getMimetype();
+
+                // PostResponse 객체로 변환
+                return new PostResponse(post.getPostId(), filePath, mimeType);
+            })
+            .collect(Collectors.toList());
+
+        // 역순으로 정렬
+        Collections.reverse(postResponses);
+
+        return postResponses;
+    }
+
 
     // MyPageInformationDto 생성 메서드
     public MyPageInformationResponse createResponseDto(String nickname,
         List<PostResponse> postsList,
-        List<PostResponse> bookmarkList, Profile profile) {
+        List<PostResponse> bookmarkList, List<PostResponse> tagePostList, Profile profile) {
         return MyPageInformationResponse.builder()
             .nickname(nickname) // 닉네임
             .postsList(postsList) // 유저의 게시물 리스트
             .bookmarkList(bookmarkList) // 북마크 리스트
+            .tagePostList(tagePostList) // 태그된 게시물 리스트
             .petName(profile.getPetName()) // 반려동물 이름
             .petSex(profile.getPetSex()) // 반려동물 성별
             .petAge(profile.getPetAge()) // 반려동물 나이
@@ -162,8 +197,11 @@ public class MyPageService {
             List<Bookmark> bookmarks = bookmarkRepository.findByUserUserId(user.getUserId());
             List<PostResponse> bookmarkList = bookmarkList(bookmarks);
 
-            // 기능 구현후 팔로우, 팔로워 수 추가 예정
-            return createResponseDto(user.getNickname(), postsList, bookmarkList,
+            // 멘션된 게시물 리스트
+            List<Mention> postMentions = mentionRepository.findByMetionedUserAndPostIsNotNull(user);
+            List<PostResponse> tagePostList = tagePostList(postMentions);
+
+            return createResponseDto(user.getNickname(), postsList, bookmarkList, tagePostList,
                 user.getProfile());
 
         } else {

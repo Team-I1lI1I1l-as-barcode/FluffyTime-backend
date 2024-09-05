@@ -1,6 +1,8 @@
 package com.fluffytime.domain.user.service;
 
+import com.fluffytime.domain.board.entity.Mention;
 import com.fluffytime.domain.board.entity.enums.TempStatus;
+import com.fluffytime.domain.board.repository.MentionRepository;
 import com.fluffytime.domain.user.dao.UserBlockDao;
 import com.fluffytime.domain.user.dto.response.BlockUserListResponse;
 import com.fluffytime.domain.user.dto.response.PostResponse;
@@ -9,15 +11,14 @@ import com.fluffytime.domain.user.dto.response.UserPageInformationResponse;
 import com.fluffytime.domain.user.entity.Profile;
 import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.user.exception.UserPageNotFound;
-import com.fluffytime.domain.user.repository.UserRepository;
 import com.fluffytime.global.auth.jwt.exception.TokenNotFound;
-import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +31,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserPageService {
 
-    private final UserRepository userRepository;
-    private final JwtTokenizer jwtTokenizer;
     private final MyPageService myPageService;
     private final UserBlockDao userBlockDao;
+    private final MentionRepository mentionRepository;
 
     // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환하는 메서드
-
     public List<PostResponse> postList(User user) {
         return user.getPostList().stream()
             // TempStatus가 TEMP가 아닌것만 필터링(임시저장글 제외)
@@ -55,12 +54,37 @@ public class UserPageService {
             }));
     }
 
+    // 태그된 게시물 리스트 메서드
+    public List<PostResponse> tagePostList(List<Mention> mentions) {
+        List<PostResponse> postResponses = mentions.stream()
+            .map(Mention::getPost) // Mention에서 Post 객체를 가져옴
+            .filter(Objects::nonNull) // Post가 null이 아닌 것만 처리
+            .map(post -> {
+                // 첫 번째 이미지의 파일 경로와 MIME 타입을 가져옴
+                String filePath = post.getPostImages().isEmpty() ? null
+                    : post.getPostImages().get(0).getFilepath();
+                String mimeType = post.getPostImages().isEmpty() ? null
+                    : post.getPostImages().get(0).getMimetype();
+
+                // PostResponse 객체로 변환
+                return new PostResponse(post.getPostId(), filePath, mimeType);
+            })
+            .collect(Collectors.toList());
+
+        // 역순으로 정렬
+        Collections.reverse(postResponses);
+
+        return postResponses;
+    }
+
     // UserPageInformationDto 생성 메서드
     public UserPageInformationResponse createResponseDto(User user, List<PostResponse> postsList,
+        List<PostResponse> tagePostList,
         Profile profile, boolean isUserBlocked) {
         return UserPageInformationResponse.builder()
             .nickname(user.getNickname()) // 닉네임
             .postsList(postsList) // 유저의 게시물 리스트
+            .tagePostList(tagePostList) // 태그된 게시물 리스트
             .petName(profile.getPetName()) // 반려동물 이름
             .petSex(profile.getPetSex()) // 반려동물 성별
             .petAge(profile.getPetAge()) // 반려동물 나이
@@ -90,12 +114,16 @@ public class UserPageService {
             // 기존 게시물 리스트에서 필요한 데이터만(이미지) 담은 postDto 리스트로 변환
             List<PostResponse> postsList = postList(user);
 
+            // 멘션된 게시물 리스트
+            List<Mention> postMentions = mentionRepository.findByMetionedUserAndPostIsNotNull(user);
+            List<PostResponse> tagePostList = tagePostList(postMentions);
+
             // 게시물 리스트가 비어있을때
             if (postsList.isEmpty()) {
                 postsList = null;
             }
 
-            return createResponseDto(user, postsList, profile, isUserBlocked);
+            return createResponseDto(user, postsList, tagePostList, profile, isUserBlocked);
 
         } else {
             log.info("UserPageInformationDto 실행 >> 해당 유저가 존재하지 않아 NOT_FOUND_USERPAGE 예외 발생");

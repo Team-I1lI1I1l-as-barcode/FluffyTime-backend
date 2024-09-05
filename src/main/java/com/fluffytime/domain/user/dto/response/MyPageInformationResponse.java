@@ -19,6 +19,7 @@ public class MyPageInformationResponse {
     private String nickname;  // 사용자 이름
     private List<PostResponse> postsList;// 게시물 리스트
     private List<PostResponse> bookmarkList; // 북마크 리스트
+    private List<PostResponse> tagePostList; //태그된 게시물 리스트
     private String petName; // 애완동물 이름
     private String petSex;   // 애완동물 성별
     private Long petAge;  // 애완동물 나이
