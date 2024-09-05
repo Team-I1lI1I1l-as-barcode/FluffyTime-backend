@@ -43,10 +43,10 @@
 
 
     <form id="profile_edit_form" method=post>
-      <!-- 모달 오버레이 -->
+      <!-- 프로필 사진 편집 관련 모달 오버레이 -->
       <div id="profile-modal-overlay" class="profile-modal-overlay"></div>
 
-      <!-- 모달 창 -->
+      <!-- 프로필 사진 편집 관련 모달 창 -->
       <div id="profile-modal" class="profile-modal">
         <div class="profile-modal-content">
           <p id="modal_title">프로필 사진 바꾸기</p>
@@ -62,6 +62,7 @@
           <input type="text" id="username" max="100"/>
           <button id="check_username_Btn">중복확인</button>
         </div>
+        <p id="nickname_check">유저명은 알파벳 대소문자, 숫자, 밑줄(_), 그리고 대시(-)만 사용할 수 있습니다.</p>
       </div>
 
       <label for="intro">소개</label><br/>
@@ -99,9 +100,19 @@
       <input type="submit" value="제출" id="submit">
     </form>
 
+
+    <!-- 차단된 유저 리스트 관련 모달 오버레이 -->
+    <div id="block-user-list-modal-overlay" class="block-user-list-modal-overlay"></div>
+
+    <!-- 차단된 유저 리스트 관련 모달 창 -->
+    <div id="block-user-list-modal" class="block-user-list-modal">
+      <div class="block-user-list-modal-content">
+      </div>
+    </div>
+
     <div id="block">
       <p>차단 계정</p>
-      <button>리스트</button>
+      <button id="block_user_list">리스트</button>
     </div>
     <div id="account_delete">
       <p>계정 삭제</p>
@@ -110,10 +121,11 @@
   </div>
 </div>
 
-<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+<th:block th:replace="~{common/createModal :: createModal}"></th:block>
 <!-- 임시 저장 모달 -->
-<th:block th:replace="~{common/tempModal :: tempModal}" ></th:block>
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
 
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
 </body>
 </html>

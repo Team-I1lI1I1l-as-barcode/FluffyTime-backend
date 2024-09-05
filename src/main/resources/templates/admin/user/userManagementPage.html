@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <meta charset="UTF-8">
+  <title>FluffyTime 관리자페이지 - 사용자관리</title>
+  <link rel="stylesheet" href="/css/admin/statistics/statistics.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+</head>
+<body>
+<div class="container">
+  <th:block th:replace="~{admin/common/sidebar :: sidebar}"></th:block>
+  <main class="main-container">
+    <table class="userTable">
+      <thead>
+      <tr>
+        <th>이메일</th>
+        <th>닉네임</th>
+        <th>가입일</th>
+        <th>권한</th>
+        <th><button>삭제</button></th>
+      </tr>
+      </thead>
+      <tbody class="userTableBody">
+      </tbody>
+    </table>
+    <div class="list_nav" id="pagination" style="display: none;">
+      <ul id="paginationList">
+      </ul>
+    </div>
+  </main>
+  </div>
+</body>
+<script th:src="@{/js/admin/usermanagement/paging.js}" defer></script>
+</html>

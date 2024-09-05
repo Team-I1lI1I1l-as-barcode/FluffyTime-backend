@@ -12,35 +12,35 @@
   <script th:src="@{/js/post/createPost.js}" defer></script>
 </head>
 <body>
-  <div class="container">
-    <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
-    <main class="content-container">
-      <div class="search-container">
+<div class="container">
+  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+  <main class="content-container">
+    <div class="search-container">
 
-        <div class="search-bar">
-          <input type="text" id="search-input" placeholder="검색">
-          <!--    <button onclick="populateList()">Search</button>-->
-        </div>
-
-        <div class="tabs">
-          <button id="tab-name" class="active" onclick="selectTab('name')">이름</button>
-          <button id="tab-tag" onclick="selectTab('tag')">태그</button>
-          <button id="tab-account" onclick="selectTab('account')">계정</button>
-        </div>
-
-        <div class="results">
-          <ul id="results-list"></ul>
-        </div>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="검색">
       </div>
-    </main>
-  </div>
 
-  <th:block th:replace="~{/common/createModal :: createModal}"></th:block>
-  <!-- 임시 저장 모달 -->
-  <th:block th:replace="~{common/tempModal :: tempModal}" ></th:block>
+      <div class="tabs">
+        <button id="tab-name" class="active" onclick="selectTab('name')">이름</button>
+        <button id="tab-tag" onclick="selectTab('tag')">태그</button>
+        <button id="tab-account" onclick="selectTab('account')">계정</button>
+      </div>
+
+      <div class="results">
+        <ul id="results-list"></ul>
+      </div>
+    </div>
+  </main>
+</div>
+
+<th:block th:replace="~{common/createModal :: createModal}"></th:block>
+<!-- 임시 저장 모달 -->
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
 
 
-  <script th:src="@{/js/search/search.js}"></script>
-  <script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/search/search.js}"></script>
+<script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
 </body>
 </html>

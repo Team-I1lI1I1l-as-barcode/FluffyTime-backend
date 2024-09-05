@@ -27,11 +27,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return data.list || [];
       } else {
         console.error('Expected an array but got:', data);
-        return []; // 배열이 아닌 경우 빈 배열 반환
+        return [];
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      return []; // 에러 발생 시 빈 배열 반환
+      return [];
     }
   }
 
@@ -45,22 +45,53 @@ document.addEventListener('DOMContentLoaded', function () {
       const postElement = document.createElement('div');
       postElement.classList.add('home-post');
 
-      postElement.innerHTML = `
+      const fileExtension = post.imageUrl.split('.').pop().toLowerCase();
+
+      // 파일 확장자에 따라 img 또는 video 요소를 생성
+      if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
+          === 'webm') {
+        postElement.innerHTML = `
         <div class="home-post-header">
-          <img src="${post.profileImageUrl}" alt="${post.nickname}">
+          <img src="${post.profileImageUrl
+        || '/image/profile/profile.png'}" alt="${post.nickname}">
           <strong>${post.nickname || 'Anonymous'}</strong>
         </div>
         <div class="home-post-content">
-          <img src="${post.imageUrl || 'https://via.placeholder.com/600x400'}" alt="Post Image">
-          <p>${post.content || ''}</p>
+          <video controls class="active" src="${post.imageUrl
+        || 'https://via.placeholder.com/600x400'}" alt="Post Image">
+          <p>${highlightMentions(post.content || '')}</p>
         </div>
         <div class="home-post-footer">
           <div id="comment-list-${post.postId}">Loading comments...</div>
         </div>
       `;
+      } else {
+        postElement.innerHTML = `
+          <div class="home-post-header">
+            <img src="${post.profileImageUrl
+        || '/image/profile/profile.png'}" alt="${post.nickname}">
+            <strong>${post.nickname || 'Anonymous'}</strong>
+          </div>
+          <div class="home-post-content">
+            <img src="${post.imageUrl || '/image/profile/profile.png'}" alt="Post Image">
+            <p>${highlightMentions(post.content || '')}</p>
+          </div>
+          <div class="home-post-footer">
+            <div id="comment-list-${post.postId}">Loading comments...</div>
+          </div>
+        `;
+      }
+
+      //프로필 클릭 시 유저 페이지로 이동
+      const headerElement = postElement.querySelector('.home-post-header');
+      headerElement.addEventListener('click', () => {
+        const nickname = post.nickname;
+        window.location.href = `/userpages/${nickname}`;
+      })
 
       //게시글 클릭 시 상세 페이지로 이동
-      postElement.addEventListener('click', () => {
+      const contentElement = postElement.querySelector('.home-post-content')
+      contentElement.addEventListener('click', () => {
         window.location.href = `/posts/detail/${post.postId}`;
       })
 
@@ -70,21 +101,24 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         const commentList = postElement.querySelector(
             `#comment-list-${post.postId}`);
-        const comments = await fetchComments(post.postId); // 댓글 가져오기
-        commentList.innerHTML = ''; // 기존 내용을 초기화
+        const comments = await fetchComments(post.postId);
+        commentList.innerHTML = '';
 
-        if (comments.length > 0) {
-          comments.forEach(comment => {
+        //최대 2개의 댓글만 표시
+        const maxComments = comments.slice(0, 2);
+
+        if (maxComments.length > 0) {
+          maxComments.forEach(comment => {
             const commentElement = document.createElement('div');
-            commentElement.className = 'comment-content'; // 스타일 클래스 추가
+            commentElement.className = 'comment-content';
 
             const nicknameElement = document.createElement('span');
             nicknameElement.className = 'comment-nickname';
-            nicknameElement.textContent = `${comment.nickname} `; // 닉네임
+            nicknameElement.textContent = `${comment.nickname} `;
 
             const contentElement = document.createElement('span');
             contentElement.className = 'comment-text';
-            contentElement.textContent = comment.content; // 댓글 내용
+            contentElement.innerHTML = highlightMentions(comment.content);
 
             commentElement.appendChild(nicknameElement);
             commentElement.appendChild(contentElement);
@@ -133,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     fetchPosts(currentPage).then(posts => {
       if (posts.length > 0) {
+        console.log(posts)
         renderPosts(posts);
         currentPage++;
         console.log(posts.length);
@@ -142,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!document.querySelector('.no-more-posts-message')) {
           const noMorePostsMessage = document.createElement('div');
           noMorePostsMessage.className = 'no-more-posts-message';
-          noMorePostsMessage.textContent = 'No more posts available.';
+          noMorePostsMessage.textContent = '게시글을 모두 확인했습니다';
           postsContainer.appendChild(noMorePostsMessage);
         }
       }
@@ -172,8 +207,15 @@ document.addEventListener('DOMContentLoaded', function () {
         >= document.documentElement.scrollHeight - 100) {
       loadMorePosts();
     }
-  }, 200); // 200ms 디바운스 대기 시간
+  }, 200);
 
   // 스크롤 이벤트 처리
   window.addEventListener('scroll', handleScroll);
 });
+
+// 멘션 하이라이트 함수
+function highlightMentions(content) {
+  // '@nickname' 패턴을 찾아서 <span> 태그로 감싸기
+  return content.replace(/(@\w+)/g,
+      '<span style="color: #0078e8; font-weight: 500;">$1</span>');
+}

@@ -9,7 +9,7 @@ body {
   height: 100vh;
 }
 
-.modal, .edit-modal {
+.modal {
   display: none;
   position: fixed;
   top: 0;
@@ -21,7 +21,7 @@ body {
   align-items: center;
 }
 
-.modal-content, .edit-modal-content {
+.modal-content {
   background-color: #ffffff;
   width: 80%;
   max-width: 1200px;
@@ -32,21 +32,26 @@ body {
   overflow: hidden;
 }
 
-.left-content, .right-content, .edit-left-content, .edit-right-content {
+.left-content, .right-content {
   height: 100%;
-  overflow-y: auto;
 }
 
-.left-content, .edit-left-content {
+.right-content {
+  position: relative;
+}
+
+.left-content {
   flex: 3.5;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 0;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
-.left-content img, .edit-left-content img {
+.left-content img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -56,11 +61,11 @@ body {
   display: none;
 }
 
-.left-content img.active, .edit-left-content img.active {
+.left-content img.active {
   display: block;
 }
 
-.left-content .nav-button, .edit-left-content .nav-button {
+.left-content .nav-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -79,44 +84,28 @@ body {
   z-index: 10;
 }
 
-.left-content .prev, .edit-left-content .prev {
+.left-content .prev {
   left: 10px;
 }
 
-.left-content .next, .edit-left-content .next {
+.left-content .next {
   right: 10px;
 }
 
-.right-content, .edit-right-content {
+.right-content {
   flex: 1.5;
-  padding: 20px;
   display: flex;
   flex-direction: column;
   border-left: 1px solid #ccc;
-  overflow-x: hidden; /* 가로 스크롤 숨기기 */
-  overflow-y: auto; /* 세로 스크롤은 자동으로 표시되도록 */
 }
 
 .header {
   text-align: center;
-  padding: 10px;
+  padding: 10px 20px;
   border-bottom: 1px solid #ccc;
   font-size: 18px;
   font-weight: bold;
   position: relative;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  flex: 0 1 auto;
-  display: block;
-  padding: 20px;
-}
-
-.content p {
-  font-size: 18px;
-  margin-bottom: 20px;
 }
 
 .close-btn {
@@ -171,48 +160,125 @@ body {
   color: red;
 }
 
-.edit-modal {
-  display: none;
-}
-
-.edit-modal-content input[type="text"] {
-  width: 100%;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-#editImagePreviewContainer img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  margin-bottom: 10px;
-}
-
-.edit-left-content img.active {
-  display: block;
+.dropdown-menu a.report {
+  color: red;
 }
 
 .profile {
   display: flex;
   align-items: center;
-  margin-bottom: 5px; /* 하단 간격을 줄임 */
-  margin-top: 5px; /* 상단 간격을 줄임 */
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 .profile img {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  margin-right: 20px; /* 이미지와 닉네임 사이 간격 */
+  margin-right: 20px;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  justify-content: space-between;
+}
+
+#petInfo {
+  font-size: 14px;
+  color: #666; /* 펫 정보는 약간 연한 색으로 표시 */
+}
+
+#nicknameDisplay {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .post-header {
-  margin-bottom: 10px; /* 프로필 위쪽의 간격을 줄임 */
+  margin-bottom: 10px;
 }
 
 .post-content {
-  padding-top: 5px; /* 프로필 아래쪽의 간격을 줄임 */
-  padding-bottom: 5px;
+  padding: 10px 20px;
+  /*margin: 10px 10px;*/
+}
+
+
+#petInfo span {
+  margin-right: 5px; /* 각 요소 사이에 5px 간격 추가 */
+}
+
+#petInfo span:last-child {
+  margin-right: 0; /* 마지막 요소는 간격을 추가하지 않음 */
+}
+
+#petSexDisplay {
+  font-weight: 900; /* 성별 텍스트를 매우 진하고 두껍게 표시 */
+}
+
+/*북마크*/
+.bookmark-section {
+  text-align: right;
+  margin-top: 0.6rem;
+}
+
+.bookmark-section img {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.postDetail-footer-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.tag-list {
+  padding: 10px 15px;
+  border-bottom: 1px solid #ccc;
+  /*max-height: 150px; !* 최대 높이 설정 *!*/
+  /*overflow-y: auto;  !* 세로 스크롤바 추가 *!*/
+}
+
+.noneTag {
+  font-size: 14px;
+  color: #7f7f7f;
+  margin: 0 10px;
+}
+
+.tag {
+  display: inline-block;
+  align-items: center;
+  background-color: rgba(255, 204, 0, 0.2);
+  color: #7f7f7f;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 10px;
+  font-size: 14px;
+  position: relative;
+  cursor: pointer;
+}
+
+.modal-content video {
+  width: 100%; /* 비디오의 너비를 100%로 설정 */
+  height: 100%; /* 비디오의 높이를 100%로 설정 */
+  object-fit: cover; /* 비디오가 컨테이너에 맞게 잘리도록 설정 */
+  aspect-ratio: auto; /* 비디오의 비율을 자동으로 설정 (일부 브라우저에서 필요할 수 있음) */
+  position: absolute; /* 비디오를 절대 위치로 설정하여 컨테이너에 맞게 배치 */
+  top: 0;
+  left: 0;
+}
+
+.like-user-list {
+  display: none;
+  list-style: none;
+  padding: 0;
+}
+
+.like-user-list li {
+  margin: 5px 0;
 }

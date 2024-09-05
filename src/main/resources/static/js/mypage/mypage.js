@@ -8,10 +8,9 @@ const pet_sex = getElement("pet_sex"); // 반려동물 성별
 const pet_age = getElement("pet_age"); // 반려동물 나이
 const intro = getElement("intro"); // 소개글
 const img = getElement('img'); // 이미지 미리보기
-const ProfileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
-
-// const follower_count = getElement("follower_count"); // 팔로워 수
-// const follow_count = getElement("follow_count");// 팔로우 수
+const profileImagePreview = getElement('Profile-image-Preview'); // 프로필 이미지 영역
+const bookmark = getElement('bookmark');
+const mention = getElement('mention');
 
 // 기본 api  요청  함수
 function fetchMyPage(url, method, func) {
@@ -75,7 +74,6 @@ function handleProfileData(data) {
   console.log("fetchMyPage 응답 Success");
 
   getElement("nickname").innerText = data.nickname;
-
   posts_count.innerText = data.postsList === null ? 0 : data.postsList.length;
   pet_name.innerText = data.petName;
   pet_sex.innerText = data.petSex === "none" ? " " : data.petSex;
@@ -95,6 +93,19 @@ function handleProfileData(data) {
     // 게시글이 없을시 문구 출력
     getElement('no_post').style.display = 'flex';
   }
+  // 북마크 클릭시 북마크 게시글 렌더링 처리
+  bookmark.addEventListener('click', (event) => {
+    const postListElement = document.querySelector('#post_list');
+    postListElement.innerHTML = ''; // 기존 리스트 비우기
+    renderPosts(data.bookmarkList);
+  });
+
+  // 저장됨 클릭시 멘션된 게시글 렌더링 처리
+  mention.addEventListener('click', (event) => {
+    const postListElement = document.querySelector('#post_list');
+    postListElement.innerHTML = ''; // 기존 리스트 비우기
+    renderPosts(data.tagePostList);
+  });
 }
 
 // 게시물 목록을 렌더링하는 함수
@@ -104,16 +115,33 @@ function renderPosts(posts) {
 
   posts.forEach(post => {
     if (post.fileUrl != null) {
-      const img = document.createElement('img'); // <img> 요소 생성
-      img.src = post.fileUrl; // 이미지 URL 설정
-      img.alt = post.postId;
+      if (post.mineType === "video/mp4") {
+        const video = document.createElement('video'); // <img> 요소 생성
+        video.src = post.fileUrl;
+        // 비디오 자동 재생 끄기
+        video.addEventListener('play', function (event) {
+          event.preventDefault();
+          this.pause();
+        });
+        // 비디오 클릭시 해당 게시물 상세보기 모달창 열기
+        video.addEventListener('click', event => {
 
-      // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
-      img.addEventListener('click', event => {
-        console.log(img.alt + "게시물 클릭 ");
-        window.location.href = `/posts/detail/${img.alt}`;
-      });
-      postListElement.appendChild(img); // <img>를 섹션에 추가
+          window.location.href = `/posts/detail/${post.postId}`;
+        });
+        postListElement.appendChild(video); // <video>를 섹션에 추가
+
+      } else {
+        const img = document.createElement('img'); // <img> 요소 생성
+        img.src = post.fileUrl; // 이미지 URL 설정
+        img.alt = post.postId;
+
+        // 이미지 클릭시 해당 게시물 상세보기 모달창 열기
+        img.addEventListener('click', event => {
+          console.log(img.alt + "게시물 클릭 ");
+          window.location.href = `/posts/detail/${img.alt}`;
+        });
+        postListElement.appendChild(img); // <img>를 섹션에 추가
+      }
     }
   });
 }
@@ -131,7 +159,7 @@ function initialize() {
   fetchMyPage("/api/mypage/info", "GET", handleProfileData);
 
   // 초기화 - 프로필 사진 클릭시 파일 선택 버튼이 눌림
-  ProfileImagePreview.addEventListener('click', event => {
+  profileImagePreview.addEventListener('click', event => {
     event.preventDefault();
     document.getElementById("mypage-images").click();  // 프로필 이미지 등록
 

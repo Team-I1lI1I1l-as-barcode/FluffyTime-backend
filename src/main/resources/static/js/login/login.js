@@ -15,7 +15,6 @@ async function loginProcess(event) {
 
   let errorCount = 0;
 
-  // 이메일 형식 검사
   if (!emailPattern.test(email)) {
     emailErrorElement.innerText = "올바른 이메일 형식이 아닙니다.";
     emailErrorElement.classList.remove('hidden');
@@ -25,7 +24,6 @@ async function loginProcess(event) {
     emailErrorElement.classList.add('hidden');
   }
 
-  // passsword 빈값 검사
   if (!password) {
     passwordErrorElement.innerText = "비밀번호를 입력해주세요.";
     passwordErrorElement.classList.remove('hidden');
@@ -40,19 +38,34 @@ async function loginProcess(event) {
   }
 
   if (!formElement.checkValidity()) {
-    formElement.reportValidity(); // 브라우저의 기본 검증 메시지 표시
+    formElement.reportValidity();
     return;
   }
 
-  // 폼 데이터를 JSON으로 변환
   const jsonData = {
     email: email,
     password: password
   };
 
+  const currentUrl = window.location.href;
+
+  const url = new URL(currentUrl);
+
+  const queryParams = new URLSearchParams(url.search);
+
+  const redirectURL = queryParams.get('redirectURL');
+
+  let loginApiUri;
+
+  if (redirectURL) {
+    loginApiUri = `/api/users/login?redirectURL=${redirectURL}`;
+  } else {
+    loginApiUri = '/api/users/login';
+  }
+
   try {
     const response = await fetch(
-        '/api/users/login', {
+        loginApiUri, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -67,7 +80,7 @@ async function loginProcess(event) {
     }
     console.log("로그인 성공")
     localStorage.setItem('lastRefreshTime', new Date().getTime());
-    window.location.href = '/';
+    window.location.href = response.headers.get("Location"); // 원하는 URL로 변경;
 
   } catch (error) {
     console.error(error);

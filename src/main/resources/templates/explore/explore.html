@@ -18,7 +18,7 @@
     <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
     <main class="content-container">
       <div>
-        <!--        JS로 여기에 이 div안에 아이템들을 채움-->
+        <!--        js로 이 div안에 아이템들을 채움-->
         <div class="grid-container" id="grid-container">
 
 
@@ -28,19 +28,14 @@
       </div>
     </main>
   </div>
-
-  <!--  게시물을 클릭했을 때 게시물 상세 페이지가 나오는 팝업을 임시로 만들어 놓음-->
-  <div class="popup" id="popup">
-    <span class="popup-close" id="popup-close">&times;</span>
-    <img id="popup-image" src="" alt="Popup Image">
-  </div>
 </div>
 
-<th:block th:replace="~{/common/createModal :: createModal}"></th:block>
+<th:block th:replace="~{common/createModal :: createModal}"></th:block>
 <!-- 임시 저장 모달 -->
-<th:block th:replace="~{common/tempModal :: tempModal}" ></th:block>
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
 
 <script th:src="@{/js/explore/explore.js}"></script>
 <script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
 </body>
 </html>

@@ -2,13 +2,13 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org/">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>임시 저장 글 목록</title>
 </head>
 <body>
 <div th:fragment="tempModal" class="modal" id="draftModal" style="display: none;">
   <div class="modal-content">
     <button class="close-btn" onclick="closeDraftModal()">&times;</button>
-    <div class="header">임시 저장 글 목록</div>
+    <div class="header"><h3>임시 저장 글 목록</h3></div>
     <div id="tempPostsContainer"></div>
   </div>
 </div>

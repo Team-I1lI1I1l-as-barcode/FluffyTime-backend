@@ -24,7 +24,6 @@ const usernamePattern = /^[a-zA-Z0-9_-]+$/;
 async function tempJoin(event) {
   event.preventDefault()
 
-  // 폼 데이터 수집
   const formElement = document.getElementById("joinForm");
 
   const email = formElement.email.value;
@@ -33,7 +32,7 @@ async function tempJoin(event) {
   const nickname = formElement.nickname.value;
 
   if (!formElement.checkValidity()) {
-    formElement.reportValidity(); // 브라우저의 기본 검증 메시지 표시
+    formElement.reportValidity();
     return;
   }
 
@@ -88,7 +87,6 @@ async function tempJoin(event) {
     return
   }
 
-  // 폼 데이터를 JSON으로 변환
   const jsonData = {
     email: email,
     password: password,
@@ -120,8 +118,6 @@ async function tempJoin(event) {
 
     joinBtn.innerText="인증메일 전송 중..."
 
-
-
     const sendResult = await getCertificationEmail();
     if (sendResult) {
       window.location.href = response.headers.get("Location"); // 원하는 URL로 변경
@@ -135,7 +131,6 @@ async function checkEmail() {
   const emailElement = document.getElementById('email');
   const email = emailElement.value;
 
-  // 이메일 형식 검사
   if (!emailPattern.test(email)) {
     emailNoticeElement.innerText = "올바른 이메일 형식이 아닙니다.";
     emailNoticeElement.classList.add('error')

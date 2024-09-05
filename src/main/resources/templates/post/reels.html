@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Reels</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/post/createPost.css">
+  <link rel="stylesheet" href="/css/post/reels.css">
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"/>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script th:src="@{/js/auth/auth.js}" defer></script>
+  <script th:src="@{/js/post/createPost.js}" defer></script>
+  <script th:src="@{/js/post/reels.js}" defer></script>
+</head>
+<body>
+
+<div class="reels-container">
+  <th:block th:replace="~{common/sidebar :: sidebar}"></th:block>
+
+  <div id="reels-list" class="reels-reels-list">
+
+  </div>
+
+</div>
+
+<th:block th:replace="~{common/createModal :: createModal}"></th:block>
+<!-- 임시 저장 모달 -->
+<th:block th:replace="~{common/tempModal :: tempModal}"></th:block>
+
+<script th:src="@{/js/mypage/mypageNav.js}"></script>
+<script th:src="@{/js/common/logout.js}"></script>
+</body>
+</html>

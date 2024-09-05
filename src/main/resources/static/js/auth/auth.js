@@ -1,4 +1,6 @@
 // refresh token으로 access token 재발급 요청 보내기
+let intervalId;
+
 async function refreshAccessToken() {
   console.log("Refreshing Access Token");
   const response = await fetch('/api/auth/refreshToken', {
@@ -7,8 +9,16 @@ async function refreshAccessToken() {
 
   if(!response.ok) {
     console.log("Failed to refresh Access Token")
-    // window.location.href="/login"
     return;
+  }
+
+  const isAdminValue = response.headers.get('is-admin');
+
+  if (isAdminValue !== null) {
+    localStorage.setItem('isAdmin', isAdminValue);
+    console.log('is-true value saved to localStorage:', isAdminValue);
+  } else {
+    console.log('is-true header not found in the response');
   }
 
   console.log("Access Token refreshed successfully")
@@ -22,25 +32,50 @@ async function initTokenRefresh() {
   const currentTime = new Date().getTime();
   const timeElapsed = currentTime - lastRefreshTime;
 
-  // 마지막 갱신 후 50분이 지났다면 즉시 갱신
-  if(timeElapsed >= 50 * 60 * 1000) {
-    console.log("즉시갱신")
-     await refreshAccessToken();
-  }
 
-  // 주기적으로 AccessToken 갱신
-  setInterval(() => {
+  console.log("즉시갱신")
+  await refreshAccessToken();
+
+  intervalId = setInterval(() => {
     const lastRefreshTime = localStorage.getItem("lastRefreshTime");
     const currentTime = new Date().getTime();
     const timeElapsed = currentTime - lastRefreshTime;
 
-    // 50분이 지난 경우에만 갱신
     if(timeElapsed >= 50 * 60 * 1000) {
        refreshAccessToken();
     }
-  }, 60 * 1000); // 매 1분마다 체크
+  }, 60 * 1000);
 }
 
-// 페이지 로드 시 초기화
+function hiddenAdminPageBtn() {
+
+  let isAdmin = localStorage.getItem('isAdmin');
+
+  let adminPageBtnDiv = document.querySelector('.adminPageBtn');
+
+  if(adminPageBtnDiv == null || isAdmin == null) {return;}
+
+  if (isAdmin === 'true') {
+    adminPageBtnDiv.classList.remove('hidden');  // 보여줌
+    console.log("admin 숨기기 제거")
+  } else {
+    if(adminPageBtnDiv.classList.contains('hidden')) {
+      console.log("admin 숨기기 이미있음")
+      return
+    }
+    console.log("admin 숨기기 실행")
+    adminPageBtnDiv.classList.add('hidden');  // 보여줌
+  }
+}
+
+async function onPageLoad() {
+  await initTokenRefresh();
+  hiddenAdminPageBtn();
+}
+
+window.addEventListener("beforeunload", () => {
+  clearInterval(intervalId);
+});
+
 console.log('Script loaded');
-window.addEventListener("load", initTokenRefresh);
+window.addEventListener("DOMContentLoaded", onPageLoad);
