@@ -104,6 +104,7 @@ function renderPosts(posts) {
     if (post.fileUrl != null) {
       if (post.mineType === "video/mp4") {
         const video = document.createElement('video');
+        video.classList.add('userpage_video');
         video.src = post.fileUrl;
         // 비디오 자동 재생 끄기
         video.addEventListener('play', function (event) {

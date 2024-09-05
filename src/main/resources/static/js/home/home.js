@@ -51,35 +51,35 @@ document.addEventListener('DOMContentLoaded', function () {
       if (fileExtension === 'mp4' || fileExtension === 'mov' || fileExtension
           === 'webm') {
         postElement.innerHTML = `
-        <div class="home-post-header">
-          <img src="${post.profileImageUrl
+      <div class="home-post-header">
+        <img src="${post.profileImageUrl
         || '/image/profile/profile.png'}" alt="${post.nickname}">
-          <strong>${post.nickname || 'Anonymous'}</strong>
-        </div>
-        <div class="home-post-content">
-          <video controls class="active" src="${post.imageUrl
+        <strong>${post.nickname || 'Anonymous'}</strong>
+      </div>
+      <div class="home-post-content">
+       <video controls autoplay muted playsinline class="active" src="${post.imageUrl
         || 'https://via.placeholder.com/600x400'}" alt="Post Image">
-          <p>${highlightMentions(post.content || '')}</p>
-        </div>
-        <div class="home-post-footer">
-          <div id="comment-list-${post.postId}">Loading comments...</div>
-        </div>
-      `;
+
+      </div>
+      <div class="home-post-footer">
+        <div id="comment-list-${post.postId}">Loading comments...</div>
+      </div>
+    `;
       } else {
         postElement.innerHTML = `
-          <div class="home-post-header">
-            <img src="${post.profileImageUrl
+      <div class="home-post-header">
+        <img src="${post.profileImageUrl
         || '/image/profile/profile.png'}" alt="${post.nickname}">
-            <strong>${post.nickname || 'Anonymous'}</strong>
-          </div>
-          <div class="home-post-content">
-            <img src="${post.imageUrl || '/image/profile/profile.png'}" alt="Post Image">
-            <p>${highlightMentions(post.content || '')}</p>
-          </div>
-          <div class="home-post-footer">
-            <div id="comment-list-${post.postId}">Loading comments...</div>
-          </div>
-        `;
+        <strong>${post.nickname || 'Anonymous'}</strong>
+      </div>
+      <div class="home-post-content">
+        <img src="${post.imageUrl || '/image/profile/profile.png'}" alt="Post Image">
+        <p>${highlightMentions(post.content || '')}</p>
+      </div>
+      <div class="home-post-footer">
+        <div id="comment-list-${post.postId}">Loading comments...</div>
+      </div>
+    `;
       }
 
       //프로필 클릭 시 유저 페이지로 이동
