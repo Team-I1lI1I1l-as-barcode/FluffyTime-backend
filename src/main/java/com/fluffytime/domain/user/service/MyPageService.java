@@ -5,6 +5,8 @@ import com.fluffytime.domain.board.entity.Mention;
 import com.fluffytime.domain.board.entity.enums.TempStatus;
 import com.fluffytime.domain.board.repository.BookmarkRepository;
 import com.fluffytime.domain.board.repository.MentionRepository;
+import com.fluffytime.domain.chat.entity.ChatRoom;
+import com.fluffytime.domain.chat.repository.ChatRoomRepository;
 import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.domain.user.dto.request.ProfileRequest;
 import com.fluffytime.domain.user.dto.response.CheckUsernameResponse;
@@ -30,6 +32,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +53,7 @@ public class MyPageService {
     private final JwtTokenizer jwtTokenizer;
     private final S3Service s3Service;
     private final MentionRepository mentionRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     // 사용자 조회(userId로 조회) 메서드
     @Transactional
@@ -379,6 +384,9 @@ public class MyPageService {
             userRepository.delete(user);
             // 쿠기 삭제
             deleteCookie(response);
+
+            // 해당 유저가 존재하는 채팅 방 삭제
+            deleteAllChatRoomsByNickname(nickname);
             return RequestResultResponse.builder()
                 .result(true)
                 .build();
@@ -388,6 +396,21 @@ public class MyPageService {
                 .result(false)
                 .build();
         }
+    }
+
+    // 탈퇴한 회원이 속한 채팅방 삭제하는 메서드
+    @Transactional
+    public void deleteAllChatRoomsByNickname(String nickname) {
+        // 닉네임으로 해당 유저가 속한 채팅방 리스트 가져오기
+        Optional<Set<String>> chatRooms = chatRoomRepository.findByRoomNameContaining(nickname);
+
+        // 채팅방이 존재하면 삭제
+        chatRooms.ifPresent(rooms -> {
+            rooms.forEach(roomName -> {
+                Optional<ChatRoom> chatRoom = chatRoomRepository.findByRoomName(roomName);
+                chatRoom.ifPresent(chatRoomRepository::delete);
+            });
+        });
     }
 }
 
