@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const reelsContainer = document.getElementById('reels-list'); // 릴스 항목을 담을 컨테이너
 
-  // 릴스 데이터를 불러오는 함수
+// 릴스 데이터를 불러오는 함수
   function loadReels(page) {
     if (loading || !hasMoreData) return; // 이미 로딩 중이거나 더 이상 데이터가 없으면 중지
 
@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const profileImage = document.createElement('img'); // 프로필 이미지 생성
     profileImage.src = reel.profileImageUrl || '../../../image/profile/profile.png';
     profileImage.alt = '프로필 이미지';
-    console.log("프로필 이미지 경로: ", profileImage.src);
 
     const nickname = document.createElement('div'); // 닉네임 표시 영역 생성
     nickname.className = 'reels-nickname';
@@ -75,25 +74,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const content = document.createElement('div'); // 릴스 내용 표시 영역 생성
     content.className = 'reels-content';
     content.innerText = reel.content;
-
-    // 좋아요 아이콘 및 개수 추가
-    const likeContainer = document.createElement('div');
-    likeContainer.className = 'like-container';
-
-    const likeIcon = document.createElement('span');
-    likeIcon.className = 'material-icons like-button'; // Material Icons 클래스를 사용
-    likeIcon.textContent = reel.isLiked ? 'favorite' : 'favorite_border'; // 좋아요 상태에 따라 아이콘 설정
-    likeIcon.addEventListener('click', () => {
-      toggleLikePost(reel.postId, likeIcon, likeCountSpan); // 좋아요 상태 토글
-    });
-
-    const likeCountSpan = document.createElement('span');
-    likeCountSpan.className = 'like-count';
-    likeCountSpan.textContent = reel.likeCount; // 좋아요 수 표시
-
-    // likeContainer에 아이콘과 좋아요 수를 추가
-    likeContainer.appendChild(likeIcon);
-    likeContainer.appendChild(likeCountSpan);
 
     // 북마크 아이콘 생성 및 초기화
     const bookmarkIcon = document.createElement('img');
@@ -106,6 +86,29 @@ document.addEventListener('DOMContentLoaded', function() {
     bookmarkIcon.addEventListener('click', () => {
       toggleBookmark(reel.postId, bookmarkIcon); // 북마크 상태 토글
     });
+
+    profileContainer.appendChild(profileImage);
+    profileContainer.appendChild(nickname);
+    overlay.appendChild(profileContainer);
+    overlay.appendChild(content);
+    overlay.appendChild(bookmarkIcon);
+
+    // 좋아요 버튼 생성
+    const likeButton = document.createElement('button');
+    likeButton.className = 'like-button';
+
+    // 좋아요 상태 초기화
+    await initializeLikeStatus(reel.postId, likeButton);
+
+    // 좋아요 버튼 클릭 이벤트 처리
+    likeButton.addEventListener('click', () => {
+      toggleLikePost(reel.postId, likeButton);
+    });
+
+    // 좋아요 수 표시
+    const likeCountSpan = document.createElement('span');
+    likeCountSpan.className = 'like-count';
+    likeCountSpan.textContent = reel.likeCount;
 
     // 토글 아이콘 추가
     const toggleIcon = document.createElement('img');
@@ -132,59 +135,16 @@ document.addEventListener('DOMContentLoaded', function() {
       toggleMenu.classList.toggle('reels-hidden'); // 메뉴의 표시/숨기기 토글
     });
 
-    // 각 요소를 오버레이와 릴스 아이템에 추가
-    profileContainer.appendChild(profileImage);
-    profileContainer.appendChild(nickname);
-    overlay.appendChild(profileContainer);
-    overlay.appendChild(content);
-    overlay.appendChild(likeContainer); // 좋아요 버튼 및 수 추가
-    overlay.appendChild(bookmarkIcon); // 북마크 버튼 추가
+    overlay.appendChild(likeButton); // 좋아요 버튼 추가
+    overlay.appendChild(likeCountSpan); // 좋아요 수 추가
     overlay.appendChild(toggleIcon); // 토글 아이콘 추가
     overlay.appendChild(toggleMenu); // 토글 메뉴 추가
-
     reelItem.appendChild(video);
     reelItem.appendChild(overlay);
     reelsContainer.appendChild(reelItem); // 완성된 릴스 항목을 컨테이너에 추가
   }
 
-  // //좋아요 등록/취소
-  // async function toggleLikePost(postId, likeButton, likeCountSpan) {
-  //   try {
-  //     const isLiked = likeButton.classList.contains('liked');
-  //     const method = isLiked ? 'DELETE' : 'POST';
-  //     const response = await fetch(`/api/likes/post/${postId}`, {
-  //       method: method,
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify({})  // 비워진 객체를 body로 전송
-  //     });
-  //
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`);
-  //     }
-  //
-  //     const data = await response.json();
-  //
-  //     if (data) {
-  //       likeButton.innerHTML = data.liked ? 'favorite' : 'favorite_border'; // 버튼 모양 업데이트
-  //       likeButton.classList.toggle('liked', data.liked);
-  //       likeCountSpan.textContent = `${data.likeCount}`; // 좋아요 수 업데이트
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // }
-
-  // 스크롤 이벤트 처리
-  function onScroll() {
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
-      page++; // 페이지 번호 증가
-      loadReels(page); // 다음 페이지 로드
-    }
-  }
-
-  // 북마크 상태를 초기화하는 함수
+// 북마크 상태를 업데이트하는 함수
   async function initializeBookmarkState(postId, bookmarkIcon) {
     try {
       const response = await fetch(`/api/bookmarks/check?postId=${postId}`, {
@@ -279,6 +239,77 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+// 좋아요 상태
+  async function initializeLikeStatus(postId, likeButton) {
+    try {
+      const response = await fetch(`/api/posts/detail/${postId}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data) {
+        likeButton.innerHTML = data.liked
+            ? '<span class="material-icons">favorite</span>'
+            : '<span class="material-icons">favorite_border</span>'; // 아이콘 모양 업데이트
+        likeButton.classList.toggle('liked', data.liked);
+      }
+    } catch (error) {
+      console.error('Error initializing like status:', error);
+    }
+  }
+
+//좋아요 등록/취소
+  async function toggleLikePost(postId, likeButton) {
+    try {
+      const isLiked = likeButton.classList.contains('liked');
+      const method = isLiked ? 'DELETE' : 'POST';
+      const response = await fetch(`/api/likes/post/${postId}`, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data) {
+        // 아이콘 모양 업데이트
+        likeButton.innerHTML = data.liked
+            ? '<span class="material-icons">favorite</span>'
+            : '<span class="material-icons">favorite_border</span>';
+        likeButton.classList.toggle('liked', data.liked);
+
+        // 좋아요 개수 업데이트
+        const likeCountSpan = likeButton.nextElementSibling;
+        let currentLikeCount = parseInt(likeCountSpan.textContent, 10);
+
+        if (data.liked) {
+          likeCountSpan.textContent = currentLikeCount + 1; // 좋아요 증가
+        } else {
+          likeCountSpan.textContent = currentLikeCount - 1; // 좋아요 감소
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+// 스크롤 이벤트 처리
+  function onScroll() {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+      page++; // 페이지 번호 증가
+      loadReels(page); // 다음 페이지 로드
+    }
+  }
+
   window.addEventListener('scroll', onScroll); // 스크롤 이벤트 핸들러 추가
   loadReels(page); // 첫 페이지 로드
 });
+

@@ -98,27 +98,50 @@ body, html {
   z-index: 10; /* 동영상 위에 표시되도록 설정 */
 }
 
-/* 좋아요 아이콘과 개수 스타일 */
-.like-container {
+.like-button {
+  width: 30px;
+  height: 150px;
+  cursor: pointer;
   position: absolute;
-  bottom: 40px; /* 북마크 바로 위에 배치 */
-  right: -37.5px; /* 북마크와 같은 오른쪽 위치 */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 11; /* 북마크보다 더 위에 표시 */
+  bottom: -10px; /* 아래쪽에 위치 */
+  right: -43px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
+  z-index: 10; /* 동영상 위에 표시되도록 설정 */
+  color: black; /* 기본 회색 색상 */
 }
 
-.like-button {
-  font-size: 30px; /* 아이콘 크기 설정 */
-  color: black; /* 아이콘 색상 */
-  cursor: pointer;
+.like-button:hover {
+  transform: scale(1.1);
+  background: none;
+}
+
+/* 좋아요 애니메이션 */
+@keyframes like-animation {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.like-button.liked {
+  color: #ed4956; /* 인스타그램 좋아요 색상 (빨간색) */
+  animation: like-animation 0.5s forwards;
 }
 
 .like-count {
-  font-size: 14px; /* 좋아요 개수 글자 크기 */
-  color: black; /* 글자 색상 */
-  margin-top: 4px; /* 좋아요 버튼과 개수 사이의 간격 */
+  width: 30px;
+  height: 150px;
+  cursor: pointer;
+  position: absolute;
+  bottom: -95px; /* 아래쪽에 위치 */
+  right: -51.5px; /* 오른쪽에 위치하되 동영상 옆으로 이동 */
+  z-index: 10; /* 동영상 위에 표시되도록 설정 */
+  color: black; /* 기본 회색 색상 */
+  font-size: 12px;
 }
 
 /* 토글 아이콘 스타일 */
