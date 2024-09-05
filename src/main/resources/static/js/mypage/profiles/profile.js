@@ -32,8 +32,8 @@ const blockUserListBtn = getElement('block_user_list'); // 차단 유저 리스�
 // 입력 값 변화 체크 요소
 let originalIntroValue = ""; // intro 필드의 원래 값
 let originalPetNameValue = ""; // pet_name 필드의 원래 값
-let checkUsernameResult;
 let lastUsername;
+let checkUsernameResult = false;
 
 // 반려동물 나이 옵션 설정 함수
 function setPetAgeOptions(maxAge) {
@@ -47,21 +47,12 @@ function petOptionsStatus(status) {
   petSex.disabled = !status;
   petAge.disabled = !status;
   petCategory.disabled = !status;
-
 }
 
-//  유저명 변경시 중복 버튼 활성화
+// 유저명 변경 시 중복 버튼 활성화
 username.addEventListener('keyup', () => {
   checkUsernameBtn.disabled = false;
 });
-
-// 다른 정보가 바뀌고 + 유저명이 바뀔시 유저명 중복 확인 했는지 확인
-function check() {
-  console.log(username.value);
-  console.log(lastUsername);
-  return (username.value !== lastUsername)
-      && checkUsernameResult
-}
 
 // 프로필 수정 요청 DTO 구성
 function createRequestDto(nickname) {
@@ -158,14 +149,14 @@ function fetchProfileImage(method, url) {
 function handleProfileData(data) {
   nickname.innerText = data.nickname;
   email.innerText = data.email;
-  username.value = data.nickname;
+  username.value = data.nickname; // 닉네임을 username 입력 필드에 설정
   intro.value = data.intro;
   petName.value = data.petName;
   petSex.value = data.petSex;
   petAge.value = data.petAge;
   petCategory.value = data.petCategory;
   publicStatus.checked = data.publicStatus === "1";
-  lastUsername = data.nickname;
+  lastUsername = username.value; // lastUsername을 username.value로 설정
 
   if (data.fileUrl !== null) {
     console.log("등록된 프로필 사진을 불러옵니다.");
@@ -185,15 +176,15 @@ function handleProfileData(data) {
   }
 }
 
-// intro 입력시 제출 버튼 활성화 여부 검토
+// intro 입력 시 제출 버튼 활성화 여부 검토
 intro.addEventListener('input', () => {
   // intro 필드 값이 원래 값과 다르면 제출 버튼 활성화
   submitBtn.disabled = (intro.value.trim() === originalIntroValue);
 });
 
-// 반려동물 이름 입력시 관련 옵션 활성화/비활성화 + 제출 버튼 활성화
-pet_name.addEventListener('input', () => {
-  const petNameValue = pet_name.value.trim();
+// 반려동물 이름 입력 시 관련 옵션 활성화/비활성화 + 제출 버튼 활성화
+petName.addEventListener('input', () => {
+  const petNameValue = petName.value.trim();
   // intro 필드 값이 원래 값과 다르면 제출 버튼 활성화
 
   // 반려동물 이름이 비어있는 경우
@@ -211,15 +202,15 @@ pet_name.addEventListener('input', () => {
   }
 });
 
-// 데이터 변화시 제출 버튼을 활성화하는 버튼
+// 데이터 변화 시 제출 버튼을 활성화하는 버튼
 function activateSubmitButton() {
   submitBtn.disabled = false; // 제출 버튼 활성화
 }
 
 // 이벤트를 처리할 요소들을 배열에 저장
-const elements = [pet_sex, pet_age, petCategory, publicStatus];
+const elements = [petSex, petAge, petCategory, publicStatus];
 
-// 반려동물 성별, 나이, 카테고리, 계정 활성화 여부 변경시 제출 버튼 활성화
+// 반려동물 성별, 나이, 카테고리, 계정 활성화 여부 변경 시 제출 버튼 활성화
 elements.forEach(el => el.addEventListener('change', activateSubmitButton));
 
 // 프로필 데이터 수정 함수
@@ -241,79 +232,40 @@ function checkUsername(data) {
     alert("사용 가능합니다");
     checkUsernameResult = true;
     submitBtn.disabled = false; // 제출하기 버튼 활성화
-
   }
 }
 
 // 회원 탈퇴 함수
 function withdrawAccount(data) {
-  if (data.result === true) {
-    alert("회원 탈퇴가 완료되었습니다.");
-    window.location.href = "/login";
+  if (data.result) {
+    alert("계정이 삭제되었습니다.");
+    window.location.href = "/";
   } else {
-    alert("회원 탈퇴가 실패되었습니다. 다시 시도해주세요.");
-    window.location.reload();
+    alert("계정 삭제에 실패했습니다.");
   }
 }
 
-// 사진 삭제 함수
+// 프로필 사진 삭제 함수
 function deleteImage(data) {
-  if (data.result === true) {
-    console.log("프로필 이미지가 삭제되었습니다.")
-    window.location.reload();
+  if (data.result) {
+    img.src = "../../../image/profile/profile.png"; // 기본 이미지로 변경
+    alert("프로필 사진이 삭제되었습니다.");
   } else {
-    alert("프로필 이미지 삭제를 실패하였습니다. 다시 시도 해주세요.")
-    window.location.reload();
+    alert("프로필 사진 삭제에 실패했습니다.");
   }
 }
 
-// 차단된 유저 리스트를 구성하는 함수
+// 차단 유저 리스트 업데이트 함수
 function updateBlockedUsersList(data) {
-  const users = data.blockUserList;
-
-  // 오버레이 클릭 시 모달 닫기
-  blockModalOverlay.addEventListener('click', (event) => {
-    blockModal.classList.remove('show');
-    blockModalOverlay.style.display = 'none';
-  });
-
-  if (users != null) {
+  if (data.blockedUsers.length > 0) {
+    // 차단된 유저 리스트가 있다면 모달에 표시
+    const blockUserList = getElement('block-user-list');
+    blockUserList.innerHTML = data.blockedUsers.map(
+        user => `<li>${user}</li>`).join('');
     blockModal.classList.add('show');
     blockModalOverlay.style.display = 'block';
-    blockModal.innerHTML = ''; // 기존 리스트 비우기
-
-    // Set을 사용하여 중복된 유저를 방지
-    const existingNicknames = new Set();
-
-    users.forEach(user => {
-      // 이미 존재하는 유저인지 확인
-      if (existingNicknames.has(user.nickname)) {
-        return;
-      }
-
-      // 새로운 유저 추가
-      existingNicknames.add(user.nickname);
-
-      const div = document.createElement('div');
-      const img = document.createElement('img');
-      const a = document.createElement('a');
-
-      a.innerHTML = user.nickname; // 차단된 유저명
-      if (user.fileUrl !== null) {
-        img.src = user.fileUrl; // 차단된 유저 프로필 사진
-      }
-      div.appendChild(img);
-      div.appendChild(a);
-      blockModal.appendChild(div);
-
-      // 차단된 유저 클릭 시 해당 유저 페이지로 이동
-      div.addEventListener('click', () => {
-        window.location.href = `/userpages/${encodeURIComponent(
-            user.nickname)}`;
-      });
-    });
   } else {
-    alert("차단한 유저가 없습니다");
+    alert("차단된 유저가 없습니다.");
   }
 }
 
@@ -333,7 +285,7 @@ function initialize() {
   // 초기화 - 프로필 정보 불러오기
   fetchProfile("GET", handleProfileData, "/api/mypage/profiles/info");
 
-  // 초기화 - 중복 버튼 클릭시 api 요청
+  // 초기화 - 중복 버튼 클릭 시 API 요청
   checkUsernameBtn.addEventListener('click', event => {
     event.preventDefault();
     if (usernamePattern.test(createRequestDto(nickname).username)) {
@@ -345,12 +297,11 @@ function initialize() {
     }
   });
 
-  // 초기화 - 제출 버튼 클릭시 프로필 정보 업데이트
+  // 초기화 - 제출 버튼 클릭 시 프로필 정보 업데이트
   submitBtn.addEventListener('click', event => {
     event.preventDefault();
-    if (check()) {
-      const nickname = window.location.pathname.split('/').pop();
 
+    if (username.value === lastUsername || checkUsernameResult) {
       fetchProfileJson("PATCH", saveProfileData, "/api/mypage/profiles/edit",
           createRequestDto(nickname));
     } else {
@@ -358,7 +309,7 @@ function initialize() {
     }
   });
 
-  // 초기화 - 회원 탈퇴 클릭시 회원 탈퇴
+  // 초기화 - 회원 탈퇴 클릭 시 회원 탈퇴
   deleteAccountBtn.addEventListener('click', event => {
     event.preventDefault();
     const deleteAccountMessage = confirm("계정이 영구 삭제됩니다. 정말 탈퇴하시겠습니까?");
@@ -370,15 +321,15 @@ function initialize() {
     }
   });
 
-  // 초기화 - 사진 변경 버튼시 파일 선택 버튼이 눌림
+  // 초기화 - 사진 변경 버튼 클릭 시 파일 선택 버튼이 눌림
   imageBtn.addEventListener('click', event => {
     event.preventDefault();
-    const img = getElement('img');
     // 모달 창 열기
     profileModal.classList.add('show');
     profileOverlay.style.display = 'block';
   });
-// 초기화 -  모달 닫기
+
+  // 초기화 - 모달 닫기
   closeModal.addEventListener('click', (event) => {
     event.preventDefault();
     profileModal.classList.remove('show');
@@ -389,14 +340,14 @@ function initialize() {
   document.getElementById("profile-images").addEventListener('change',
       event => {
         event.preventDefault();
-        // 기본 이미지일 경우 이미지 등록 api 요청
+        // 기본 이미지일 경우 이미지 등록 API 요청
         if (img.src === "../../../image/profile/profile.png") {
-          console.log("프로필 사진 등록 api 요청")
+          console.log("프로필 사진 등록 API 요청");
           fetchProfileImage('POST',
               `/api/mypage/profiles/images/reg?nickname=${encodeURIComponent(
                   nickname)}`);
-        } else { // 아닐 경우 이미지 업데이트 api 요청
-          console.log("프로필 사진 업데이트 api 요청")
+        } else { // 아닐 경우 이미지 업데이트 API 요청
+          console.log("프로필 사진 업데이트 API 요청");
           fetchProfileImage('PATCH',
               `/api/mypage/profiles/images/edit?nickname=${encodeURIComponent(
                   nickname)}`);
@@ -415,7 +366,7 @@ function initialize() {
     console.log("프로필 이미지 삭제");
     fetchProfile("DELETE", deleteImage,
         `/api/mypage/profiles/images/delete?nickname=${encodeURIComponent(
-            nickname)}`)
+            nickname)}`);
   });
 
   // 초기화 - 차단한 유저 리스트 불러오기
@@ -424,7 +375,6 @@ function initialize() {
     console.log("차단한 유저 리스트 불러오기");
     fetchProfile("GET", updateBlockedUsersList, "/api/users/block/list");
   });
-
 }
 
 // 페이지 로드 시 초기화 함수 호출
