@@ -106,12 +106,12 @@ async function handleFollowButtonClick(event, targetUserNickname) {
 //모달
 
 // 모달 열기 함수
-function openModal(modal) {
+function openFollowModal(modal) {
   modal.style.display = "block";
 }
 
 // 모달 닫기 함수
-function closeModal(modal) {
+function closeFollowModal(modal) {
   modal.style.display = "none";
 }
 
@@ -122,12 +122,12 @@ window.onclick = function (event) {
 
   // 팔로워 모달이 열려 있고, 클릭했던 대상이 팔로워 모달인 경우 모달 닫기
   if (followerModal && event.target === followerModal) {
-    closeModal(followerModal);
+    closeFollowModal(followerModal);
   }
 
   // 팔로잉 모달이 열려 있고, 클릭했던 대상이 팔로잉 모달인 경우 모달 닫기
   if (followingModal && event.target === followingModal) {
-    closeModal(followingModal);
+    closeFollowModal(followingModal);
   }
 }
 
@@ -138,9 +138,9 @@ document.querySelectorAll('.follow-close').forEach(closeButton => {
     const followingModal = document.getElementById('followingList-modal');
 
     if (followerModal && followerModal.style.display === 'block') {
-      closeModal(followerModal);
+      closeFollowModal(followerModal);
     } else if (followingModal && followingModal.style.display === 'block') {
-      closeModal(followingModal);
+      closeFollowModal(followingModal);
     }
   };
 });
@@ -229,7 +229,7 @@ async function fetchList(type, nickname) {
     }
 
     const modal = document.getElementById(`${type}List-modal`);
-    openModal(modal);
+    openFollowModal(modal);
   } catch (error) {
     console.error(
         `fetch ${type}List() Error:`, error);
