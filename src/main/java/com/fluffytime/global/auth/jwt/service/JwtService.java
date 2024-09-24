@@ -34,9 +34,7 @@ public class JwtService {
     public ResponseEntity<Void> reissue(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtTokenizer.getTokenFromCookie(request, REFRESH_TOKEN_NAME.getName());
 
-        if (refreshToken == null) {
-            throw new TokenNotFound();
-        }
+        notFoundToken(refreshToken);
 
         Claims claims = jwtTokenizer.parseRefreshToken(refreshToken);
 
@@ -48,9 +46,7 @@ public class JwtService {
 
         String getRefreshToken = refreshTokenDao.getRefreshToken(email);
 
-        if(getRefreshToken == null) {
-            throw new TokenNotFound();
-        }
+        notFoundToken(getRefreshToken);
 
         boolean isSame = getRefreshToken.equals(refreshToken);
 
@@ -78,6 +74,12 @@ public class JwtService {
             response.addCookie(accessTokencookie);
 
             throw new InvalidToken();
+        }
+    }
+
+    private void notFoundToken(String token) {
+        if (token == null) {
+            throw new TokenNotFound();
         }
     }
 }

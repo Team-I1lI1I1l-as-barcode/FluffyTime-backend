@@ -1,6 +1,10 @@
 package com.fluffytime.domain.notification.service;
 
 import static com.fluffytime.domain.notification.entity.enums.AdminNotificationType.*;
+import static com.fluffytime.domain.notification.util.constants.AdminNotificationMessage.DELETE_POST_NOTICE;
+import static com.fluffytime.domain.notification.util.constants.AdminNotificationMessage.JOIN_NOTICE;
+import static com.fluffytime.domain.notification.util.constants.AdminNotificationMessage.REG_POST_NOTICE;
+import static com.fluffytime.domain.notification.util.constants.AdminNotificationMessage.WITHDRAW_NOTICE;
 
 import com.fluffytime.domain.board.entity.Post;
 import com.fluffytime.domain.notification.dto.response.AdminNotificationResponse;
@@ -35,7 +39,7 @@ public class AdminNotificationService {
     @Transactional
     public void createJoinNotification(User user) {
 
-        String message = "[" + user.getEmail() + "]\n유저가 가입하였습니다.";
+        String message = JOIN_NOTICE.joinNotice(user.getEmail());
 
         AdminNotification adminNotification = AdminNotification.builder()
             .message(message)
@@ -49,7 +53,7 @@ public class AdminNotificationService {
 
     @Transactional
     public void withdrawJoinNotification(User user) {
-        String message = "[" + user.getEmail() + "]\n유저가 계정을 삭제하였습니다.";
+        String message = WITHDRAW_NOTICE.withdrawNotice(user.getEmail());
 
         AdminNotification adminNotification = AdminNotification.builder()
             .message(message)
@@ -75,7 +79,7 @@ public class AdminNotificationService {
 
     @Transactional
     public void createRegPostNotification(User user,Post post) {
-        String message = "[" + user.getEmail() + "]\n게시물 ID : " + post.getPostId() + "번\n게시물을 등록하였습니다.";
+        String message = REG_POST_NOTICE.regPostNotice(user.getEmail(), post.getPostId());
 
         AdminNotification adminNotification = AdminNotification.builder()
             .message(message)
@@ -88,7 +92,7 @@ public class AdminNotificationService {
 
     @Transactional
     public void createDeletePostNotification(User user, Post post) {
-        String message = "[" + user.getEmail() + "]\n게시물 ID : " + post.getPostId() + "번\n게시물을 삭제하였습니다.";
+        String message = DELETE_POST_NOTICE.deletePostNotice(user.getEmail(), post.getPostId());
 
         AdminNotification adminNotification = AdminNotification.builder()
             .message(message)

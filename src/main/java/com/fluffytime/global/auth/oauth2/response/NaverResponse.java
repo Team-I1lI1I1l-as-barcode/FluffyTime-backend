@@ -1,5 +1,7 @@
 package com.fluffytime.global.auth.oauth2.response;
 
+import static com.fluffytime.global.auth.oauth2.util.constants.RegistrationId.NAVER_ID;
+
 import java.util.Map;
 
 public class NaverResponse implements Oauth2Response{
@@ -12,7 +14,7 @@ public class NaverResponse implements Oauth2Response{
 
     @Override
     public String getProvider() {
-        return "naver";
+        return NAVER_ID.getId();
     }
 
     @Override
