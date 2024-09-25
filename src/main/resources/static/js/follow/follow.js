@@ -1,6 +1,6 @@
 // 팔로우버튼 클릭 api 호출 함수
 async function toggleFollow(button, action, targetUserNickname) {
-  console.log("팔로우/언팔로우 api 호출");
+  // console.log("팔로우/언팔로우 api 호출");
   const url = action === "add" ? "/api/follow/add" : "/api/follow/remove";
 
   try {
@@ -27,7 +27,7 @@ async function toggleFollow(button, action, targetUserNickname) {
 
 // 팔로우 상태 확인 함수
 async function checkFollowStatus(button, targetUserNickname) {
-  console.log("팔로우 상태 확인 api 호출");
+  // console.log("팔로우 상태 확인 api 호출");
   try {
     const response = await fetch(
         `/api/follow/status?nickname=${encodeURIComponent(targetUserNickname)}`,
@@ -52,7 +52,7 @@ async function checkFollowStatus(button, targetUserNickname) {
 
 //버튼 상태 갱신 함수
 function updateButtonStatus(button, isFollowing) {
-  console.log("버튼 상태 갱신 api 호출");
+  // console.log("버튼 상태 갱신 api 호출");
   if (isFollowing) {
     button.textContent = "팔로잉";
     button.dataset.action = "remove";
@@ -66,7 +66,7 @@ function updateButtonStatus(button, isFollowing) {
 
 //팔로워/팔로우 수 갱신 함수
 async function updateFollowCounts(nickname) {
-  console.log("팔로워/팔로우 카운트 갱신 api 호출");
+  // console.log("팔로워/팔로우 카운트 갱신 api 호출");
   try {
     const response = await fetch(`/api/follow/count/${nickname}`, {
       method: "GET",
@@ -147,7 +147,7 @@ document.querySelectorAll('.follow-close').forEach(closeButton => {
 
 //팔로우/팔로잉 유저 목록 가져오기
 async function fetchList(type, nickname) {
-  console.log(`${type} 리스트 API 호출`);
+  // console.log(`${type} 리스트 API 호출`);
   try {
     const response = await fetch(`/api/follow/search/${type}s/${nickname}`, {
       method: "GET",
@@ -295,27 +295,29 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.addEventListener('postDataLoaded', async (event) => {
 
       const postData = event.detail;  // postData를 postDetail.js의 이벤트로부터 가져옴
-      console.log('postData를 사용하여 follow.js에서 작업 수행:', postData.nickname);
+      // console.log('postData를 사용하여 follow.js에서 작업 수행:', postData.nickname);
 
       const targetUserNickname = postData.nickname;
-      console.log("포스트 작성 유저 닉네임: " + targetUserNickname);
+      // console.log("포스트 작성 유저 닉네임: " + targetUserNickname);
 
-      // 팔로우 상태를 확인하고 상태를 화면에 적용
       const followButton = document.querySelector(".follow_button");
-      if (followButton) {//팔로우 버튼이 있는 경우에만 팔로우 버튼 상태확인(마이페이지는 없음)
-        console.log("팔로우 버튼 존재!");
+      // 팔로우 상태를 확인하고 상태를 화면에 적용
+      if (postData.targetUserId !== postData.myUserId) {
         await checkFollowStatus(followButton, targetUserNickname);
+
+        // 정적으로 생성된(화면에 무조건 있는) 팔로우 버튼에 대한 이벤트 핸들러
+        followButton.addEventListener("click", function (event) {
+          event.stopPropagation();
+          handleFollowButtonClick(event, targetUserNickname);
+        });
+      } else {
+        followButton.style.display = "none";
       }
 
-      // 정적으로 생성된(화면에 무조건 있는) 팔로우 버튼에 대한 이벤트 핸들러
-      followButton.addEventListener("click", function (event) {
-        event.stopPropagation();
-        handleFollowButtonClick(event, targetUserNickname);
-      });
     });
 
   } else {
-    console.log("이 페이지에는 팔로우 버튼이 없습니다.")
+    // console.log("이 페이지에는 팔로우 버튼이 없습니다.")
   }
 
 });

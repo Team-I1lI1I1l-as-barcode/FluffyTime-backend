@@ -8,11 +8,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostResponse { //게시글과 관련된 특정한 응답 데이터를 담기 위해 사용
+public class PostResponse {
+
+    //현재 로그인한 유저 아이디
+    private Long myUserId;
+
+    //게시글과 관련된 특정한 응답 데이터를 담기 위해 사용
     private Long postId;
     private String content;
     private List<ImageResponse> imageUrls;
-//    private List<TagsResponse> tags;
+    //    private List<TagsResponse> tags;
     private List<String> tags;
     private String createdAt;
     private String updatedAt;
@@ -22,6 +27,7 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     private boolean hideLikeCount;
 
     //작성자 정보
+    private Long targetUserId;
     private String nickname;
     private String profileImageurl;
     private String petName;
@@ -32,6 +38,7 @@ public class PostResponse { //게시글과 관련된 특정한 응답 데이터�
     @Setter
     @AllArgsConstructor
     public static class ImageResponse {
+
         private Long imageId;
         private String filename;
         private String filepath;

@@ -81,8 +81,8 @@ public class PostService {
             post.setContent(postRequest.getContent());
             post.setHideLikeCount(postRequest.isHideLikeCount());
             post.setCommentsDisabled(postRequest.isCommentsDisabled());
-          
-            adminNotificationService.createRegPostNotification(user,post);
+
+            adminNotificationService.createRegPostNotification(user, post);
 
         } else {
             // 새 게시물 생성
@@ -94,8 +94,8 @@ public class PostService {
                 .hideLikeCount(postRequest.isHideLikeCount())
                 .commentsDisabled(postRequest.isCommentsDisabled())
                 .build();
-        postRepository.save(post);
-        adminNotificationService.createRegPostNotification(user,post);
+            postRepository.save(post);
+            adminNotificationService.createRegPostNotification(user, post);
         }
 
         // 파일 저장 로직
@@ -130,7 +130,8 @@ public class PostService {
             post.setCommentsDisabled(postRequest.isCommentsDisabled());
         } else {
             // 현재 사용자의 임시 저장 글 개수를 확인
-            List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus(user.getUserId(), TempStatus.TEMP);
+            List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus(
+                user.getUserId(), TempStatus.TEMP);
 
             if (tempPosts.size() >= 20) {
                 // 가장 오래된 임시 저장 글을 삭제
@@ -384,13 +385,13 @@ public class PostService {
         return contentType != null && (
             // 이미지 파일 형식
             contentType.equals("image/jpeg") ||
-            contentType.equals("image/png") ||
-            contentType.equals("image/webp") ||
-            contentType.equals("image/avif") ||
-            // 비디오 파일 형식
-            contentType.equals("video/mp4") ||
-            contentType.equals("video/mpeg") ||
-            contentType.equals("video/quicktime")
+                contentType.equals("image/png") ||
+                contentType.equals("image/webp") ||
+                contentType.equals("image/avif") ||
+                // 비디오 파일 형식
+                contentType.equals("video/mp4") ||
+                contentType.equals("video/mpeg") ||
+                contentType.equals("video/quicktime")
         );
     }
 
@@ -428,6 +429,7 @@ public class PostService {
         List<String> tags = convertToTagsName(post);
 
         return new PostResponse(
+            currentUserId,//현재 로그인한 유저 아이디
             post.getPostId(),
             post.getContent(),
             post.getPostImages().stream().map(image -> new PostResponse.ImageResponse(
@@ -447,6 +449,7 @@ public class PostService {
                 .anyMatch(like -> like.getUser().getUserId().equals(currentUserId)),
             post.isCommentsDisabled(),
             post.isHideLikeCount(),
+            author.getUserId(),
             author.getNickname(),        // 작성자 닉네임
             profileImageUrl,             // 프로필 이미지 URL
             petName,                     // 반려동물 이름
