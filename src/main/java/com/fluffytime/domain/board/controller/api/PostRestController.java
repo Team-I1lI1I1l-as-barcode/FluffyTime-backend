@@ -45,6 +45,7 @@ public class PostRestController {
 
         Long postId = postService.createPost(postRequest, files, request);
 
+        //임시 저장 상태 삭제
         if (postRequest.getTempId() != null) {
             postService.deleteTempPost(postRequest.getTempId());
         }

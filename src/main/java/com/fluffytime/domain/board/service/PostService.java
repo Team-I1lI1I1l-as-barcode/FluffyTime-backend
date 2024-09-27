@@ -42,6 +42,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class PostService {
 
+    private static final int MAX_TEMP_POST_COUNT = 20;  // 임시 게시글 최대 개수
+    private static final long MAX_FILE_SIZE = 104857600;  // 파일 최대 크기 (100MB)
+    private static final int MAX_FILE_COUNT = 10;  // 파일 최대 개수
+    private static final int MAX_CONTENT_LENGTH = 2200;  // 게시물 내용 최대 길이
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final PostImagesRepository postImagesRepository;
@@ -59,14 +64,15 @@ public class PostService {
     @Transactional
     public Long createPost(PostRequest postRequest, MultipartFile[] files,
         HttpServletRequest request) {
-        // 업로드된 파일들의 유효성을 검증함
+        // 1. 파일의 유효성을 검증
         validateFiles(files);
 
+        // 2. 액세스 토큰을 통해 사용자 정보 찾기
         User user = findUserByAccessToken(request);
         Post post;
 
         if (postRequest.getTempId() != null) {
-            // 임시 저장된 글을 가져옴
+            // 3. 임시 저장된 게시물인 경우
             post = postRepository.findById(postRequest.getTempId())
                 .orElseThrow(PostNotFound::new);
 
@@ -75,7 +81,7 @@ public class PostService {
                 throw new PostNotInTempStatus();  // 상태가 올바르지 않으면 예외 발생
             }
 
-            // 상태를 최종 등록으로 업데이트
+            // 4. 게시물 상태를 최종 등록으로 업데이트
             post.setTempStatus(TempStatus.SAVE);
             post.setUpdatedAt(LocalDateTime.now());
             post.setContent(postRequest.getContent());
@@ -85,7 +91,7 @@ public class PostService {
             adminNotificationService.createRegPostNotification(user,post);
 
         } else {
-            // 새 게시물 생성
+            // 5. 새 게시물을 생성
             post = Post.builder()
                 .user(user)
                 .content(postRequest.getContent())
@@ -98,12 +104,12 @@ public class PostService {
         adminNotificationService.createRegPostNotification(user,post);
         }
 
-        // 파일 저장 로직
+        // 6. 파일 저장
         if (files != null && files.length > 0) {
             savePostFiles(files, post);
         }
 
-        // 태그 등록 로직
+        // 7. 태그 등록
         tagService.regTags(postRequest.getTags(), post);
 
         return post.getPostId();  // 생성된 게시물의 ID를 반환
@@ -132,7 +138,7 @@ public class PostService {
             // 현재 사용자의 임시 저장 글 개수를 확인
             List<Post> tempPosts = postRepository.findAllByUser_UserIdAndTempStatus(user.getUserId(), TempStatus.TEMP);
 
-            if (tempPosts.size() >= 20) {
+            if (tempPosts.size() >= MAX_TEMP_POST_COUNT) {
                 // 가장 오래된 임시 저장 글을 삭제
                 Post oldestTempPost = tempPosts.stream()
                     .sorted(Comparator.comparing(Post::getCreatedAt))
@@ -166,7 +172,7 @@ public class PostService {
         return post.getPostId(); // 생성된 임시 게시물의 ID를 반환
     }
 
-    // 이미지 및 동영상 파일을 처리하는 메서드
+    // 이미지 및 동영상 파일을 처리하는 메서드(게시물에 저장)
     private void savePostFiles(MultipartFile[] files, Post post) {
         List<MultipartFile> imageFiles = Arrays.stream(files)
             .filter(file -> isImageFormat(file.getContentType()))
@@ -180,7 +186,7 @@ public class PostService {
         saveVideoFiles(videoFiles, post);
     }
 
-    // 이미지 파일을 저장하는 메서드
+    // PostImages 저장하는 메서드
     private void saveImageFiles(List<MultipartFile> imageFiles, Post post) {
         for (MultipartFile file : imageFiles) {
             try {
@@ -276,7 +282,7 @@ public class PostService {
         }
 
         // 게시물 내용의 길이를 검증함
-        if (postRequest.getContent() != null && postRequest.getContent().length() > 2200) {
+        if (postRequest.getContent() != null && postRequest.getContent().length() > MAX_CONTENT_LENGTH) {
             throw new ContentLengthExceeded();
         }
 
@@ -361,14 +367,13 @@ public class PostService {
     }
 
     private void checkFileCount(MultipartFile[] files) {
-        if (files.length > 10) {
+        if (files.length > MAX_FILE_COUNT) {
             throw new TooManyFiles();
         }
     }
 
     private void checkFileSize(MultipartFile file) {
-        long maxSize = 104857600; // 모든 파일에 대해 최대 100MB로 설정
-        if (file.getSize() > maxSize) {
+        if (file.getSize() > MAX_FILE_SIZE) {
             throw new FileSizeExceeded();
         }
     }

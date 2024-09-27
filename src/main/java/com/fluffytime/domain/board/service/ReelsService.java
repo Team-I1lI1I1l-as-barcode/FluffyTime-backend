@@ -34,42 +34,55 @@ public class ReelsService {
         Long userId = getUserIdFromRequest(request); // 사용자 ID 가져오기
 
         return reelsRepository.findAll().stream()
-            .map(reels -> {
-                // 프로필 이미지 URL을 가져오기
-                String profileImageUrl = null;
-                Profile profile = reels.getPost().getUser().getProfile();
-
-                if (profile != null && profile.getProfileImages() != null) {
-                    profileImageUrl = profile.getProfileImages().getFilePath();
-                }
-
-                // 북마크 여부 확인
-                boolean isBookmarked = bookmarkRepository.existsByUserUserIdAndPostPostId(userId, reels.getPost().getPostId());
-
-                // 좋아요 수 계산
-                int likeCount = postLikeRepository.countByPost(reels.getPost());
-
-                // 사용자가 해당 릴스를 좋아요 했는지 여부 확인
-                boolean isLiked = postLikeRepository.existsByPostAndUserUserId(reels.getPost(), userId);
-
-                // ReelsResponse 생성 시
-                return new ReelsResponse(
-                    reels.getReelsId(),
-                    reels.getPost().getPostId(),
-                    reels.getUser().getUserId(),
-                    reels.getFilename(),
-                    reels.getFilepath(),
-                    reels.getFilesize(),
-                    reels.getMimetype(),
-                    reels.getPost().getContent(),
-                    reels.getUser().getNickname(),
-                    profileImageUrl,
-                    isBookmarked,
-                    likeCount,
-                    isLiked
-                );
-            })
+            .map(reels -> convertToReelsResponse(reels, userId))
             .collect(Collectors.toList());
+    }
+
+    // Reels 객체를 ReelsResponse로 변환하는 메서드
+    private ReelsResponse convertToReelsResponse(Reels reels, Long userId) {
+        String profileImageUrl = getProfileImageUrl(reels.getPost().getUser().getProfile());
+        boolean isBookmarked = isPostBookmarked(userId, reels.getPost().getPostId());
+        int likeCount = getLikeCount(reels.getPost());
+        boolean isLiked = isPostLikedByUser(reels.getPost(), userId);
+
+        return new ReelsResponse(
+            reels.getReelsId(),
+            reels.getPost().getPostId(),
+            reels.getUser().getUserId(),
+            reels.getFilename(),
+            reels.getFilepath(),
+            reels.getFilesize(),
+            reels.getMimetype(),
+            reels.getPost().getContent(),
+            reels.getUser().getNickname(),
+            profileImageUrl,
+            isBookmarked,
+            likeCount,
+            isLiked
+        );
+    }
+
+    // 프로필 이미지 URL을 가져오기
+    private String getProfileImageUrl(Profile profile) {
+        if (profile == null || profile.getProfileImages() == null) {
+            return null;
+        }
+        return profile.getProfileImages().getFilePath();
+    }
+
+    // 북마크 여부 확인
+    private boolean isPostBookmarked(Long userId, Long postId) {
+        return bookmarkRepository.existsByUserUserIdAndPostPostId(userId, postId);
+    }
+
+    // 좋아요 수 계산
+    private int getLikeCount(Post post) {
+        return postLikeRepository.countByPost(post);
+    }
+
+    // 사용자가 해당 릴스를 좋아요 했는지 여부 확인
+    private boolean isPostLikedByUser(Post post, Long userId) {
+        return postLikeRepository.existsByPostAndUserUserId(post, userId);
     }
 
     // 요청에서 사용자 ID를 가져오는 메서드
