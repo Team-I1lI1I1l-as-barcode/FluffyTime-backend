@@ -73,8 +73,22 @@ function connectSSE(userId) {
   eventSource.addEventListener('notification', event => {
     console.log("Received notification:", event.data);
     const notification = JSON.parse(event.data);
+    if (notification && !notification.read) {
+      showNotificationBadge(); //알림을 받으면 빨간 점 표시
+      createNotificationElement(notification); //알림 표시 UI 업데이트
+    }
     addNotificationToList(notification);
   });
+
+  function showNotificationBadge() {
+    const notificationBadge = document.querySelector('.notification-badge');
+    if (notificationBadge) {
+      notificationBadge.style.display = 'block'; //빨간 점 표시
+      console.log("Notification badge displayed"); // 디버깅용 로그
+    } else {
+      console.log("Notification badge element not found"); // 디버깅용 로그
+    }
+  }
 
   eventSource.addEventListener('connect', event => {
     console.log("SSE connected:", event.data);
