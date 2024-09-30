@@ -1,5 +1,8 @@
 package com.fluffytime.global.auth.oauth2.handler;
 
+import static com.fluffytime.global.auth.jwt.util.constants.TokenName.ACCESS_TOKEN_NAME;
+import static com.fluffytime.global.auth.jwt.util.constants.TokenName.REFRESH_TOKEN_NAME;
+
 import com.fluffytime.global.auth.jwt.dao.RefreshTokenDao;
 import com.fluffytime.global.auth.jwt.util.JwtTokenizer;
 import com.fluffytime.global.auth.oauth2.dao.SocialTempUserDao;
@@ -51,15 +54,15 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             refreshTokenDao.saveRefreshToken(email, refreshToken);
 
             Cookie accessTokenCookie = TokenCookieManager.generateTokenCookie(
-                "accessToken",
+                ACCESS_TOKEN_NAME.getName(),
                 accessToken,
-                TokenExpiry.ACCESS_TOKEN_EXPIRY.getExpiry() / 1000
+                TokenExpiry.ACCESS_TOKEN_EXPIRY_SECOND.getExpiry()
             );
 
             Cookie refreshTokenCookie = TokenCookieManager.generateTokenCookie(
-                "refreshToken",
+                REFRESH_TOKEN_NAME.getName(),
                 refreshToken,
-                TokenExpiry.REFRESH_TOKEN_EXPIRY.getExpiry() / 1000
+                TokenExpiry.REFRESH_TOKEN_EXPIRY_SECOND.getExpiry()
             );
 
             response.addCookie(accessTokenCookie);
@@ -68,7 +71,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             response.sendRedirect("/");
         } else {
             // 추가 정보 기입 페이지로 이동
-            log.info("간편 회원가입 화면으로 이동");
             response.sendRedirect("/join/social?email="+email);
         }
 

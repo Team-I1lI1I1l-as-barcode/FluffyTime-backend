@@ -2,7 +2,6 @@ package com.fluffytime.domain.notification.controller.api;
 
 import com.fluffytime.domain.notification.dto.request.NotificationRequest;
 import com.fluffytime.domain.notification.dto.response.NotificationResponse;
-import com.fluffytime.domain.notification.service.AdminNotificationService;
 import com.fluffytime.domain.notification.service.NotificationService;
 import com.fluffytime.domain.user.dto.response.NotificationUserResponse;
 import com.fluffytime.domain.user.entity.User;
@@ -10,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,7 +49,7 @@ public class NotificationRestController {
         return ResponseEntity.ok(responseDto);
     }
 
-    //좋아요 읽음 상태 바뀜
+    //읽음 상태 바뀜
     @PostMapping("/{notificationId}/read")
     public ResponseEntity<NotificationResponse> markAsRead(
         @PathVariable("notificationId") Long notificationId) {

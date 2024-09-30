@@ -226,3 +226,15 @@ li {
 .hidden {
   display: none;
 }
+
+/* 알림 빨간 점 스타일 */
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  display: none; /* 기본적으로 숨겨짐 */
+}
