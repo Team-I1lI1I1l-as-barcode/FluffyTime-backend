@@ -69,6 +69,7 @@
 }
 
 .user .profile-img {
+  display: flex;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -141,11 +142,17 @@
   }
 }
 
-.nickname-intro {
+.linkBox {
   display: flex;
-  flex-direction: column;
 }
 
-.follow-button {
-  margin-left: auto;
+.user .details {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
+
+/*.follow-button {*/
+/*  margin-left: auto;*/
+/*}*/
+/*이거는 팔로우 버튼으로 기능이 들어간 이후 팔로우 css로 생각해보자*/

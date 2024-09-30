@@ -89,11 +89,10 @@ public class PostLikeService {
 
     //게시글 좋아요 한 유저 목록
     @Transactional
-    public List<PostLikeResponse> getUsersWhoLikedPost(Long postId) {
+    public List<PostLikeResponse> getUsersWhoLikedPost(Long postId, Long myUserId) {
         Post post = postRepository.findById(postId).orElseThrow(PostNotFound::new);
-
         return postLikeRepository.findAllByPost(post).stream()
-            .map(like -> convertToPostLikeResponseDto(like, post))
+            .map(like -> convertToPostLikeResponseDto(like, post, myUserId))
             .collect(Collectors.toList());
     }
 
@@ -117,8 +116,9 @@ public class PostLikeService {
 
     //게시글 좋아요 response convert
     private PostLikeResponse convertToPostLikeResponseDto(PostLike like,
-        Post post) {
+        Post post, Long myUserId) {
         return PostLikeResponse.builder()
+            .myUserId(myUserId)
             .userId(like.getUser().getUserId())
             .nickname(like.getUser().getNickname())
             .likeCount(postLikeRepository.countByPost(post))

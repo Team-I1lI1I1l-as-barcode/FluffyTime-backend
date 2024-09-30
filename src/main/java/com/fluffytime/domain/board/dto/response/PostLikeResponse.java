@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class PostLikeResponse {
 
+    private Long myUserId;
     private Long userId;
     private String nickname;
     private int likeCount;
@@ -18,8 +19,10 @@ public class PostLikeResponse {
     private String intro;
 
     @Builder
-    public PostLikeResponse(Long userId, String nickname, int likeCount, boolean isLiked,
+    public PostLikeResponse(Long myUserId, Long userId, String nickname, int likeCount,
+        boolean isLiked,
         String profileImageurl, String intro) {
+        this.myUserId = myUserId;
         this.userId = userId;
         this.nickname = nickname;
         this.likeCount = likeCount;

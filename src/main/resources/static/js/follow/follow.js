@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const targetUserNickname = postData.nickname;
       // console.log("포스트 작성 유저 닉네임: " + targetUserNickname);
 
-      const followButton = document.querySelector(".follow_button");
+      const followButton = document.querySelector(".follow_button");//TODO 여기서 좋아요 모달창 3가지에 팔로우버튼들 다 인식해서 기능 넣어줘야 함ㅋㅋ
       // 팔로우 상태를 확인하고 상태를 화면에 적용
       if (postData.targetUserId !== postData.myUserId) {
         await checkFollowStatus(followButton, targetUserNickname);

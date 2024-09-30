@@ -75,9 +75,16 @@ function showLikeUserModalPost(users) {
     const userDiv = document.createElement('div');
     userDiv.className = 'user';
 
+    const linkBox = document.createElement('div');
+    linkBox.className = 'linkBox';
+
     const profileImg = document.createElement('img');
     profileImg.src = user.profileImageurl || '/image/profile/profile.png';
     profileImg.className = 'profile-img';
+
+    // nicknameSpan과 introSpan을 묶어줄 컨테이너 div 생성
+    const details = document.createElement('div');
+    details.className = 'details';
 
     const nicknameSpan = document.createElement('span');
     nicknameSpan.className = 'nickname';
@@ -87,20 +94,34 @@ function showLikeUserModalPost(users) {
     introSpan.className = 'intro-text';
     introSpan.textContent = user.intro;
 
-    // nicknameSpan과 introSpan을 묶어줄 컨테이너 div 생성
-    const nicknameIntroDiv = document.createElement('div');
-    nicknameIntroDiv.className = 'nickname-intro';
+    // 자기소개 없으면 "자기 소개 없음" 글씨 회색으로 변경
+    if (introSpan.textContent === null || introSpan.textContent.trim() === "") {
+      introSpan.textContent = "자기 소개 없음";
+      introSpan.style.color = '#A9A9A9';
+    }
 
-    nicknameIntroDiv.appendChild(nicknameSpan);
-    nicknameIntroDiv.appendChild(introSpan);
+    details.appendChild(nicknameSpan);
+    details.appendChild(introSpan);
 
-    const followButton = document.createElement('button');
-    followButton.className = 'follow-button';
-    followButton.textContent = '팔로우';
+    linkBox.appendChild(profileImg);
+    linkBox.appendChild(details);
 
-    userDiv.appendChild(profileImg);
-    userDiv.appendChild(nicknameIntroDiv);
-    userDiv.appendChild(followButton);
+    // 클릭 시 유저 페이지로 이동
+    linkBox.addEventListener('click', () => {
+      window.location.href = `/userpages/${user.nickname}`;
+    });
+
+    userDiv.appendChild(linkBox);
+
+    if (user.myUserId !== user.userId) {
+
+      console.log("내 아이디가 아님");
+      const followButton = document.createElement('button');
+      followButton.className = 'follow-button';
+      followButton.textContent = '팔로우';
+
+      userDiv.appendChild(followButton);
+    }
 
     userList.appendChild(userDiv);
   });

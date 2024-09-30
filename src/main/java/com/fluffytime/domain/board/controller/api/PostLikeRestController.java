@@ -1,9 +1,9 @@
 package com.fluffytime.domain.board.controller.api;
 
-import com.fluffytime.domain.user.entity.User;
 import com.fluffytime.domain.board.dto.request.PostLikeRequest;
 import com.fluffytime.domain.board.dto.response.PostLikeResponse;
 import com.fluffytime.domain.board.service.PostLikeService;
+import com.fluffytime.domain.user.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +54,10 @@ public class PostLikeRestController {
     @GetMapping("/post/{postId}/list")
     public ResponseEntity<List<PostLikeResponse>> getUsersWhoLikedPost(
         @PathVariable(name = "postId") Long postId) {
-        List<PostLikeResponse> users = postLikeService.getUsersWhoLikedPost(postId);
+        //현재 사용자 ID
+        Long myUserId = postLikeService.findByAccessToken(httpServletRequest).getUserId();
+
+        List<PostLikeResponse> users = postLikeService.getUsersWhoLikedPost(postId, myUserId);
         return ResponseEntity.ok(users); //유저 목록 반환
     }
 }
