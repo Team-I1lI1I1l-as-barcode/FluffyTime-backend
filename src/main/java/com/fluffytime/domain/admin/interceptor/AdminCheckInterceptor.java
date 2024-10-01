@@ -16,6 +16,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 @RequiredArgsConstructor
 public class AdminCheckInterceptor implements HandlerInterceptor {
+
+    private final String ADMIN_ROLE_NAME = "ROLE_ADMIN";
+    private final String IS_ADMIN_HEADER = "Is-Admin";
+
     private final JwtTokenizer jwtTokenizer;
 
     @Override
@@ -32,14 +36,14 @@ public class AdminCheckInterceptor implements HandlerInterceptor {
 
         List<String> roles = claims.get(ROLES.getKey(), List.class); // 권한 정보 추출
 
-        if (roles != null && roles.contains("ROLE_ADMIN")) {
+        if (roles != null && roles.contains(ADMIN_ROLE_NAME)) {
 
             // 응답 헤더에 ROLE_ADMIN 여부를 추가
-            response.addHeader("Is-Admin", "true");
+            response.addHeader(IS_ADMIN_HEADER, "true");
             return true; // ROLE_ADMIN 권한이 있을 경우 요청을 계속 진행
         }
 
-        response.addHeader("Is-Admin", "false");
+        response.addHeader(IS_ADMIN_HEADER, "false");
         return true; // ROLE_ADMIN 권한이 있을 경우 요청을 계속 진행
     }
 }

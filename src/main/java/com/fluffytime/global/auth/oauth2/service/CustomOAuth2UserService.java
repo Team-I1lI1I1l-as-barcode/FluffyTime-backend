@@ -1,5 +1,8 @@
 package com.fluffytime.global.auth.oauth2.service;
 
+import static com.fluffytime.global.auth.oauth2.util.constants.RegistrationId.GOOGLE_ID;
+import static com.fluffytime.global.auth.oauth2.util.constants.RegistrationId.NAVER_ID;
+
 import com.fluffytime.global.auth.oauth2.dao.SocialTempUserDao;
 import com.fluffytime.global.auth.oauth2.dto.CustomOAuth2User;
 import com.fluffytime.global.auth.oauth2.dto.SocialTempUser;
@@ -33,14 +36,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        System.out.println(oAuth2User);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        Oauth2Response oAuth2Response = null;
-        if(registrationId.equals("naver")) {
+        Oauth2Response oAuth2Response;
+        if(registrationId.equals(NAVER_ID.getId())) {
             oAuth2Response = new NaverResponse(oAuth2User.getAttributes());
             log.info("naver response = {}", oAuth2Response);
-        } else if (registrationId.equals("google")) {
+        } else if (registrationId.equals(GOOGLE_ID.getId())) {
             oAuth2Response = new GoogleResponse(oAuth2User.getAttributes());
             log.info("google response = {}", oAuth2Response);
         } else {
@@ -65,7 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             return new CustomOAuth2User(userDto);
         } else {
-            log.info("이미 있는 유저");
+            log.info("이미 존재하는 유저입니다. : {}", oAuth2Response.getEmail());
             UserDto userDto = UserDto.builder()
                 .id(existUser.getUserId())
                 .email(oAuth2Response.getEmail())
