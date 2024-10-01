@@ -50,7 +50,6 @@ public class PostService {
     private final TagService tagService;
 
     private final AdminNotificationService adminNotificationService;
-    private final AdminNotificationRepository adminNotificationRepository;
 
     private final ReelsService reelsService;
 
