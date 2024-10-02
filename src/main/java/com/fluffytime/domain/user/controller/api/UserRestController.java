@@ -1,5 +1,8 @@
 package com.fluffytime.domain.user.controller.api;
 
+import static com.fluffytime.global.common.smtp.util.constants.EmailTitle.CERTIFICATION_EMAIL_TITLE;
+import static com.fluffytime.global.common.smtp.util.constants.EmailTitle.PASSWORD_CHANGE_EMAIL_TITLE;
+
 import com.fluffytime.domain.user.dto.request.FindEmailRequest;
 import com.fluffytime.domain.user.dto.request.LoginUserRequest;
 import com.fluffytime.domain.user.dto.request.PasswordChangeRequest;
@@ -24,17 +27,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -135,10 +132,12 @@ public class UserRestController {
         @Email
         String email
     ) {
-        String subject = "[ FluffyTime - 반려동물 전용 SNS ] 가입 인증 메일입니다.";
-
         return ResponseEntity.status(HttpStatus.OK)
-            .body(emailService.sendHtmlMail(email,subject,new CertificationEmailContent()));
+            .body(emailService.sendHtmlMail(
+                email,
+                CERTIFICATION_EMAIL_TITLE.getTitle(),
+                new CertificationEmailContent()
+            ));
     }
 
     // 메일 인증
@@ -166,23 +165,37 @@ public class UserRestController {
     public ResponseEntity<SucceedSendEmailResponse> sendChangePasswordMail(
         @RequestBody @Valid SendEmailRequest sendEmailRequest
     ) {
-        if(loginService.existsUserByEmail(sendEmailRequest.getEmail())) {
-            String subject = "[ FluffyTime - 반려동물 전용 SNS ] 비밀번호 변경 메일입니다.";
-
-            loginService.savePasswordChangeTtl(sendEmailRequest.getEmail());
-
-            return ResponseEntity.status(HttpStatus.OK)
-                .body(emailService.sendHtmlMail(sendEmailRequest.getEmail(),subject,new ChangePasswordEmailContent()));
-        } else {
-            throw new UserNotFound();
-        }
+        return getSucceedSendEmailResponse(sendEmailRequest);
     }
+
 
     // 비밀번호 변경하기
     @PostMapping("/change/password")
     public ResponseEntity<Void> changePassword(
         @RequestBody @Valid PasswordChangeRequest passwordChangeRequest
     ) {
+        return getChangePasswordResponse(passwordChangeRequest);
+    }
+
+    private ResponseEntity<SucceedSendEmailResponse> getSucceedSendEmailResponse(
+        SendEmailRequest sendEmailRequest) {
+        if (loginService.existsUserByEmail(sendEmailRequest.getEmail())) {
+
+            loginService.savePasswordChangeTtl(sendEmailRequest.getEmail());
+
+            return ResponseEntity.status(HttpStatus.OK)
+                .body(emailService.sendHtmlMail(
+                    sendEmailRequest.getEmail(),
+                    PASSWORD_CHANGE_EMAIL_TITLE.getTitle(),
+                    new ChangePasswordEmailContent())
+                );
+        } else {
+            throw new UserNotFound();
+        }
+    }
+
+    private ResponseEntity<Void> getChangePasswordResponse(
+        PasswordChangeRequest passwordChangeRequest) {
         if (loginService.findPasswordChangeTtl(passwordChangeRequest.getEmail())) {
             loginService.changePassword(passwordChangeRequest);
             loginService.removePasswordChangeTtl(passwordChangeRequest.getEmail());

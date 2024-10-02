@@ -1,5 +1,7 @@
 package com.fluffytime.global.auth.oauth2.response;
 
+import static com.fluffytime.global.auth.oauth2.util.constants.RegistrationId.GOOGLE_ID;
+
 import java.util.Map;
 
 public class GoogleResponse implements Oauth2Response{
@@ -13,7 +15,7 @@ public class GoogleResponse implements Oauth2Response{
 
     @Override
     public String getProvider() {
-        return "google";
+        return GOOGLE_ID.getId();
     }
 
     @Override
