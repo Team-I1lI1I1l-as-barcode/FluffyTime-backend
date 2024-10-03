@@ -1,0 +1,126 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "mysql",
+      "image": "mysql",
+      "essential": true,
+      "memory": 512,
+      "environment": [
+        {
+          "name": "MYSQL_ROOT_PASSWORD",
+          "value": "barcode1234"
+        },
+        {
+          "name": "MYSQL_DATABASE",
+          "value": "fluffydb"
+        },
+        {
+          "name": "MYSQL_USER",
+          "value": "barcode"
+        },
+        {
+          "name": "MYSQL_PASSWORD",
+          "value": "barcode1234"
+        },
+        {
+          "name": "TZ",
+          "value": "Asia/Seoul"
+        }
+      ],
+      "command": [
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "mysql-init",
+          "containerPath": "/docker-entrypoint-initdb.d"
+        },
+        {
+          "sourceVolume": "mysql-data",
+          "containerPath": "/var/lib/mysql"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 3306,
+          "hostPort": 3306
+        }
+      ]
+    },
+    {
+      "name": "redis",
+      "image": "redis:latest",
+      "essential": true,
+      "memory": 256,
+      "command": ["redis-server", "--requirepass", "barcode1234"],
+      "mountPoints": [
+        {
+          "sourceVolume": "redis-data",
+          "containerPath": "/data"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 6379,
+          "hostPort": 6379
+        }
+      ]
+    },
+    {
+      "name": "mongo",
+      "image": "mongo",
+      "essential": true,
+      "memory": 512,
+      "environment": [
+        {
+          "name": "MONGO_INITDB_ROOT_USERNAME",
+          "value": "barcode"
+        },
+        {
+          "name": "MONGO_INITDB_ROOT_PASSWORD",
+          "value": "barcode1234"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "mongo-data",
+          "containerPath": "/data/db"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 27017,
+          "hostPort": 27017
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mysql-init",
+      "host": {
+        "sourcePath": "/var/app/database/init"
+      }
+    },
+    {
+      "name": "mysql-data",
+      "host": {
+        "sourcePath": "/var/app/database/datadir"
+      }
+    },
+    {
+      "name": "redis-data",
+      "host": {
+        "sourcePath": "/var/app/redis-data"
+      }
+    },
+    {
+      "name": "mongo-data",
+      "host": {
+        "sourcePath": "/var/app/mongo-data"
+      }
+    }
+  ]
+}
